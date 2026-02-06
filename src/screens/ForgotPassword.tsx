@@ -90,7 +90,7 @@ function ForgotPassword() {
                             </label>
                             <input
                                 type="password"
-                                placeholder="New Password"
+                                placeholder="example@xyz.com"
                                 className="h-11 w-full rounded-lg bg-gray-100 px-4
                    text-sm border border-gray-200
                    focus:outline-none focus:ring-2 focus:ring-green-400"

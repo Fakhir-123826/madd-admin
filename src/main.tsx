@@ -9,6 +9,7 @@ import Login from './screens/Login.tsx'
 import Signup from './screens/Signup.tsx'
 import ForgotPassword from './screens/ForgotPassword.tsx'
 import EnterOTP from './screens/EnterOTP.tsx'
+import Dashboard from './screens/Dashboard.tsx'
 
 
 const routes = createBrowserRouter([
@@ -16,6 +17,7 @@ const routes = createBrowserRouter([
   { path: "/log", element: <Login/> },
   { path: "/otp", element: <EnterOTP/> },
   { path: "/pass", element: <ForgotPassword/> },
+  { path: "/ddd", element: <Dashboard/> },
 ])
 
 
