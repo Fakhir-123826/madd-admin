@@ -27,7 +27,7 @@ const Dashboard = () => {
                     {/* NAV */}
                     <nav className="flex-1 px-4 space-y-3 text-sm">
 
-                        {/* DASHBOARD (ACTIVE) */}
+                        {/* DASHBOARD (ACTIVE)  */}
                         <div
                             className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-4"
                                 } py-4 rounded-xl bg-blue-500 text-white cursor-pointer`}
