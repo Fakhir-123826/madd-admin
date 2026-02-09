@@ -139,7 +139,7 @@ const StoreList = () => {
         page * ITEMS_PER_PAGE
     );
     return (
-        <div className="bg-white  shadow-sm p-6">
+        <div className="bg-white shadow-sm p-6">
 
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">

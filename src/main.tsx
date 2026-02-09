@@ -13,6 +13,7 @@ import Dashboard from './screens/Dashboard.tsx'
 import Layout from './shear/Layout.tsx'
 import StoreList from './screens/Store/StoreList.tsx'
 import StoreCardList from './screens/Store/StoreCardList.tsx'
+import Store from './screens/Store/Store.tsx'
 
 
 const routes = createBrowserRouter([
@@ -21,7 +22,9 @@ const routes = createBrowserRouter([
     element: <Layout />,
     children: [
       {path : "/" , element : <Dashboard/>},
-      {path : "/store" , element : <StoreCardList/>}
+      {path : "/storeList" , element : <StoreList/>},
+      {path : "/storeCardLsit" , element : <StoreCardList/>},
+      {path : "/store" , element : <Store/>},
     ]
   },
   { path: "/log", element: <Login /> },
