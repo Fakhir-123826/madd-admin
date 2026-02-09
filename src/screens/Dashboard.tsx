@@ -1,6 +1,7 @@
 // import React from 'react'
 import { useState } from "react";
 import SalesOrdersChart from "../component/SalesOrdersChart";
+import TopSellingCategoriesChart from "../component/TopSellingCategoriesChart";
 // import { FaBars, FaHome, FaStore, FaUsers } from "react-icons/fa";
 // import logo from "../../public/madd-admin.png"
 
@@ -101,6 +102,13 @@ const Dashboard = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="col-span-full">
+                    <TopSellingCategoriesChart />
+                </div>
             </div>
         </>
     )
