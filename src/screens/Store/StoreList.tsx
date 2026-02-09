@@ -2,6 +2,7 @@ import { FaPlus, FaEllipsisV, FaSearch, FaFilter, FaRedo } from "react-icons/fa"
 import AddButton from "../../component/AddButton";
 import Searchbar from "../../component/Searchbar";
 import { useState } from "react";
+import CardForStoreList from "../../component/CardForStoreList";
 
 const stores = [
     {
@@ -264,6 +265,18 @@ const StoreList = () => {
                     Next →
                 </button>
             </div>
+
+
+
+
+            <CardForStoreList
+  name="Blossoms Store"
+  id="7283944"
+  location="New York street #3, USA"
+  status="Active"
+  onView={() => console.log("View store")}
+/>
+
 
         </div>
     );
