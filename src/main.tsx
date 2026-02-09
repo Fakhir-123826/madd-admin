@@ -11,6 +11,7 @@ import ForgotPassword from './screens/ForgotPassword.tsx'
 import EnterOTP from './screens/EnterOTP.tsx'
 import Dashboard from './screens/Dashboard.tsx'
 import Layout from './shear/Layout.tsx'
+import StoreList from './screens/Store/StoreList.tsx'
 
 
 const routes = createBrowserRouter([
@@ -18,7 +19,8 @@ const routes = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      {path : "/" , element : <Dashboard/>}
+      {path : "/" , element : <Dashboard/>},
+      {path : "/store" , element : <StoreList/>}
     ]
   },
   { path: "/log", element: <Login /> },
