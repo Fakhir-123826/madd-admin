@@ -18,6 +18,9 @@ import CreateStore from './screens/Store/CreateStore.tsx'
 import VendorList from './screens/Vender/VendorList.tsx'
 import Vendor from './screens/Vender/Vendor.tsx'
 import CreateVendor from './screens/Vender/CreateVendor.tsx'
+import CreateVendoronBoard from './screens/Vender/Vendor Onboarding/CreateVendoronBoard.tsx'
+import VendorOnboard from './screens/Vender/Vendor Onboarding/VendorOnboard.tsx'
+import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 
 
 const routes = createBrowserRouter([
@@ -30,9 +33,13 @@ const routes = createBrowserRouter([
       {path : "/storeCardList" , element : <StoreCardList/>},
       {path : "/store" , element : <Store/>},
       {path : "/CreateStore" , element : <CreateStore/>},
-      {path : "/Verder" , element : <VendorList/>},
+      {path : "/Verdor" , element : <VendorList/>},
       {path : "/Verder1" , element : <Vendor/>},
       {path : "/CreateVerder" , element : <CreateVendor/>},
+      {path : "/CreateVerderOnboard" , element : <CreateVendoronBoard/>},
+      {path : "/VerderOnboard" , element : <VendorOnboard/>},
+      {path : "/VendorDashBoard" , element : <VendorDashBoard/>},
+      
     ]
   },
   { path: "/log", element: <Login /> },

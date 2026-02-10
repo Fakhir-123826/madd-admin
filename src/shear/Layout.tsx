@@ -30,7 +30,17 @@ const menuItems = [
   { label: "Stores", icon: FaStore, path: "/store" },
   { label: "Catalog", icon: FaBox, path: "/" },
   { label: "Users", icon: FaUsers, path: "/" },
-  { label: "Vendors", icon: FaHandshake, path: "/Verder" },
+  // { label: "Vendors", icon: FaHandshake, path: "/Verder" },
+  {
+    label: "Vendors",
+    icon: FaHandshake,
+    path: "/Vendor",
+    children: [
+      { label: "All Vendors", path: "/Verdor" },
+      { label: "Add Vendor Onboard", path: "/CreateVerderOnboard" },
+      { label: "Vendor Requests", path: "/vendor/requests" },
+    ],
+  },
   { label: "Settlements", icon: FaExchangeAlt, path: "/" },
   { label: "CMS", icon: FaFileAlt, path: "/" },
   { label: "OMS", icon: FaCogs, path: "/" },
@@ -52,6 +62,8 @@ const menuItems = [
 const Layout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [active, setActive] = useState("Dashboard");
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -74,7 +86,7 @@ const Layout = () => {
           className={`flex-1 px-4 space-y-2 text-sm ${!collapsed ? "mt-6" : ""
             }`}
         >
-          {menuItems.map((item) => {
+          {/* {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = active === item.label;
 
@@ -105,7 +117,72 @@ const Layout = () => {
               </div>
 
             );
+          })} */}
+
+
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+            const isActive = active === item.label;
+            const isOpen = openMenu === item.label;
+
+            const MenuContent = (
+              <div
+                onClick={() => {
+                  setActive(item.label);
+
+                  if (hasChildren) {
+                    setOpenMenu(isOpen ? null : item.label);
+                  } else {
+                    setOpenMenu(null);
+                  }
+                }}
+                className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-6"
+                  } py-4 rounded-xl cursor-pointer transition-all
+                    ${isActive
+                    ? "bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                  }`}
+              >
+                <Icon className="text-lg" />
+                {!collapsed && <span className="font-medium">{item.label}</span>}
+              </div>
+            );
+
+            return (
+              <div key={item.label} className="relative">
+                {isActive && (
+                  <span className="absolute -left-4 top-3 bottom-3 w-1 rounded-full bg-blue-500" />
+                )}
+
+                {/* MAIN ITEM */}
+                {hasChildren ? (
+                  MenuContent
+                ) : (
+                  <Link to={item.path}>{MenuContent}</Link>
+                )}
+
+                {/* SUB MENU */}
+                {!collapsed && hasChildren && isOpen && (
+                  <div className="ml-10 mt-2 space-y-1">
+                    {item.children!.map((child) => (
+                      <Link key={child.label} to={child.path}>
+                        <div
+                          onClick={() => setActive(child.label)}
+                          className="py-2 px-4 rounded-lg text-gray-600 hover:bg-gray-100 text-sm"
+                        >
+                          {child.label}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
           })}
+
+
+
         </nav>
       </aside>
 
