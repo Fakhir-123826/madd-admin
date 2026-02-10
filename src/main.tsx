@@ -15,6 +15,9 @@ import StoreList from './screens/Store/StoreList.tsx'
 import StoreCardList from './screens/Store/StoreCardList.tsx'
 import Store from './screens/Store/Store.tsx'
 import CreateStore from './screens/Store/CreateStore.tsx'
+import VendorList from './screens/Vender/VendorList.tsx'
+import Vendor from './screens/Vender/Vendor.tsx'
+import CreateVendor from './screens/Vender/CreateVendor.tsx'
 
 
 const routes = createBrowserRouter([
@@ -27,6 +30,9 @@ const routes = createBrowserRouter([
       {path : "/storeCardList" , element : <StoreCardList/>},
       {path : "/store" , element : <Store/>},
       {path : "/CreateStore" , element : <CreateStore/>},
+      {path : "/Verder" , element : <VendorList/>},
+      {path : "/Verder1" , element : <Vendor/>},
+      {path : "/CreateVerder" , element : <CreateVendor/>},
     ]
   },
   { path: "/log", element: <Login /> },

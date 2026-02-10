@@ -30,7 +30,7 @@ const menuItems = [
   { label: "Stores", icon: FaStore, path: "/store" },
   { label: "Catalog", icon: FaBox, path: "/" },
   { label: "Users", icon: FaUsers, path: "/" },
-  { label: "Vendors", icon: FaHandshake, path: "/" },
+  { label: "Vendors", icon: FaHandshake, path: "/Verder" },
   { label: "Settlements", icon: FaExchangeAlt, path: "/" },
   { label: "CMS", icon: FaFileAlt, path: "/" },
   { label: "OMS", icon: FaCogs, path: "/" },

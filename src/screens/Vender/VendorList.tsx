@@ -2,12 +2,14 @@ import { FaPlus, FaEllipsisV, FaSearch, FaFilter, FaRedo } from "react-icons/fa"
 import AddButton from "../../component/AddButton";
 import Searchbar from "../../component/Searchbar";
 import { useState } from "react";
+import CardForStoreList from "../../component/CardForStoreList";
 
 const stores = [
     {
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Active",
     },
@@ -15,20 +17,15 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
-        status: "Hold",
+        status: "Active",
     },
     {
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
-        pickup: "Yes",
-        status: "Inactive",
-    },
-    {
-        name: "Blossom Store",
-        storeId: "8728394456133",
-        location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -36,6 +33,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -43,6 +41,15 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
+        pickup: "Yes",
+        status: "Inactive",
+    },
+    {
+        name: "Blossom Store",
+        storeId: "8728394456133",
+        location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -51,6 +58,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -58,12 +66,14 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     }, {
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -71,6 +81,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -78,6 +89,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -85,6 +97,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -92,6 +105,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -99,6 +113,7 @@ const stores = [
         name: "Blossom Store",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -106,6 +121,7 @@ const stores = [
         name: "Blossom Store 5554554545",
         storeId: "8728394456133",
         location: "New York street #1, USA",
+        createdAt: "23 july 2025",
         pickup: "Yes",
         status: "Inactive",
     },
@@ -118,16 +134,14 @@ const statusStyle = (status: string) => {
             return "bg-green-100 text-green-600";
         case "Inactive":
             return "bg-red-100 text-red-600";
-        case "Hold":
-            return "bg-purple-100 text-purple-600";
+
         default:
             return "";
     }
 };
 
 
-const StoreList = () => {
-
+const VendorList = () => {
     const tdBase =
         "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
@@ -145,7 +159,7 @@ const StoreList = () => {
 
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">Stores Management</h2>
+                <h2 className="text-lg font-semibold">Venders Management</h2>
                 <AddButton />
             </div>
 
@@ -155,14 +169,15 @@ const StoreList = () => {
             {/* TABLE */}
             {/* TABLE */}
             <div className="rounded-t-3xl overflow-hidden">
-                <table className="w-full text-sm border-separate border-spacing-y-2 ">
+                <table className="w-full text-sm border-separate border-spacing-y-3">
                     {/* HEADER */}
-                    <thead className="bg-gradient-to-r from-teal-400 to-green-400 text-white ">
+                    <thead className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
                         <tr>
-                            <th className="p-4 text-left">Name</th>
-                            <th className="p-4 text-left">Store ID</th>
-                            <th className="p-4 text-left">Location</th>
-                            <th className="p-4 text-left">Pickup Enabled</th>
+                            <th className="p-4 text-left">Vendor Name</th>
+                            <th className="p-4 text-left">Email</th>
+                            <th className="p-4 text-left">Phone Number</th>
+                            <th className="p-4 text-left">Plan Assigned</th>
+                            <th className="p-4 text-left">Created Date</th>
                             <th className="p-4 text-left">Status</th>
                             <th className="p-4"></th>
                         </tr>
@@ -171,36 +186,27 @@ const StoreList = () => {
                     {/* BODY */}
                     <tbody>
                         {paginatedStores.map((store, i) => (
-                            <tr
-                                key={i}
-                                className="bg-white shadow-sm hover:shadow-md transition"
-                            >
-                                {/* NAME */}
-                                <td className={`${tdBase} font-medium text-black rounded-l-xl`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-9 w-9 rounded-full bg-gray-300" />
-                                        {store.name}
-                                    </div>
+                            <tr className="bg-white shadow-sm hover:shadow-md transition">
+                                <td className={`${tdBase} font-medium rounded-l-xl text-black`}>
+                                    {store.name}
                                 </td>
 
-                                {/* EMAIL */}
                                 <td className={tdBase}>
-                                    {store.location}@gmail.com
+                                    {store.location + "@gmail.com"}
                                 </td>
 
-                                {/* LOCATION */}
                                 <td className={tdBase}>
                                     📍 {store.location}
                                 </td>
 
-                                {/* PLAN / PICKUP */}
                                 <td className={tdBase}>
                                     {store.pickup ? "Yes" : "No"}
                                 </td>
 
-                               
+                                <td className={tdBase}>
+                                    {store.createdAt}
+                                </td>
 
-                                {/* STATUS */}
                                 <td className={tdBase}>
                                     <span
                                         className={`px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
@@ -212,21 +218,22 @@ const StoreList = () => {
                                 </td>
 
                                 {/* ACTION */}
-                                <td className="relative p-4 text-right rounded-r-xl">
-                                    {/* RIGHT GRADIENT */}
+                                <td className="relative p-4 rounded-r-xl text-right">
+                                    {/* right gradient */}
                                     <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
 
-                                    {/* BOTTOM GRADIENT */}
+                                    {/* bottom gradient */}
                                     <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
 
                                     <FaEllipsisV className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
                                 </td>
                             </tr>
+
                         ))}
                     </tbody>
-
                 </table>
             </div>
+
 
             <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-600">
                 <button
@@ -262,4 +269,4 @@ const StoreList = () => {
     );
 };
 
-export default StoreList;
+export default VendorList;

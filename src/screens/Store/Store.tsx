@@ -76,7 +76,7 @@ const Store = () => {
                 <AddButton />
             </div>
 
-            <div className="bg-white p-6 ">
+            <div className="bg-white p-6 rounded-lg">
 
                 {/* ################################ */}
                 {/* First Section  strat here*/}
