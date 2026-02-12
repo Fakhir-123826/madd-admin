@@ -4,9 +4,32 @@ import SigninSuggestion from "../component/SigninSuggestion";
 import { Link } from "react-router-dom";
 import { FaLock, FaUser, FaArrowRight } from "react-icons/fa";
 import InputField from "../component/InputField";
+import { useRegisterAdminMutation } from "../app/AuthSlices/AuthSlices";
+
 const Signup = () => {
-    const [password, setPassword] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+    const [register, { isLoading, error }] = useRegisterAdminMutation();
+
+    const handleSignup = async () => {
+        try {
+            const result = await register({
+                firstname,
+                lastname,
+                email,
+                password,
+                password_confirmation: passwordConfirmation,
+            }).unwrap();
+
+            console.log("Success:", result);
+        } catch (err) {
+            console.error("Error:", err);
+        }
+    };
     return (
         <div>
             <div className="lg:min-h-screen lg:flex lg:flex-col lg:gap-6">
@@ -14,6 +37,9 @@ const Signup = () => {
                     <h3 className="pl-30 text-2xl font-semibold tracking-wide text-gray-800">
                         Log in
                     </h3>
+                    {isLoading && <p>Registering...</p>}
+                    {error && <p style={{ color: "red" }}>Something went wrong</p>}
+
                     <img
                         src={logo}
                         alt="main logo"
@@ -30,10 +56,10 @@ const Signup = () => {
                             <InputField
                                 label="First Name"
                                 type="First Name"
-                                value={email}
+                                value={firstname}
                                 placeholder="esteban_schiller@gmail.com"
                                 icon={FaUser}
-                                onChange={setEmail}
+                                onChange={setFirstname}
                             />
 
                         </div>
@@ -41,10 +67,10 @@ const Signup = () => {
                             <InputField
                                 label="Last Name"
                                 type="Last Name"
-                                value={email}
+                                value={lastname}
                                 placeholder="esteban_schiller@gmail.com"
                                 icon={FaUser}
-                                onChange={setEmail}
+                                onChange={setLastname}
                             />
                         </div>
                     </div>
@@ -67,7 +93,14 @@ const Signup = () => {
                         icon={FaLock}
                         onChange={setPassword}
                     />
-
+                    <InputField
+                        label="Confirmation Password"
+                        type="password"
+                        value={passwordConfirmation}
+                        placeholder="Enter your password"
+                        icon={FaLock}
+                        onChange={setPasswordConfirmation}
+                    />
 
 
                     {/* Social signin */}
@@ -80,7 +113,7 @@ const Signup = () => {
                 </div>
 
                 <button
-                    onClick={() => { }}
+                    onClick={handleSignup}
                     className="w-24 h-24 bg-blue-400 text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg
                  rotate-45 hover:bg-blue-500 transition-all duration-300 fixed bottom-6 right-6 z-50"
                 >

@@ -42,10 +42,11 @@ const routes = createBrowserRouter([
       
     ]
   },
-  { path: "/log", element: <Login /> },
+  { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
   { path: "/pass", element: <ForgotPassword /> },
   { path: "/ddd", element: <Dashboard /> },
+  { path: "/signup", element: <Signup /> },
 ])
 
 

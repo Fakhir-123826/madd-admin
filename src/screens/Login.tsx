@@ -4,9 +4,30 @@ import { FaLock, FaUser, FaArrowRight } from "react-icons/fa";
 import InputField from '../component/InputField';
 import { Link } from 'react-router-dom';
 import SigninSuggestion from '../component/SigninSuggestion';
+import { useLoginAdminMutation } from "../app/AuthSlices/AuthSlices";
+
 const Login = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
+    const [loginAdmin, { isLoading, error }] = useLoginAdminMutation();
+
+    const handleLogin = async () => {
+        try {
+            const result = await loginAdmin({
+                email,
+                password,
+            }).unwrap();
+
+            console.log("Login Success:", result);
+
+            // Optional: Save token
+            localStorage.setItem("token", result.token);
+
+        } catch (err) {
+            console.error("Login Error:", err);
+        }
+    };
+
     return (
         <div>
             <div className="lg:min-h-screen lg:flex lg:flex-col lg:gap-6">
@@ -14,6 +35,8 @@ const Login = () => {
                     <h3 className="pl-30 text-2xl font-semibold tracking-wide text-gray-800">
                         Log in
                     </h3>
+                    {isLoading && <p>Registering...</p>}
+                    {error && <p style={{ color: "red" }}>Something went wrong</p>}
                     <img
                         src={logo}
                         alt="main logo"
@@ -63,7 +86,7 @@ const Login = () => {
                 </div>
 
                 <button
-                    onClick={() => { }}
+                    onClick={handleLogin}
                     className="w-24 h-24 bg-blue-400 text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg
                  rotate-45 hover:bg-blue-500 transition-all duration-300 fixed bottom-6 right-6 z-50"
                 >
