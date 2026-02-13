@@ -4,7 +4,7 @@ import { FaLock, FaUser, FaArrowRight } from "react-icons/fa";
 import InputField from '../component/InputField';
 import { Link } from 'react-router-dom';
 import SigninSuggestion from '../component/SigninSuggestion';
-import { useLoginAdminMutation } from "../app/AuthSlices/AuthSlices";
+import { useLoginAdminMutation } from "../app/api/AuthSlices/AuthSlices";
 
 const Login = () => {
     const [password, setPassword] = useState("");

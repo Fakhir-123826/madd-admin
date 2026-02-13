@@ -21,6 +21,8 @@ import CreateVendor from './screens/Vender/CreateVendor.tsx'
 import CreateVendoronBoard from './screens/Vender/Vendor Onboarding/CreateVendoronBoard.tsx'
 import VendorOnboard from './screens/Vender/Vendor Onboarding/VendorOnboard.tsx'
 import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
+import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
+import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
 
 
 const routes = createBrowserRouter([
@@ -39,6 +41,8 @@ const routes = createBrowserRouter([
       {path : "/CreateVerderOnboard" , element : <CreateVendoronBoard/>},
       {path : "/VerderOnboard" , element : <VendorOnboard/>},
       {path : "/VendorDashBoard" , element : <VendorDashBoard/>},
+      {path : "/CreateSubscription" , element : <CreateSubscription/>},
+      {path : "/SubscriptionList" , element : <SubscriptionList/>},
       
     ]
   },

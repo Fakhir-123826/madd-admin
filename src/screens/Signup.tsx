@@ -4,7 +4,7 @@ import SigninSuggestion from "../component/SigninSuggestion";
 import { Link } from "react-router-dom";
 import { FaLock, FaUser, FaArrowRight } from "react-icons/fa";
 import InputField from "../component/InputField";
-import { useRegisterAdminMutation } from "../app/AuthSlices/AuthSlices";
+import { useRegisterAdminMutation } from "../app/api/AuthSlices/AuthSlices";
 
 const Signup = () => {
     const [firstname, setFirstname] = useState("");

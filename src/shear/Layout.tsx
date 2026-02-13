@@ -27,7 +27,14 @@ import logo from "../../public/madd-admin.png";
 
 const menuItems = [
   { label: "Dashboard", icon: FaHome, path: "/" },
-  { label: "Stores", icon: FaStore, path: "/store" },
+  {
+    label: "Stores",
+    icon: FaStore,
+    path: "/store",
+    children: [
+      { label: "All Subscription", path: "/SubscriptionList" },
+    ],
+  },
   { label: "Catalog", icon: FaBox, path: "/" },
   { label: "Users", icon: FaUsers, path: "/" },
   // { label: "Vendors", icon: FaHandshake, path: "/Verder" },
