@@ -43,7 +43,7 @@ const routes = createBrowserRouter([
       {path : "/VendorDashBoard" , element : <VendorDashBoard/>},
       {path : "/CreateSubscription" , element : <CreateSubscription/>},
       {path : "/SubscriptionList" , element : <SubscriptionList/>},
-      
+      { path: "/CreateSubscription/:id", element: <CreateSubscription /> },
     ]
   },
   { path: "/login", element: <Login /> },

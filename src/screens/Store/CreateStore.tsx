@@ -7,7 +7,11 @@ const CreateStore = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Stores Management</h2>
-        <AddButton />
+        <AddButton
+          label="Add New Store"
+          type="button" 
+          onClick={() => console.log("Clicked")}
+        />
       </div>
 
 
