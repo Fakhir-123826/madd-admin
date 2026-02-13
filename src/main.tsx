@@ -23,6 +23,7 @@ import VendorOnboard from './screens/Vender/Vendor Onboarding/VendorOnboard.tsx'
 import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
+import Order from './screens/OrdersManagement/OrderList.tsx'
 
 
 const routes = createBrowserRouter([
@@ -34,6 +35,7 @@ const routes = createBrowserRouter([
       {path : "/storeList" , element : <StoreList/>},
       {path : "/storeCardList" , element : <StoreCardList/>},
       {path : "/store" , element : <Store/>},
+      {path : "/orderlist" , element : <Order/>},
       {path : "/CreateStore" , element : <CreateStore/>},
       {path : "/Verdor" , element : <VendorList/>},
       {path : "/Verder1" , element : <Vendor/>},

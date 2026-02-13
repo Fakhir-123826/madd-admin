@@ -20,6 +20,7 @@ import {
   FaUndoAlt,
   FaBullhorn,
   FaCreditCard,
+  FaShoppingCart,
 } from "react-icons/fa";
 
 import { Link, Outlet } from "react-router-dom";
@@ -27,6 +28,7 @@ import logo from "../../public/madd-admin.png";
 
 const menuItems = [
   { label: "Dashboard", icon: FaHome, path: "/" },
+  { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },
   {
     label: "Stores",
     icon: FaStore,
