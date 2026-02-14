@@ -37,9 +37,15 @@ const menuItems = [
       { label: "All Subscription", path: "/SubscriptionList" },
     ],
   },
-  { label: "Catalog", icon: FaBox, path: "/" },
+  { 
+    label: "Catalog",
+    icon: FaBox,
+    path: "/",
+    children:[
+      { label: "Inventory Management", path: "/InventoryManagement" },
+    ]
+  },
   { label: "Users", icon: FaUsers, path: "/" },
-  // { label: "Vendors", icon: FaHandshake, path: "/Verder" },
   {
     label: "Vendors",
     icon: FaHandshake,
