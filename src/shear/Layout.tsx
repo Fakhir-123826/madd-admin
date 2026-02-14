@@ -37,13 +37,17 @@ const menuItems = [
       { label: "All Subscription", path: "/SubscriptionList" },
     ],
   },
-  { 
+  {
     label: "Catalog",
     icon: FaBox,
     path: "/",
-    children:[
-      { label: "Inventory Management", path: "/InventoryManagement" },
-    ]
+    children: [
+      { label: "All Inventiries", path: "/InventoryManagementList" },
+      { label: "All Product Bases", path: "/ProductBaseList" },
+      { label: "All Category", path: "/CategoryList" },
+      { label: "All Product Sharing", path: "/ProductSharingList" },
+      { label: "All Category", path: "/CategoryList" }
+    ],
   },
   { label: "Users", icon: FaUsers, path: "/" },
   {
