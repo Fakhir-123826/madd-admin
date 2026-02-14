@@ -84,7 +84,7 @@ function UsersRoles() {
       <RoleDetails 
         role={selectedRole} 
         onBack={handleBackToList}
-        onEdit={() => handleEditRole(selectedRole)}
+        // onEdit={() => handleEditRole(selectedRole)}
       />
     );
   }
