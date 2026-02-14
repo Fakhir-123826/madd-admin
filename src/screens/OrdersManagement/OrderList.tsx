@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Eye, Plus } from "lucide-react";
-import { FaLongArrowAltRight, FaLongArrowAltLeft  } from "react-icons/fa";
+import { Eye, Plus, ArrowLeft } from "lucide-react";
+import { FaLongArrowAltRight, FaLongArrowAltLeft, FaPlus } from "react-icons/fa";
 
 import FilterBar from "../../component/orderManagement/FilterBar";
 import OrderDetails from "../../component/orderManagement/Order";
@@ -11,7 +11,7 @@ function OrderList() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showAddOrder, setShowAddOrder] = useState(false);
   const itemsPerPage = 5;
-  
+
   const [orders, setOrders] = useState([
     {
       id: "#44447",
@@ -114,117 +114,150 @@ function OrderList() {
 
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order);
+    setShowAddOrder(false);
   };
 
   const handleAddOrder = (newOrder: any) => {
     setOrders([...orders, newOrder]);
+    setShowAddOrder(false);
   };
+
+  const handleBackToList = () => {
+    setSelectedOrder(null);
+    setShowAddOrder(false);
+  };
+
+  // If Add Order is shown, display the form inline
+  if (showAddOrder) {
+    return (
+      <>
+        <div className="flex items-center gap-4 mb-4">
+          <button
+            onClick={handleBackToList}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <h1 className="text-xl font-semibold">Add New Order</h1>
+        </div>
+
+        <AddOrder
+          onClose={handleBackToList}
+          onSave={handleAddOrder}
+          isEmbedded={true}
+        />
+      </>
+    );
+  }
 
   // If an order is selected, show order details
   if (selectedOrder) {
-    return <OrderDetails orderId={selectedOrder.id} onBack={() => setSelectedOrder(null)} />;
+    return <OrderDetails orderId={selectedOrder.id} onBack={handleBackToList} />;
   }
 
+  // Default view - Order List
   return (
     <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-semibold">Orders Management</h1>
         <button
           onClick={() => setShowAddOrder(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-400 to-green-400 text-white rounded-lg hover:from-teal-500 hover:to-green-500"
+          className="
+            flex items-center gap-3
+            px-6 py-1
+            rounded-full
+            bg-gradient-to-r from-teal-400 to-green-500
+            text-white text-sm font-medium
+            shadow-md
+            hover:from-teal-500 hover:to-green-600
+            transition-all
+            hover:cursor-pointer
+          "
         >
-          <Plus size={18} />
+          <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
+            <FaPlus className="text-teal-500 text-sm" />
+          </span>
           Add Order
         </button>
       </div>
-      
+
       {/* Filter Bar */}
       <FilterBar />
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-6">
-        {/* Header */}
+        {/* Header - Using CSS Grid with specific column widths */}
         <div className="px-6 py-4 bg-gradient-to-r from-teal-400 to-green-400 text-white font-medium">
-          <ul className="flex justify-around items-end">
-            <li className="pb-2">Order ID</li>
-            <li className="pb-2">Customer Name</li>
-            <li className="pb-2">Store Name</li>
-            <li className="pb-2">Date & Time</li>
-            <li className="pb-2">Payment Method</li>
-            <li className="pb-2">Delivery Method</li>
-            <li className="pb-2">Amount</li>
-            <li className="pb-2">Status</li>
-            <li className="pb-2"></li>
-          </ul>
+          <div className="grid grid-cols-12 gap-2">
+            <div className="col-span-1 text-center">Order ID</div>
+            <div className="col-span-2 text-center">Customer Name</div>
+            <div className="col-span-2 text-center">Store Name</div>
+            <div className="col-span-2 text-center">Date & Time</div>
+            <div className="col-span-1 text-center">Payment</div>
+            <div className="col-span-1 text-center">Delivery</div>
+            <div className="col-span-1 text-center">Amount</div>
+            <div className="col-span-1 text-center">Status</div>
+            <div className="col-span-1 text-center">Action</div>
+          </div>
         </div>
 
-        <div className="p-6 overflow-x-auto">
-          <table className="w-full text-sm border-separate border-spacing-y-3">
-            <tbody>
-              {currentOrders.map((order, index) => (
-                <tr key={index}>
-                  <td colSpan={9} className="p-0 rounded-3xl">
-                    <div className="relative bg-gray-50 shadow-xl rounded-2xl">
-                      <div className="absolute rounded-3xl right-0 top-0 bottom-0 w-[4px] bg-gradient-to-b from-teal-400 to-green-400 rounded-l-lg"></div>
-                      <div className="absolute rounded-3xl bottom-0 left-0 right-0 h-[4px] bg-gradient-to-r from-teal-400 to-green-400 rounded-b-lg"></div>
-                      
-                      <div className="p-3 pl-4 pb-4">
-                        <table className="w-full">
-                          <tbody>
-                            <tr>
-                              <td className="py-2 px-2">{order.id}</td>
-                              <td className="py-2 px-2">{order.name}</td>
-                              <td className="py-2 px-2">{order.store}</td>
-                              <td className="py-2 px-2">{order.datetime}</td>
-                              <td className="py-2 px-2">{order.payment}</td>
-                              <td className="py-2 px-2">{order.delivery}</td>
-                              <td className="py-2 px-2">{order.amount}</td>
-                              <td className="py-2 px-2">
-                                <span
-                                  className={`px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
-                                    order.status
-                                  )}`}
-                                >
-                                  {order.status}
-                                </span>
-                              </td>
-                              <td className="py-2 px-2">
-                                <button 
-                                  className="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
-                                  onClick={() => handleViewOrder(order)}
-                                >
-                                  <Eye size={16} />
-                                </button>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Orders List - Using CSS Grid with exact same columns */}
+        <div className="p-6">
+          <div className="space-y-4">
+            {currentOrders.map((order, index) => (
+              <div
+                key={index}
+                className="relative bg-gray-50 shadow-xl rounded-2xl p-4 hover:shadow-2xl transition-shadow"
+              >
+                {/* Decorative Borders */}
+                <div className="absolute rounded-3xl right-0 top-0 bottom-0 w-[4px] bg-gradient-to-b from-teal-400 to-green-400 rounded-l-lg"></div>
+                <div className="absolute rounded-3xl bottom-0 left-0 right-0 h-[4px] bg-gradient-to-r from-teal-400 to-green-400 rounded-b-lg"></div>
+
+                {/* Order Data Grid - Same columns as header with text-center */}
+                <div className="grid grid-cols-12 gap-2 items-center">
+                  <div className="col-span-1 font-medium text-center">{order.id}</div>
+                  <div className="col-span-2 text-center">{order.name}</div>
+                  <div className="col-span-2 text-center">{order.store}</div>
+                  <div className="col-span-2 text-center">{order.datetime}</div>
+                  <div className="col-span-1 text-center">{order.payment}</div>
+                  <div className="col-span-1 text-center">{order.delivery}</div>
+                  <div className="col-span-1 text-center font-semibold text-teal-600">{order.amount}</div>
+                  <div className="col-span-1 text-center">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
+                        order.status
+                      )}`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="col-span-1 text-center">
+                    <button
+                      className="p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors mx-auto"
+                      onClick={() => handleViewOrder(order)}
+                    >
+                      <Eye size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-
-
 
         {/* Pagination */}
-        {/* Next / Back Buttons */}
-
-        <div className="px-6 py-4 flex justify-center gap-10 items-center">
+        <div className="px-6 py-4 flex justify-center gap-10 items-center border-t border-gray-200">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className={`px-4 py-2 rounded-lg flex gap-2 items-center ${
               currentPage === 1
-                ? " text-gray-400 cursor-not-allowed"
-                : "hover:bg-gray-50"
+                ? "text-gray-400 cursor-not-allowed"
+                : "hover:bg-gray-50 text-gray-700"
             }`}
           >
-             <FaLongArrowAltLeft /> Back
+            <FaLongArrowAltLeft /> Back
           </button>
-          
+
           <div className="flex gap-2">
             {[...Array(totalPages)].map((_, i) => (
               <button
@@ -233,7 +266,7 @@ function OrderList() {
                 className={`w-10 h-10 rounded-lg ${
                   currentPage === i + 1
                     ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-                    : "border hover:bg-gray-50"
+                    : "border border-gray-300 hover:bg-gray-50 text-gray-700"
                 }`}
               >
                 {i + 1}
@@ -244,24 +277,16 @@ function OrderList() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg  flex gap-2 items-center ${
+            className={`px-4 py-2 rounded-lg flex gap-2 items-center ${
               currentPage === totalPages
-                ? " text-gray-400 cursor-not-allowed"
-                : "hover:bg-gray-50"
+                ? "text-gray-400 cursor-not-allowed"
+                : "hover:bg-gray-50 text-gray-700"
             }`}
           >
-            Next <FaLongArrowAltRight  />
+            Next <FaLongArrowAltRight />
           </button>
         </div>
       </div>
-
-      {/* Add Order Modal */}
-      {showAddOrder && (
-        <AddOrder 
-          onClose={() => setShowAddOrder(false)}
-          onSave={handleAddOrder}
-        />
-      )}
     </>
   );
 }

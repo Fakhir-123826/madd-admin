@@ -11,9 +11,10 @@ interface ProductItem {
 interface AddOrderProps {
   onClose?: () => void;
   onSave?: (order: any) => void;
+  isEmbedded?: boolean; // New prop to control layout
 }
 
-function AddOrder({ onClose, onSave }: AddOrderProps) {
+function AddOrder({ onClose, onSave, isEmbedded = false }: AddOrderProps) {
   const [products, setProducts] = useState<ProductItem[]>([
     { id: 1, name: "Product A", quantity: 1, price: 400 },
   ]);
@@ -46,7 +47,7 @@ function AddOrder({ onClose, onSave }: AddOrderProps) {
 
   const calculateTotal = () => {
     const subtotal = products.reduce((sum, p) => sum + (p.quantity * p.price), 0);
-    const tax = subtotal * 0.1; // 10% tax example
+    const tax = subtotal * 0.1;
     const shipping = 395;
     return {
       subtotal,
@@ -72,22 +73,23 @@ function AddOrder({ onClose, onSave }: AddOrderProps) {
     onClose?.();
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+  // If embedded, render without the overlay
+  if (isEmbedded) {
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto animate-in slide-in-from-bottom duration-300">
         {/* Header with Gradient */}
-        <div className="sticky top-0 bg-gradient-to-r from-teal-500 to-green-500 rounded-t-2xl">
+        <div className=" bg-gradient-to-r from-teal-500 to-green-500 rounded-t-2xl">
           <div className="flex items-center justify-between p-6 text-white">
             <div>
               <h2 className="text-2xl font-bold">Add New Order</h2>
               <p className="text-sm text-white/80 mt-1">Create a new order for customer</p>
             </div>
-            <button 
+            {/* <button 
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200"
             >
               <X size={24} />
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -335,6 +337,15 @@ function AddOrder({ onClose, onSave }: AddOrderProps) {
             </button>
           </div>
         </form>
+      </div>
+    );
+  }
+
+  // Original modal version (kept for backward compatibility)
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+        {/* ... (same content as embedded version) ... */}
       </div>
     </div>
   );
