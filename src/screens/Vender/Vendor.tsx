@@ -75,7 +75,11 @@ const Vendor = () => {
         <div>
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Stores Management</h2>
-                <AddButton />
+                <AddButton
+                    label="Add New Store"
+                    type="button" 
+                    onClick={() => console.log("Clicked")}
+                />
             </div>
 
             <div className="bg-white p-6 rounded-lg">
@@ -300,8 +304,8 @@ const Vendor = () => {
                     <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-teal-400 to-green-400 text-white text-sm shadow">
                         ✏️ Edit Point
                     </button>
-{/* onClick={() => setOpen(true)} */}
-                    <button  className="flex items-center gap-2 px-5 py-2 rounded-full bg-red-500 text-white text-sm shadow">
+                    {/* onClick={() => setOpen(true)} */}
+                    <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-red-500 text-white text-sm shadow">
                         🗑 Delete Store
                     </button>
                 </div>
@@ -312,46 +316,46 @@ const Vendor = () => {
 
 
             {/* {open && ( */}
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="w-[380px] rounded-xl bg-white p-6 shadow-lg relative">
-{/* onClick={() => setOpen(false)} */}
-                        {/* Close Icon */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-[380px] rounded-xl bg-white p-6 shadow-lg relative">
+                    {/* onClick={() => setOpen(false)} */}
+                    {/* Close Icon */}
+                    <button
+
+                        className="absolute right-4 top-4 text-gray-500 hover:text-black"
+                    >
+                        ✕
+                    </button>
+
+                    {/* Icon */}
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                        <span className="text-2xl">👤</span>
+                    </div>
+
+                    {/* Text */}
+                    <h2 className="text-center text-lg font-semibold text-gray-800">
+                        Are you sure you want to delete
+                        <br />
+                        <span className="font-bold">“Thai restaurant”</span> account?
+                    </h2>
+
+                    {/* Actions */}
+                    <div className="mt-6 flex justify-center gap-4">
                         <button
-                            
-                            className="absolute right-4 top-4 text-gray-500 hover:text-black"
+                            className="rounded-lg bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
                         >
-                            ✕
+                            Suspend Instead
                         </button>
+                        {/* onClick={() => setOpen(false)} */}
+                        <button
 
-                        {/* Icon */}
-                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
-                            <span className="text-2xl">👤</span>
-                        </div>
-
-                        {/* Text */}
-                        <h2 className="text-center text-lg font-semibold text-gray-800">
-                            Are you sure you want to delete
-                            <br />
-                            <span className="font-bold">“Thai restaurant”</span> account?
-                        </h2>
-
-                        {/* Actions */}
-                        <div className="mt-6 flex justify-center gap-4">
-                            <button
-                                className="rounded-lg bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
-                            >
-                                Suspend Instead
-                            </button>
-{/* onClick={() => setOpen(false)} */}
-                            <button
-                                
-                                className="rounded-lg bg-gray-200 px-6 py-2 text-sm text-gray-700 hover:bg-gray-300"
-                            >
-                                Yes
-                            </button>
-                        </div>
+                            className="rounded-lg bg-gray-200 px-6 py-2 text-sm text-gray-700 hover:bg-gray-300"
+                        >
+                            Yes
+                        </button>
                     </div>
                 </div>
+            </div>
             {/* )} */}
         </div>
     )

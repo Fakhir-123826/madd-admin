@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { FaFilter, FaRedo, FaSearch } from 'react-icons/fa'
 
 const Searchbar = () => {

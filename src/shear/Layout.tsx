@@ -37,19 +37,15 @@ const menuItems = [
       { label: "All Subscription", path: "/SubscriptionList" },
     ],
   },
-  { label: "Catalog", icon: FaBox, path: "/" },
-  // { label: "Users", icon: FaUsers, path: "/" },
-  // { label: "Vendors", icon: FaHandshake, path: "/Verder" },
-   {
-    label: "Users",
-    icon: FaUsers,
+  { 
+    label: "Catalog",
+    icon: FaBox,
     path: "/",
-    children: [
-      { label: "Users List", path: "/userlist" },
-      { label: "Roles", path: "/usersroles" },
-      { label: "Group", path: "/usersgroup" },
-    ],
+    children:[
+      { label: "Inventory Management", path: "/InventoryManagement" },
+    ]
   },
+  { label: "Users", icon: FaUsers, path: "/" },
   {
     label: "Vendors",
     icon: FaHandshake,

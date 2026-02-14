@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import type { Subscription } from '../../../model/susbcription/ISubscription'
 
 export const subscriptionApi = createApi({
   reducerPath: 'subscriptionApi',
@@ -10,20 +11,20 @@ export const subscriptionApi = createApi({
   tagTypes: ['Subscription'],
 
   endpoints: (builder) => ({
-    // GET all subscriptions
-    getSubscriptions: builder.query<any, void>({
+    // ✅ GET all subscriptions
+    getSubscriptions: builder.query<Subscription[], void>({
       query: () => 'subscriptions',
       providesTags: ['Subscription'],
     }),
 
     // GET single subscription
-    getSubscription: builder.query<any, number>({
+    getSubscription: builder.query<Subscription, number>({
       query: (id) => `subscriptions/${id}`,
       providesTags: ['Subscription'],
     }),
 
     // CREATE subscription
-    createSubscription: builder.mutation<any, any>({
+    createSubscription: builder.mutation<Subscription, Partial<Subscription>>({
       query: (data) => ({
         url: 'subscriptions',
         method: 'POST',
@@ -33,7 +34,10 @@ export const subscriptionApi = createApi({
     }),
 
     // UPDATE subscription
-    updateSubscription: builder.mutation<any, { id: number; data: any }>({
+    updateSubscription: builder.mutation<
+      Subscription,
+      { id: number; data: Partial<Subscription> }
+    >({
       query: ({ id, data }) => ({
         url: `subscriptions/${id}`,
         method: 'PUT',
@@ -43,7 +47,7 @@ export const subscriptionApi = createApi({
     }),
 
     // DELETE subscription
-    deleteSubscription: builder.mutation<any, number>({
+    deleteSubscription: builder.mutation<void, number>({
       query: (id) => ({
         url: `subscriptions/${id}`,
         method: 'DELETE',

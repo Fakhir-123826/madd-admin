@@ -143,7 +143,11 @@ const StoreCardList = () => {
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Stores Management</h2>
-                <AddButton />
+                <AddButton
+                    label="Add New Store"
+                    type="button" 
+                    onClick={() => console.log("Clicked")}
+                />
             </div>
 
             <Searchbar />
@@ -178,8 +182,8 @@ const StoreCardList = () => {
                         key={i}
                         onClick={() => setPage(i + 1)}
                         className={`px-3 py-1 rounded-md ${page === i + 1
-                                ? "bg-blue-500 text-white"
-                                : "hover:bg-gray-100"
+                            ? "bg-blue-500 text-white"
+                            : "hover:bg-gray-100"
                             }`}
                     >
                         {i + 1}
