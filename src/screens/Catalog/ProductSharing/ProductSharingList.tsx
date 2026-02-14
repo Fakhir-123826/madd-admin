@@ -3,6 +3,7 @@ import { useState } from "react";
 import AddButton from "../../../component/AddButton";
 import Searchbar from "../../../component/Searchbar";
 import { FaEllipsisV } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 const stores = [
     {
         name: "Blossom Store",
@@ -140,6 +141,7 @@ const statusStyle = (status: string) => {
 };
 
 const ProductSharingList  = () => {
+   const navigate = useNavigate();
   const tdBase =
     "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
@@ -159,10 +161,10 @@ const ProductSharingList  = () => {
         {/* HEADER */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">Product Shearing</h2>
-          <AddButton
-            label="Add New Store"
+         <AddButton
+            label= "Add New Product Shearing"
             type="button"
-            onClick={() => console.log("Clicked")}
+            onClick={() => navigate("/CreateProductSharing")}
           />
         </div>
 

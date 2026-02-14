@@ -44,7 +44,7 @@ const menuItems = [
     children: [
       { label: "All Inventiries", path: "/InventoryManagementList" },
       { label: "All Product Bases", path: "/ProductBaseList" },
-      { label: "All Category", path: "/CategoryList" },
+      { label: "All Legality Control", path: "/LegalityControlList" },
       { label: "All Product Sharing", path: "/ProductSharingList" },
       { label: "All Category", path: "/CategoryList" }
     ],

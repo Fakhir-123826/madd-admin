@@ -2,6 +2,7 @@ import { useState } from "react";
 import AddButton from "../../../component/AddButton";
 import Searchbar from "../../../component/Searchbar";
 import { FaEllipsisV } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 const stores = [
     {
         name: "Blossom Store",
@@ -139,6 +140,7 @@ const statusStyle = (status: string) => {
 };
 
 const ProductBaseList  = () => {
+   const navigate = useNavigate();
   const tdBase =
     "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
@@ -159,9 +161,9 @@ const ProductBaseList  = () => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">Product Base</h2>
           <AddButton
-            label="Add New Store"
+            label= "Add New Product Base"
             type="button"
-            onClick={() => console.log("Clicked")}
+            onClick={() => navigate("/CreateProductBase")}
           />
         </div>
 
