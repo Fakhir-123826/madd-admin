@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Eye, Plus, ArrowLeft } from "lucide-react";
-import { FaLongArrowAltRight, FaLongArrowAltLeft, FaPlus } from "react-icons/fa";
-
+import { Eye, ArrowLeft } from "lucide-react";
+import { FaPlus, FaEllipsisV } from "react-icons/fa";
 import FilterBar from "../../component/orderManagement/FilterBar";
 import OrderDetails from "../../component/orderManagement/Order";
 import AddOrder from "../../component/orderManagement/AddOrder";
@@ -10,7 +9,7 @@ function OrderList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showAddOrder, setShowAddOrder] = useState(false);
-  const itemsPerPage = 5;
+  const itemsPerPage = 8; // Changed to 8 like VendorList
 
   const [orders, setOrders] = useState([
     {
@@ -83,6 +82,26 @@ function OrderList() {
       amount: "320$",
       status: "Shipped",
     },
+    {
+      id: "#44454",
+      name: "Lisa White",
+      store: "Beauty Store",
+      datetime: "7:45 pm - 5 July",
+      payment: "Credit Card",
+      delivery: "Delivery",
+      amount: "180$",
+      status: "Pending",
+    },
+    {
+      id: "#44455",
+      name: "Tom Harris",
+      store: "Electronics",
+      datetime: "8:20 pm - 5 July",
+      payment: "Paypal",
+      delivery: "Pick up",
+      amount: "560$",
+      status: "Delivered",
+    },
   ]);
 
   const statusStyle = (status: string) => {
@@ -127,10 +146,13 @@ function OrderList() {
     setShowAddOrder(false);
   };
 
+  // Base style for table cells with gradient underlines (matching VendorList)
+  const tdBase = "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
+
   // If Add Order is shown, display the form inline
   if (showAddOrder) {
     return (
-      <>
+      <div className="bg-white shadow-sm p-6">
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={handleBackToList}
@@ -138,7 +160,7 @@ function OrderList() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl font-semibold">Add New Order</h1>
+          <h1 className="text-lg font-semibold">Add New Order</h1>
         </div>
 
         <AddOrder
@@ -146,7 +168,7 @@ function OrderList() {
           onSave={handleAddOrder}
           isEmbedded={true}
         />
-      </>
+      </div>
     );
   }
 
@@ -155,11 +177,12 @@ function OrderList() {
     return <OrderDetails orderId={selectedOrder.id} onBack={handleBackToList} />;
   }
 
-  // Default view - Order List
+  // Default view - Order List (VendorList style)
   return (
-    <>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold">Orders Management</h1>
+    <div className="bg-white rounded-xl shadow-sm p-6">
+      {/* HEADER with Add Button (matching VendorList) */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold">Orders Management</h2>
         <button
           onClick={() => setShowAddOrder(true)}
           className="
@@ -184,110 +207,120 @@ function OrderList() {
       {/* Filter Bar */}
       <FilterBar />
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-6">
-        {/* Header - Using CSS Grid with specific column widths */}
-        <div className="px-6 py-4 bg-gradient-to-r from-teal-400 to-green-400 text-white font-medium">
-          <div className="grid grid-cols-12 gap-2">
-            <div className="col-span-1 text-center">Order ID</div>
-            <div className="col-span-2 text-center">Customer Name</div>
-            <div className="col-span-2 text-center">Store Name</div>
-            <div className="col-span-2 text-center">Date & Time</div>
-            <div className="col-span-1 text-center">Payment</div>
-            <div className="col-span-1 text-center">Delivery</div>
-            <div className="col-span-1 text-center">Amount</div>
-            <div className="col-span-1 text-center">Status</div>
-            <div className="col-span-1 text-center">Action</div>
-          </div>
-        </div>
+      {/* TABLE - Matching VendorList exactly */}
+      <div className="rounded-t-3xl overflow-hidden mt-6">
+        <table className="w-full text-sm border-separate border-spacing-y-3">
+          {/* HEADER - Gradient background */}
+          <thead className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
+            <tr>
+              <th className="p-4 text-left">Order ID</th>
+              <th className="p-4 text-left">Customer Name</th>
+              <th className="p-4 text-left">Store Name</th>
+              <th className="p-4 text-left">Date & Time</th>
+              <th className="p-4 text-left">Payment</th>
+              <th className="p-4 text-left">Delivery</th>
+              <th className="p-4 text-left">Amount</th>
+              <th className="p-4 text-left">Status</th>
+              <th className="p-4"></th>
+            </tr>
+          </thead>
 
-        {/* Orders List - Using CSS Grid with exact same columns */}
-        <div className="p-6">
-          <div className="space-y-4">
+          {/* BODY - With gradient underlines and borders */}
+          <tbody>
             {currentOrders.map((order, index) => (
-              <div
-                key={index}
-                className="relative bg-gray-50 shadow-xl rounded-2xl p-4 hover:shadow-2xl transition-shadow"
-              >
-                {/* Decorative Borders */}
-                <div className="absolute rounded-3xl right-0 top-0 bottom-0 w-[4px] bg-gradient-to-b from-teal-400 to-green-400 rounded-l-lg"></div>
-                <div className="absolute rounded-3xl bottom-0 left-0 right-0 h-[4px] bg-gradient-to-r from-teal-400 to-green-400 rounded-b-lg"></div>
+              <tr key={index} className="bg-white shadow-sm hover:shadow-md transition">
+                <td className={`${tdBase} font-medium rounded-l-xl text-black`}>
+                  {order.id}
+                </td>
 
-                {/* Order Data Grid - Same columns as header with text-center */}
-                <div className="grid grid-cols-12 gap-2 items-center">
-                  <div className="col-span-1 font-medium text-center">{order.id}</div>
-                  <div className="col-span-2 text-center">{order.name}</div>
-                  <div className="col-span-2 text-center">{order.store}</div>
-                  <div className="col-span-2 text-center">{order.datetime}</div>
-                  <div className="col-span-1 text-center">{order.payment}</div>
-                  <div className="col-span-1 text-center">{order.delivery}</div>
-                  <div className="col-span-1 text-center font-semibold text-teal-600">{order.amount}</div>
-                  <div className="col-span-1 text-center">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
-                        order.status
-                      )}`}
-                    >
-                      {order.status}
-                    </span>
-                  </div>
-                  <div className="col-span-1 text-center">
-                    <button
-                      className="p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors mx-auto"
-                      onClick={() => handleViewOrder(order)}
-                    >
-                      <Eye size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
+                <td className={tdBase}>
+                  {order.name}
+                </td>
+
+                <td className={tdBase}>
+                  {order.store}
+                </td>
+
+                <td className={tdBase}>
+                  {order.datetime}
+                </td>
+
+                <td className={tdBase}>
+                  {order.payment}
+                </td>
+
+                <td className={tdBase}>
+                  {order.delivery}
+                </td>
+
+                <td className={`${tdBase} font-semibold`}>
+                  {order.amount}
+                </td>
+
+                <td className={tdBase}>
+                  <span
+                    className={`px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
+                      order.status
+                    )}`}
+                  >
+                    {order.status}
+                  </span>
+                </td>
+
+                {/* ACTION - With gradient borders like VendorList */}
+                <td className="relative p-4 rounded-r-xl text-right">
+                  {/* Right gradient border */}
+                  <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
+
+                  {/* Bottom gradient border */}
+                  <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
+
+                  <button
+                    onClick={() => handleViewOrder(order)}
+                    className="relative text-gray-400 cursor-pointer hover:text-gray-600"
+                  >
+                    <Eye size={18} />
+                  </button>
+                </td>
+              </tr>
             ))}
-          </div>
-        </div>
-
-        {/* Pagination */}
-        <div className="px-6 py-4 flex justify-center gap-10 items-center border-t border-gray-200">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg flex gap-2 items-center ${
-              currentPage === 1
-                ? "text-gray-400 cursor-not-allowed"
-                : "hover:bg-gray-50 text-gray-700"
-            }`}
-          >
-            <FaLongArrowAltLeft /> Back
-          </button>
-
-          <div className="flex gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => handlePageChange(i + 1)}
-                className={`w-10 h-10 rounded-lg ${
-                  currentPage === i + 1
-                    ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-                    : "border border-gray-300 hover:bg-gray-50 text-gray-700"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg flex gap-2 items-center ${
-              currentPage === totalPages
-                ? "text-gray-400 cursor-not-allowed"
-                : "hover:bg-gray-50 text-gray-700"
-            }`}
-          >
-            Next <FaLongArrowAltRight />
-          </button>
-        </div>
+          </tbody>
+        </table>
       </div>
-    </>
+
+      {/* PAGINATION - Exactly like VendorList */}
+      <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-600">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+          className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-40"
+        >
+          ← Back
+        </button>
+
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageChange(i + 1)}
+            className={`px-3 py-1 rounded-md ${
+              currentPage === i + 1
+                ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
+                : "hover:bg-gray-100"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-40"
+        >
+          Next →
+        </button>
+      </div>
+    </div>
   );
 }
 

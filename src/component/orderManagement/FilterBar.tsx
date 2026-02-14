@@ -1,64 +1,94 @@
-import React from "react";
-
-import { FaFilter, FaRedo } from "react-icons/fa";
-import { FiChevronDown } from "react-icons/fi";
-import { IoSearch } from "react-icons/io5";
+import React from 'react'
+import { FaFilter, FaRedo } from 'react-icons/fa'
+import { IoSearch } from 'react-icons/io5'
 
 function FilterBar() {
   return (
-    <div className="w-full flex items-center justify-between gap-4">
-      
+    <div className="flex items-center overflow-hidden h-[52px] py-10">
       {/* Left Side Filters */}
-      <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden">
+      <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[60%]">
         
         {/* Filter Icon */}
-        <div className="px-4 py-3 border-r border-gray-300 flex items-center gap-2 text-gray-600">
+        <div className="px-5 flex items-center border-r border-gray-200 text-gray-600">
           <FaFilter />
         </div>
 
-        
-        {/* Filter Icon */}
-        <div className="px-4 py-3 border-r border-gray-300 flex items-center gap-2 text-gray-600">
-          <span className="font-medium">Filter By</span>
+        {/* Filter By Text */}
+        <div className="px-5 flex items-center border-r border-gray-200 text-sm font-medium text-gray-700">
+          Filter By
         </div>
 
-        {/* Status */}
-        <div className="px-6 py-3 border-r border-gray-300 flex items-center gap-2 cursor-pointer hover:bg-gray-50">
-          <span>Status</span>
-          <FiChevronDown />
+        {/* Status Dropdown */}
+        <div className="relative border-r border-gray-200">
+          <select className="h-[52px] px-5 pr-9 text-sm bg-transparent outline-none appearance-none cursor-pointer text-gray-700">
+            <option>Status</option>
+            <option>Delivered</option>
+            <option>Shipped</option>
+            <option>Cancelled</option>
+            <option>Pending</option>
+          </select>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            ▾
+          </span>
         </div>
 
-        {/* Date */}
-        <div className="px-6 py-3 border-r border-gray-300 flex items-center gap-2 cursor-pointer hover:bg-gray-50">
-          <span>Date</span>
-          <FiChevronDown />
+        {/* Date Dropdown */}
+        <div className="relative border-r border-gray-200">
+          <select className="h-[52px] px-5 pr-9 text-sm bg-transparent outline-none appearance-none cursor-pointer text-gray-700">
+            <option>Date</option>
+            <option>Today</option>
+            <option>Yesterday</option>
+            <option>This Week</option>
+            <option>This Month</option>
+          </select>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            ▾
+          </span>
         </div>
 
-        {/* Customer */}
-        <div className="px-6 py-3 border-r border-gray-300 flex items-center gap-2 cursor-pointer hover:bg-gray-50">
-          <span>Customer</span>
-          <FiChevronDown />
+        {/* Customer Dropdown */}
+        <div className="relative border-r border-gray-200">
+          <select className="h-[52px] px-5 pr-9 text-sm bg-transparent outline-none appearance-none cursor-pointer text-gray-700">
+            <option>Customer</option>
+            <option>Jhon Smith</option>
+            <option>Alice Johnson</option>
+            <option>Mike Wilson</option>
+            <option>Sarah Brown</option>
+          </select>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            ▾
+          </span>
         </div>
 
-        {/* Reset Filter */}
-        <div className="px-6 py-3 flex items-center gap-2 text-blue-500 cursor-pointer hover:bg-gray-50">
-          <FaRedo className="text-sm" />
-          <span>Reset Filter</span>
-        </div>
+        {/* Reset Filter Button */}
+        <button className="px-5 flex items-center gap-2 text-sm text-blue-500 hover:underline">
+          <FaRedo className="text-xs" />
+          Reset Filter
+        </button>
       </div>
 
       {/* Search Box */}
-      <div className="relative w-[280px]">
-        <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <div className="ml-auto relative mr-2">
+        <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
         <input
           type="text"
           placeholder="Search here..."
-          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="
+            w-70
+            h-[48px]
+            pl-11 pr-4
+            text-sm
+            border border-gray-200
+            rounded-xl
+            bg-white
+            outline-none
+            focus:ring-2 focus:ring-blue-400
+            shadow-lg
+          "
         />
       </div>
-
     </div>
-  );
+  )
 }
 
-export default FilterBar;
+export default FilterBar

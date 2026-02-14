@@ -243,7 +243,7 @@ function AddOrder({ onClose, onSave, isEmbedded = false }: AddOrderProps) {
 
               {/* Totals Section */}
               <div className="mt-6 border-t-2 border-gray-200 pt-6">
-                <div className="flex flex-col items-end space-y-2">
+                <div className="flex flex-col items-center space-y-2">
                   <div className="w-72 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal:</span>
@@ -325,13 +325,13 @@ function AddOrder({ onClose, onSave, isEmbedded = false }: AddOrderProps) {
             <button
               type="button"
               onClick={onClose}
-              className="px-8 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all font-medium text-gray-700"
+              className="px-8 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all font-medium text-gray-700 hover:cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-8 py-3 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all font-medium shadow-lg hover:shadow-xl"
+              className="px-8 py-3 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all font-medium shadow-lg hover:shadow-xl hover:cursor-pointer"
             >
               Create Order
             </button>

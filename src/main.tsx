@@ -24,6 +24,9 @@ import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
 import Order from './screens/OrdersManagement/OrderList.tsx'
+import UserList from "./screens/Users/userlist.tsx"
+import UsersRoles from "./screens/Users/UsersRoles.tsx"
+import UsersGroup from "./screens/Users/UsersGroup.tsx"
 
 
 const routes = createBrowserRouter([
@@ -45,6 +48,9 @@ const routes = createBrowserRouter([
       {path : "/VendorDashBoard" , element : <VendorDashBoard/>},
       {path : "/CreateSubscription" , element : <CreateSubscription/>},
       {path : "/SubscriptionList" , element : <SubscriptionList/>},
+      {path : "/userlist" , element : <UserList />},
+      {path : "/usersroles" , element : <UsersRoles/>},
+      {path : "/usersgroup" , element : <UsersGroup/>},
       
     ]
   },

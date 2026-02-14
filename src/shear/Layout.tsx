@@ -38,8 +38,18 @@ const menuItems = [
     ],
   },
   { label: "Catalog", icon: FaBox, path: "/" },
-  { label: "Users", icon: FaUsers, path: "/" },
+  // { label: "Users", icon: FaUsers, path: "/" },
   // { label: "Vendors", icon: FaHandshake, path: "/Verder" },
+   {
+    label: "Users",
+    icon: FaUsers,
+    path: "/",
+    children: [
+      { label: "Users List", path: "/userlist" },
+      { label: "Roles", path: "/usersroles" },
+      { label: "Group", path: "/usersgroup" },
+    ],
+  },
   {
     label: "Vendors",
     icon: FaHandshake,
