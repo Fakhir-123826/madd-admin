@@ -1,12 +1,17 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-interface UserDetailsProps {
-  user: any;
-  onBack: () => void;
-}
+function UserDetails() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const user = location.state?.user;
 
-function UserDetails({ user, onBack }: UserDetailsProps) {
+  if (!user) {
+    navigate('/userlist');
+    return null;
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-sm">
       {/* Header with Username and Status */}
@@ -69,6 +74,16 @@ function UserDetails({ user, onBack }: UserDetailsProps) {
           <p className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-lg">
             {user.roleDescription}
           </p>
+        </div>
+
+        {/* Back Button */}
+        <div className="flex justify-end mt-6">
+          <button
+            onClick={() => navigate('/userlist')}
+            className="px-6 py-2 bg-gradient-to-r from-teal-400 to-green-400 text-white rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Back to List
+          </button>
         </div>
       </div>
     </div>

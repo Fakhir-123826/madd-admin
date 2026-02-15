@@ -1,18 +1,16 @@
+import { ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-interface AddUserProps {
-  onSave: (user: any) => void;
-  onCancel: () => void;
-}
-
-function AddUser({ onSave, onCancel }: AddUserProps) {
+function AddUser() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     role: "",
     roleDescription: "",
     email: "",
     phone: "",
-    status: true, // Changed to boolean: true for Active, false for Inactive
+    status: true,
     groups: [] as string[],
   });
 
@@ -47,19 +45,38 @@ function AddUser({ onSave, onCancel }: AddUserProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    
+    // Here you would typically save to backend
+    console.log("Saving user:", {
       ...formData,
       id: Date.now(),
       lastLogin: "Just now",
       joiningDate: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }),
       group: formData.groups[0] || "No Group",
       assignedGroups: formData.groups,
-      status: formData.status ? "Active" : "Inactive", // Convert back to string for saving
+      status: formData.status ? "Active" : "Inactive",
     });
+    
+    // Navigate back to users list
+    navigate('/userlist');
+  };
+
+  const handleCancel = () => {
+    navigate('/userlist');
   };
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={handleCancel}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <h1 className="text-lg font-semibold">Add New User</h1>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <h2 className="text-xl font-semibold mb-6">User Info</h2>
 
@@ -92,7 +109,7 @@ function AddUser({ onSave, onCancel }: AddUserProps) {
               value={formData.role}
               onChange={handleChange}
               required
-              placeholder="Enter URL"
+              placeholder="Enter Role"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
@@ -199,7 +216,7 @@ function AddUser({ onSave, onCancel }: AddUserProps) {
         <div className="flex justify-end gap-4">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors hover:cursor-pointer"
           >
             Cancel

@@ -1,19 +1,18 @@
 import React, { useState } from "react";
-import { Eye, ArrowLeft } from "lucide-react";
-import { FaPlus, FaEllipsisV } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { Eye } from "lucide-react";
+import { FaPlus } from "react-icons/fa";
 import FilterBar from "../../component/orderManagement/FilterBar";
-import OrderDetails from "../../component/orderManagement/Order";
-import AddOrder from "../../component/orderManagement/AddOrder";
 
 function OrderList() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [showAddOrder, setShowAddOrder] = useState(false);
-  const itemsPerPage = 8; // Changed to 8 like VendorList
+  const itemsPerPage = 8;
 
   const [orders, setOrders] = useState([
     {
-      id: "#44447",
+      id: "44447", // Changed: removed # from ID
+      displayId: "#44447", // Added for display
       name: "Jhon Smith",
       store: "Blossoms Store",
       datetime: "2:46 pm - 5 July",
@@ -23,7 +22,8 @@ function OrderList() {
       status: "Delivered",
     },
     {
-      id: "#44448",
+      id: "44448",
+      displayId: "#44448",
       name: "Jhon Smith",
       store: "Blossoms Store",
       datetime: "2:46 pm - 5 July",
@@ -33,7 +33,8 @@ function OrderList() {
       status: "Shipped",
     },
     {
-      id: "#44449",
+      id: "44449",
+      displayId: "#44449",
       name: "Jhon Smith",
       store: "Blossoms Store",
       datetime: "2:46 pm - 5 July",
@@ -43,7 +44,8 @@ function OrderList() {
       status: "Cancelled",
     },
     {
-      id: "#44450",
+      id: "44450",
+      displayId: "#44450",
       name: "Sarah Johnson",
       store: "Fashion Hub",
       datetime: "3:30 pm - 5 July",
@@ -53,7 +55,8 @@ function OrderList() {
       status: "Pending",
     },
     {
-      id: "#44451",
+      id: "44451",
+      displayId: "#44451",
       name: "Mike Wilson",
       store: "Tech Store",
       datetime: "4:15 pm - 5 July",
@@ -63,7 +66,8 @@ function OrderList() {
       status: "Processing",
     },
     {
-      id: "#44452",
+      id: "44452",
+      displayId: "#44452",
       name: "Emma Davis",
       store: "Home Decor",
       datetime: "5:00 pm - 5 July",
@@ -73,7 +77,8 @@ function OrderList() {
       status: "Delivered",
     },
     {
-      id: "#44453",
+      id: "44453",
+      displayId: "#44453",
       name: "Alex Brown",
       store: "Sports World",
       datetime: "6:30 pm - 5 July",
@@ -83,7 +88,8 @@ function OrderList() {
       status: "Shipped",
     },
     {
-      id: "#44454",
+      id: "44454",
+      displayId: "#44454",
       name: "Lisa White",
       store: "Beauty Store",
       datetime: "7:45 pm - 5 July",
@@ -93,7 +99,8 @@ function OrderList() {
       status: "Pending",
     },
     {
-      id: "#44455",
+      id: "44455",
+      displayId: "#44455",
       name: "Tom Harris",
       store: "Electronics",
       datetime: "8:20 pm - 5 July",
@@ -132,59 +139,24 @@ function OrderList() {
   };
 
   const handleViewOrder = (order: any) => {
-    setSelectedOrder(order);
-    setShowAddOrder(false);
+    // Navigate to order details with clean ID
+    navigate(`/order/${order.id}`, { state: { order } });
   };
 
-  const handleAddOrder = (newOrder: any) => {
-    setOrders([...orders, newOrder]);
-    setShowAddOrder(false);
+  const handleAddOrder = () => {
+    navigate('/addorder');
   };
 
-  const handleBackToList = () => {
-    setSelectedOrder(null);
-    setShowAddOrder(false);
-  };
-
-  // Base style for table cells with gradient underlines (matching VendorList)
+  // Base style for table cells with gradient underlines
   const tdBase = "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
-  // If Add Order is shown, display the form inline
-  if (showAddOrder) {
-    return (
-      <div className="bg-white shadow-sm p-6">
-        <div className="flex items-center gap-4 mb-4">
-          <button
-            onClick={handleBackToList}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-lg font-semibold">Add New Order</h1>
-        </div>
-
-        <AddOrder
-          onClose={handleBackToList}
-          onSave={handleAddOrder}
-          isEmbedded={true}
-        />
-      </div>
-    );
-  }
-
-  // If an order is selected, show order details
-  if (selectedOrder) {
-    return <OrderDetails orderId={selectedOrder.id} onBack={handleBackToList} />;
-  }
-
-  // Default view - Order List (VendorList style)
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
-      {/* HEADER with Add Button (matching VendorList) */}
+      {/* HEADER with Add Button */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Orders Management</h2>
         <button
-          onClick={() => setShowAddOrder(true)}
+          onClick={handleAddOrder}
           className="
             flex items-center gap-3
             px-6 py-1
@@ -204,10 +176,13 @@ function OrderList() {
         </button>
       </div>
 
+
+      
+
       {/* Filter Bar */}
       <FilterBar />
 
-      {/* TABLE - Matching VendorList exactly */}
+      {/* TABLE */}
       <div className="rounded-t-3xl overflow-hidden mt-6">
         <table className="w-full text-sm border-separate border-spacing-y-3">
           {/* HEADER - Gradient background */}
@@ -225,12 +200,12 @@ function OrderList() {
             </tr>
           </thead>
 
-          {/* BODY - With gradient underlines and borders */}
+          {/* BODY */}
           <tbody>
             {currentOrders.map((order, index) => (
               <tr key={index} className="bg-white shadow-sm hover:shadow-md transition">
                 <td className={`${tdBase} font-medium rounded-l-xl text-black`}>
-                  {order.id}
+                  {order.displayId}
                 </td>
 
                 <td className={tdBase}>
@@ -267,11 +242,10 @@ function OrderList() {
                   </span>
                 </td>
 
-                {/* ACTION - With gradient borders like VendorList */}
+                {/* ACTION - Eye Icon */}
                 <td className="relative p-4 rounded-r-xl text-right">
                   {/* Right gradient border */}
                   <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
-
                   {/* Bottom gradient border */}
                   <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
 
@@ -288,7 +262,7 @@ function OrderList() {
         </table>
       </div>
 
-      {/* PAGINATION - Exactly like VendorList */}
+      {/* PAGINATION */}
       <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-600">
         <button
           disabled={currentPage === 1}

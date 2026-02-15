@@ -22,12 +22,21 @@ import CategoryList from './screens/Catalog/Category/CategoryList.tsx'
 import CreateCategory from './screens/Catalog/Category/CreateCategory.tsx'
 import InventoryManagementList from './screens/Catalog/InventoryManagement/InventoryManagementList.tsx'
 import CreateInventoryManagement from './screens/Catalog/InventoryManagement/CreateInventoryManagement.tsx'
-import LegalityControlList from './screens/Catalog/legalityControl/legalityControlList.tsx'
+import LegalityControlList from './screens/Catalog/legalityControl/LegalityControlList.tsx'
 import ProductBaseList from './screens/Catalog/ProductBase/ProductBaseList.tsx'
 import CreatelegalityControl from './screens/Catalog/legalityControl/CreatelegalityControl.tsx'
 import CreateProductSharing from './screens/Catalog/ProductSharing/CreateProductSharing.tsx'
 import CreateProductBase from './screens/Catalog/ProductBase/CreateProductBase.tsx'
 import ProductSharingList from './screens/Catalog/ProductSharing/ProductSharingList.tsx'
+import UsersRoles from "./screens/Users/UsersRoles.tsx";
+import UserList from "./screens/Users/UserList.tsx";
+import UsersGroup from "./screens/Users/UsersGroup.tsx";
+import AddUser from "./component/Users/AddUser.tsx";
+import UserDetails from "./component/Users/UserDetails.tsx";
+import AddRole from "./component/Users/UserRole/AddRole.tsx";
+import RoleDetails from "./component/Users/UserRole/RoleDetails.tsx";
+import OrderDetails from "./component/orderManagement/OrderDetails.tsx";
+import AddOrder from "./component/orderManagement/AddOrder.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +48,8 @@ export const router = createBrowserRouter([
       {path : "/storeCardList" , element : <StoreCardList/>},
       {path : "/store" , element : <Store/>},
       {path : "/orderlist" , element : <OrderList/>},
+       { path: "/addorder", element: <AddOrder /> },
+      { path: "/order/:id", element: <OrderDetails /> },
       {path : "/CreateStore" , element : <CreateStore/>},
       {path : "/Verdor" , element : <VendorList/>},
       {path : "/Verder1" , element : <Vendor/>},
@@ -64,6 +75,14 @@ export const router = createBrowserRouter([
       {path: "/ProductSharingList", element: <ProductSharingList/> },
       {path: "/CreateProductSharing", element: <CreateProductSharing/> },
       {path: "/CreateProductSharing/:id", element: <CreateProductSharing/> },
+      {path : "/userlist" , element : <UserList />},
+      {path:"/usersroles", element:<UsersRoles />},
+       { path:"/addrole", element:<AddRole />},
+        {path:"/role/:id", element:<RoleDetails />},
+      {path : "/usersgroup" , element : <UsersGroup/>},
+      {path : "/adduser" , element : <AddUser/>},
+   {path:"/user/:id", element:<UserDetails /> },
+
     ]
   },
   { path: "/login", element: <Login /> },

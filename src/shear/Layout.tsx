@@ -45,7 +45,16 @@ const menuItems = [
       { label: "Inventory Management", path: "/InventoryManagement" },
     ]
   },
-  { label: "Users", icon: FaUsers, path: "/" },
+  {
+    label: "Users",
+    icon: FaUsers,
+    path: "/",
+    children: [
+      { label: "Users List", path: "/userlist" },
+      { label: "Roles", path: "/usersroles" },
+      { label: "Group", path: "/usersgroup" },
+    ],
+  },
   {
     label: "Vendors",
     icon: FaHandshake,

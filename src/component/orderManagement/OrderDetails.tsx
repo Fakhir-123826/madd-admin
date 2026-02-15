@@ -1,20 +1,25 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { BsDownload } from "react-icons/bs";
 import { FaCircleCheck } from "react-icons/fa6";
 
+function OrderDetails() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const order = location.state?.order;
 
-interface OrderDetailsProps {
-  orderId?: string;
-  onBack?: () => void;
-}
-
-function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
   const [showStatusPopup, setShowStatusPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("Active");
+  const [selectedStatus, setSelectedStatus] = useState(order?.status || "Delivered");
 
-  const statusOptions = ["Delivered", "Shipped", "Proccessing", "Cancelled"];
+  // If no order data, redirect to order list
+  if (!order) {
+    navigate('/orderlist');
+    return null;
+  }
+
+  const statusOptions = ["Delivered", "Shipped", "Processing", "Cancelled", "Pending"];
 
   const handleChangeStatus = () => {
     setShowStatusPopup(true);
@@ -29,8 +34,12 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
     setShowSuccessPopup(false);
   };
 
+  const handleBack = () => {
+    navigate('/orderlist');
+  };
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen relative">
+    <div className="p-6 bg-gray-50 rounded-xl min-h-screen relative">
       {/* Status Change Popup */}
       {showStatusPopup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -60,28 +69,29 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
       )}
 
       {/* Success Popup */}
-{showSuccessPopup && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-2xl shadow-2xl w-96 p-8 text-center">
-      <div className="flex justify-center mb-4">
-        <FaCircleCheck className="text-6xl text-blue-500" />
-      </div>
-      <h2 className="text-2xl font-semibold text-blue-500 mb-2">Changes Saved!</h2>
-      <p className="text-gray-600 mb-6">Your changes has been saved</p>
-      
-      <button
-        onClick={handleCloseSuccess}
-        className="bg-blue-500 text-white px-8 py-2 rounded-lg hover:bg-teal-600 transition-all font-medium"
-      >
-        OK
-      </button>
-    </div>
-  </div>
-)}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-96 p-8 text-center">
+            <div className="flex justify-center mb-4">
+              <FaCircleCheck className="text-6xl text-blue-500" />
+            </div>
+            <h2 className="text-2xl font-semibold text-blue-500 mb-2">Changes Saved!</h2>
+            <p className="text-gray-600 mb-6">Your changes has been saved</p>
+            
+            <button
+              onClick={handleCloseSuccess}
+              className="bg-blue-500 text-white px-8 py-2 rounded-lg hover:bg-teal-600 transition-all font-medium"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header with Back Button */}
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={onBack}
+          onClick={handleBack}
           className="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50"
         >
           <ArrowLeft size={20} />
@@ -99,7 +109,7 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
           <div className="p-6 grid grid-cols-4 gap-4">
             <div>
               <h2 className="text-sm text-gray-500 font-medium">Order ID</h2>
-              <p className="text-lg font-semibold">{orderId}</p>
+              <p className="text-lg font-semibold">{order.id}</p>
             </div>
 
             <div>
@@ -109,13 +119,18 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
 
             <div>
               <h2 className="text-sm text-gray-500 font-medium">Date & Time</h2>
-              <p className="text-lg">3:00 am - 5 July 2025</p>
+              <p className="text-lg">{order.datetime}</p>
             </div>
 
             <div>
               <h2 className="text-sm text-gray-500 font-medium">Status</h2>
               <div className="flex items-center gap-3">
-                <p className="text-lg text-green-600 font-medium">Delivered</p>
+                <p className={`text-lg font-medium ${
+                  order.status === 'Delivered' ? 'text-green-600' : 
+                  order.status === 'Cancelled' ? 'text-red-600' : 'text-blue-600'
+                }`}>
+                  {order.status}
+                </p>
                 <button 
                   onClick={handleChangeStatus}
                   className="text-sm text-teal-500 hover:underline"
@@ -127,6 +142,7 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
           </div>
         </div>
 
+        {/* Rest of the component remains same... */}
         {/* Card 2 - Customer Information */}
         <div className="rounded-xl border-2 border-gray-300">
           <div className="px-6 py-4 rounded-t-xl bg-gradient-to-r from-teal-400 to-green-400 text-white font-medium">
@@ -137,7 +153,7 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
             <div className="grid grid-cols-4 gap-4 mb-4">
               <div>
                 <h2 className="text-sm text-gray-500 font-medium">Customer Name</h2>
-                <p className="text-lg">Icons Snits</p>
+                <p className="text-lg">{order.name}</p>
               </div>
 
               <div>
@@ -250,23 +266,28 @@ function OrderDetails({ orderId = "#330894", onBack }: OrderDetailsProps) {
             <div className="grid grid-cols-4 gap-4 mb-4">
               <div>
                 <h2 className="text-sm text-gray-500 font-medium">Payment Method</h2>
-                <p className="text-lg">{orderId}</p>
+                <p className="text-lg">{order.payment}</p>
               </div>
 
               <div>
                 <h2 className="text-sm text-gray-500 font-medium">Payment Status</h2>
-                <p className="text-lg">Out & Time</p>
+                <p className="text-lg">Paid</p>
               </div>
 
               <div>
                 <h2 className="text-sm text-gray-500 font-medium">Date & Time</h2>
-                <p className="text-lg">3:00 am - 5 July 2025</p>
+                <p className="text-lg">{order.datetime}</p>
               </div>
 
               <div>
                 <h2 className="text-sm text-gray-500 font-medium">Status</h2>
                 <div className="flex items-center gap-3">
-                  <p className="text-lg text-green-600 font-medium">Delivered</p>
+                  <p className={`text-lg font-medium ${
+                    order.status === 'Delivered' ? 'text-green-600' : 
+                    order.status === 'Cancelled' ? 'text-red-600' : 'text-blue-600'
+                  }`}>
+                    {order.status}
+                  </p>
                   <button 
                     onClick={handleChangeStatus}
                     className="text-sm text-teal-500 hover:underline"
