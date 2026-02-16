@@ -77,7 +77,7 @@ function AddRole() {
   );
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div className="bg-white rounded-xl min-h-screen p-6">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
 
         {/* Header */}
