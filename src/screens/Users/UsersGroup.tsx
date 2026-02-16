@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaPlus, FaEllipsisV, FaFilter, FaRedo, FaSearch } from "react-icons/fa";
+import { FaPlus, FaEye, FaFilter, FaRedo, FaSearch } from "react-icons/fa";
 
 function UsersGroup() {
     const navigate = useNavigate();
@@ -10,7 +10,6 @@ function UsersGroup() {
 
     // Filter states
     const [filters, setFilters] = useState({
-        status: "",
         name: "",
         email: ""
     });
@@ -22,7 +21,6 @@ function UsersGroup() {
             description: "Handles promotions and campaigns",
             usersCount: 12,
             defaultRole: "Manager",
-            status: "Active",
         },
         {
             id: "2",
@@ -30,7 +28,6 @@ function UsersGroup() {
             description: "Handles sales and customer inquiries",
             usersCount: 8,
             defaultRole: "Sales Rep",
-            status: "Active",
         },
         {
             id: "3",
@@ -38,7 +35,6 @@ function UsersGroup() {
             description: "Creates and manages content",
             usersCount: 5,
             defaultRole: "Editor",
-            status: "Active",
         },
         {
             id: "4",
@@ -46,7 +42,6 @@ function UsersGroup() {
             description: "Oversees product development",
             usersCount: 4,
             defaultRole: "Product Lead",
-            status: "Active",
         },
         {
             id: "5",
@@ -54,7 +49,6 @@ function UsersGroup() {
             description: "Handles customer queries",
             usersCount: 15,
             defaultRole: "Support Agent",
-            status: "Inactive",
         },
         {
             id: "6",
@@ -62,7 +56,6 @@ function UsersGroup() {
             description: "Creates designs and graphics",
             usersCount: 6,
             defaultRole: "Designer",
-            status: "Active",
         },
         {
             id: "7",
@@ -70,7 +63,6 @@ function UsersGroup() {
             description: "Manages hiring and employee relations",
             usersCount: 3,
             defaultRole: "HR Manager",
-            status: "Active",
         },
         {
             id: "8",
@@ -78,7 +70,6 @@ function UsersGroup() {
             description: "Handles budgeting and accounting",
             usersCount: 4,
             defaultRole: "Accountant",
-            status: "Active",
         },
         {
             id: "9",
@@ -86,7 +77,6 @@ function UsersGroup() {
             description: "Technical support and infrastructure",
             usersCount: 7,
             defaultRole: "Tech Lead",
-            status: "Active",
         },
     ]);
 
@@ -99,7 +89,6 @@ function UsersGroup() {
 
     const resetFilters = () => {
         setFilters({
-            status: "",
             name: "",
             email: ""
         });
@@ -107,25 +96,11 @@ function UsersGroup() {
 
     // Filter groups based on filters
     const filteredGroups = groups.filter(group => {
-        if (filters.status && group.status !== filters.status) {
-            return false;
-        }
         if (filters.name && !group.groupName.toLowerCase().includes(filters.name.toLowerCase())) {
             return false;
         }
         return true;
     });
-
-    const statusStyle = (status: string) => {
-        switch (status) {
-            case "Active":
-                return "bg-green-100 text-green-600";
-            case "Inactive":
-                return "bg-red-100 text-red-600";
-            default:
-                return "bg-gray-100 text-gray-600";
-        }
-    };
 
     // Pagination logic
     const totalPages = Math.ceil(filteredGroups.length / itemsPerPage);
@@ -207,7 +182,7 @@ function UsersGroup() {
                 </button>
             </div>
 
-            {/* Filter Bar - EXACT same as UserList */}
+            {/* Filter Bar */}
             <div className="flex items-center overflow-hidden h-[52px] pt-6.5 py-10">
                 {/* Left Side Filters */}
                 <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[60%]">
@@ -220,21 +195,6 @@ function UsersGroup() {
                     {/* Filter By Text */}
                     <div className="px-5 flex items-center border-r border-gray-200 text-sm font-medium text-gray-700">
                         Filter By
-                    </div>
-
-                    {/* Status Dropdown */}
-                    <div className="relative border-r border-gray-200">
-                        <select 
-                            name="status"
-                            value={filters.status}
-                            onChange={handleFilterChange}
-                            className="h-[52px] px-5 pr-9 text-sm bg-transparent outline-none appearance-none cursor-pointer text-gray-700"
-                        >
-                            <option value="">Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">▾</span>
                     </div>
 
                     {/* Name Dropdown */}
@@ -298,8 +258,7 @@ function UsersGroup() {
                             <th className="p-4 text-left">Description</th>
                             <th className="p-4 text-left">Users in Group</th>
                             <th className="p-4 text-left">Default Role</th>
-                            <th className="p-4 text-left">Status</th>
-                            <th className="p-4"></th>
+                            <th className="p-4 text-center">Actions</th>
                         </tr>
                     </thead>
 
@@ -323,18 +282,8 @@ function UsersGroup() {
                                     {group.defaultRole}
                                 </td>
 
-                                <td className={tdBase}>
-                                    <span
-                                        className={`px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
-                                            group.status
-                                        )}`}
-                                    >
-                                        {group.status}
-                                    </span>
-                                </td>
-
-                                {/* ACTION - Three Dots Icon */}
-                                <td className="relative p-4 rounded-r-xl text-right">
+                                {/* ACTION - Eye Icon */}
+                                <td className="relative p-4 rounded-r-xl text-center">
                                     {/* Right gradient border */}
                                     <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
                                     {/* Bottom gradient border */}
@@ -342,9 +291,10 @@ function UsersGroup() {
 
                                     <button
                                         onClick={() => handleViewGroup(group)}
-                                        className="relative text-gray-400 cursor-pointer hover:text-gray-600"
+                                        className="text-gray-400 hover:text-teal-600 transition-colors"
+                                        title="View Group Details"
                                     >
-                                        <FaEllipsisV size={18} />
+                                        <FaEye size={18} />
                                     </button>
                                 </td>
                             </tr>
