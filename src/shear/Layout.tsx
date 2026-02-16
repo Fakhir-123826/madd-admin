@@ -77,7 +77,16 @@ const menuItems = [
   { label: "Return Platform", icon: FaUndoAlt, path: "/" },
   { label: "Marketing", icon: FaBullhorn, path: "/" },
   { label: "Payments", icon: FaCreditCard, path: "/" },
-  { label: "Taxes", icon: FaMoneyBill, path: "/" },
+  // { label: "Taxes", icon: FaMoneyBill, path: "/taxes" },
+    {
+    label: "Taxes",
+    icon: FaMoneyBill,
+    path: "/Vendor",
+    children: [
+      { label: "Taxes", path: "/taxes" },
+      { label: "Invoice", path: "/invoicemanagement" },
+    ],
+  },
   { label: "Shipping", icon: FaTruck, path: "/" },
   { label: "Reports", icon: FaChartBar, path: "/" },
 ];

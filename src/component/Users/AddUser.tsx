@@ -66,169 +66,230 @@ function AddUser() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={handleCancel}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <h1 className="text-lg font-semibold">Add New User</h1>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <h2 className="text-xl font-semibold mb-6">User Info</h2>
-
-        {/* Form Grid */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          {/* Username */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Username <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              placeholder="User Name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-            />
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Role <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              placeholder="Enter Role"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-            />
-          </div>
-
-          {/* Role Description */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Role Description <span className="text-gray-400">(100 words max)</span>
-            </label>
-            <textarea
-              name="roleDescription"
-              value={formData.roleDescription}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Description"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              placeholder="Email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-            />
-          </div>
-
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              placeholder="Phone number"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-            />
-          </div>
-        </div>
-
-        {/* Groups Section */}
-        <div className="mb-6">
-          <h3 className="text-md font-semibold mb-3">Groups</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {availableGroups.map((group, index) => (
-              <label key={index} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.groups.includes(group)}
-                  onChange={() => handleGroupToggle(group)}
-                  className="w-4 h-4 text-teal-500 rounded focus:ring-teal-400"
-                />
-                <span className="text-sm text-gray-700">{group}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Save Groups Button */}
-        <div className="mb-6">
+    <div className="min-h-screen bg-white rounded-xl p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        
+        {/* Header with Gradient */}
+        <div className="bg-gradient-to-r from-teal-500 to-green-500 px-6 py-4 rounded-t-2xl flex items-center gap-4 shadow-lg">
           <button
-            type="button"
-            className="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors hover:cursor-pointer"
-          >
-            Save Groups
-          </button>
-        </div>
-
-        {/* Status Section with Toggle Switch */}
-        <div className="mb-6">
-          <h3 className="text-md font-semibold mb-3">Status</h3>
-          <div className="flex items-center gap-4">
-            <span className={`text-sm ${!formData.status ? 'text-red-500' : 'text-gray-700'}`}>Inactive</span>
-            <button
-              type="button"
-              onClick={handleStatusToggle}
-              className={`relative w-14 h-8 rounded-full transition-colors duration-300 ${
-                formData.status ? "bg-blue-500" : "bg-gray-300"
-              }`}
-            >
-              <span
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${
-                  formData.status ? "translate-x-6" : ""
-                }`}
-              ></span>
-            </button>
-            <span className={`text-sm ${formData.status ? 'text-blue-700' : 'text-gray-500'}`}>Active</span>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4">
-          <button
-            type="button"
             onClick={handleCancel}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors hover:cursor-pointer"
+            className="text-white hover:bg-white/20 p-2 rounded-xl transition-all duration-200"
           >
-            Cancel
+            <ArrowLeft size={20} />
           </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-gradient-to-r from-teal-400 to-green-400 text-white rounded-lg hover:opacity-90 transition-opacity hover:cursor-pointer"
-          >
-            Save Changes
-          </button>
+          <h1 className="text-white font-semibold text-xl tracking-wide">
+            Add New User
+          </h1>
         </div>
-      </form>
+
+        {/* Main Form Card */}
+        <div className="bg-white rounded-b-2xl shadow-xl p-6 md:p-8 border-x border-b border-gray-200">
+          <form onSubmit={handleSubmit}>
+            
+            {/* User Info Section */}
+            <h2 className="text-lg font-semibold mb-5 flex items-center gap-2 text-gray-800">
+              <span className="w-1 h-6 bg-teal-500 rounded-full"></span>
+              User Information
+            </h2>
+
+            {/* Form Grid */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              {/* Username */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  Username <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter username"
+                    className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                  />
+                  {formData.username && (
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  Role <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter role"
+                    className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                  />
+                  {formData.role && (
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter email address"
+                    className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                  />
+                  {formData.email && (
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Phone Number */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  Phone number <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter phone number"
+                    className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                  />
+                  {formData.phone && (
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Role Description - Full Width */}
+              <div className="col-span-2 space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  Role Description
+                  <span className="text-gray-400 text-xs ml-2">(100 words max)</span>
+                </label>
+                <textarea
+                  name="roleDescription"
+                  value={formData.roleDescription}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Describe the user's role and responsibilities..."
+                  className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Groups Section */}
+            <div className="mb-8">
+              <h3 className="text-md font-semibold mb-4 flex items-center gap-2 text-gray-800">
+                <span className="w-1 h-5 bg-green-500 rounded-full"></span>
+                Groups ({formData.groups.length} selected)
+              </h3>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-5 bg-gray-50 rounded-xl border border-gray-200">
+                {availableGroups.map((group, index) => (
+                  <label 
+                    key={index} 
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
+                      formData.groups.includes(group) 
+                        ? 'bg-teal-50 border border-teal-200' 
+                        : 'hover:bg-gray-100'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.groups.includes(group)}
+                      onChange={() => handleGroupToggle(group)}
+                      className="w-5 h-5 text-teal-500 rounded focus:ring-teal-400"
+                    />
+                    <span className={`text-sm font-medium ${
+                      formData.groups.includes(group) ? 'text-teal-700' : 'text-gray-700'
+                    }`}>
+                      {group}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Save Groups Button */}
+              <div className="mt-4">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                >
+                  Save Groups
+                </button>
+              </div>
+            </div>
+
+            {/* Status Section with Toggle Switch */}
+            <div className="mb-8">
+              <h3 className="text-md font-semibold mb-4 flex items-center gap-2 text-gray-800">
+                <span className="w-1 h-5 bg-purple-500 rounded-full"></span>
+                Status
+              </h3>
+              
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200 w-fit">
+                <span className={`text-sm font-medium ${!formData.status ? 'text-red-600' : 'text-gray-500'}`}>
+                  Inactive
+                </span>
+                
+                <button
+                  type="button"
+                  onClick={handleStatusToggle}
+                  className={`relative w-14 h-7 flex items-center rounded-full p-1 transition-all duration-300 ${
+                    formData.status ? "bg-teal-500" : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`absolute bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
+                      formData.status ? "translate-x-7" : "translate-x-0"
+                    }`}
+                  ></span>
+                </button>
+                
+                <span className={`text-sm font-medium ${formData.status ? 'text-teal-600' : 'text-gray-500'}`}>
+                  Active
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="flex items-center gap-2 px-8 py-3.5 border-2 border-red-500 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all duration-300 font-medium shadow-md hover:shadow-lg"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

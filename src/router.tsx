@@ -39,6 +39,9 @@ import OrderDetails from "./component/orderManagement/OrderDetails.tsx";
 import AddOrder from "./component/orderManagement/AddOrder.tsx";
 import GroupDetails from "./component/Users/UserGroup/GroupDetails.tsx";
 import AddGroup from "./component/Users/UserGroup/AddGroup.tsx";
+import Taxes from "./screens/Taxes/Taxes.tsx";
+import InvoiceManagement from "./screens/Taxes/InvoiceManagement.tsx";
+import AddRule from "./component/Taxes/AddRule.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -86,11 +89,17 @@ export const router = createBrowserRouter([
       { path: "/usersroles", element: <UsersRoles /> },
       { path: "/addrole", element: <AddRole /> },
       { path: "/role/:id", element: <RoleDetails /> },
-      
+
       // User Group Section
       { path: "/usersgroup", element: <UsersGroup /> },
-      {path:"/addgroup", element:<AddGroup />},
-        {path:"/group/:id", element:<GroupDetails /> }
+      { path: "/addgroup", element: <AddGroup /> },
+      { path: "/group/:id", element: <GroupDetails /> },
+      
+      // Taxes
+      { path: "/taxes", element: <Taxes /> },
+      { path: "/add-rule", element: <AddRule /> },
+      { path: "/invoicemanagement", element: <InvoiceManagement /> },
+      
 
 
     ]
