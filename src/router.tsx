@@ -42,6 +42,12 @@ import AddGroup from "./component/Users/UserGroup/AddGroup.tsx";
 import Taxes from "./screens/Taxes/Taxes.tsx";
 import InvoiceManagement from "./screens/Taxes/InvoiceManagement.tsx";
 import AddRule from "./component/Taxes/AddRule.tsx";
+import CountryManagement from "./screens/LocalCompanies/CountryManagement.tsx";
+import AddCountry from "./component/LocalCompanies/AddCountry.tsx";
+import CurrencyManagement from "./component/LocalCompanies/CurrencyManagement.tsx";
+import LanguageManagement from "./component/LocalCompanies/LanguageManagement.tsx";
+import AddLanguage from "./component/LocalCompanies/Language Management/AddLanguage.tsx";
+import AddCurrency from "./component/LocalCompanies/Currency Management/AddCurrency.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -94,6 +100,18 @@ export const router = createBrowserRouter([
       { path: "/usersgroup", element: <UsersGroup /> },
       { path: "/addgroup", element: <AddGroup /> },
       { path: "/group/:id", element: <GroupDetails /> },
+      
+      // Local Companies....
+      // Country Managment
+      { path: "/country-management", element: <CountryManagement /> },
+      { path: "/addcountry", element: <AddCountry /> },
+      // Currency Managment
+      { path: "/currency-management", element: <CurrencyManagement /> },
+      { path: "/addcurrency", element: <AddCurrency /> },
+      // Languages Managment
+      { path: "/language-management", element: <LanguageManagement /> },
+      { path: "/add", element: <AddLanguage /> },
+
       
       // Taxes
       { path: "/taxes", element: <Taxes /> },

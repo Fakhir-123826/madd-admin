@@ -45,6 +45,7 @@ const menuItems = [
       { label: "Inventory Management", path: "/InventoryManagement" },
     ]
   },
+  // Users Section
   {
     label: "Users",
     icon: FaUsers,
@@ -69,7 +70,18 @@ const menuItems = [
   { label: "CMS", icon: FaFileAlt, path: "/" },
   { label: "OMS", icon: FaCogs, path: "/" },
   { label: "Integrations", icon: FaGlobe, path: "/" },
-  { label: "Local Companies", icon: FaBuilding, path: "/" },
+  // { label: "Local Companies", icon: FaBuilding, path: "/" },
+  // Local Companies
+    {
+    label: "Local Companies",
+    icon: FaBuilding,
+    path: "/",
+    children: [
+      { label: "Country Management", path: "/country-management" },
+      { label: "Currency Managment", path: "/currency-management" },
+      { label: "Languages Managment", path: "/language-management" },
+    ],
+  },
   { label: "Marketplace", icon: FaShoppingBag, path: "/" },
   { label: "MLM System", icon: FaProjectDiagram, path: "/" },
   { label: "Settings", icon: FaCog, path: "/" },
