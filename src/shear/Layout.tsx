@@ -84,7 +84,19 @@ const menuItems = [
   },
   { label: "Marketplace", icon: FaShoppingBag, path: "/" },
   { label: "MLM System", icon: FaProjectDiagram, path: "/" },
-  { label: "Settings", icon: FaCog, path: "/" },
+  // { label: "Settings", icon: FaCog, path: "/" },
+  // Setting Section 
+  {
+    label: "Settings",
+    icon: FaCog,
+    path: "/",
+    children: [
+      { label: "Translation", path: "/translation" },
+      { label: "Updates", path: "/updates" },
+      { label: "Backups", path: "/backups" },
+      { label: "Audit Logs", path: "/auditlogs" },
+    ],
+  },
   { label: "Domain", icon: FaGlobe, path: "/" },
   { label: "Return Platform", icon: FaUndoAlt, path: "/" },
   { label: "Marketing", icon: FaBullhorn, path: "/" },

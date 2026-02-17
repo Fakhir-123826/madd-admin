@@ -133,31 +133,12 @@
                 </div>
 
                 {/* Content */}
-                <div className="p-6 flex flex-col md:flex-row justify-between gap-8">
+                <div className="p-6 flex flex-col md:flex-row justify-between gap-8 w-[60]">
                 
                 {/* Left Side */}
                 <div className="space-y-4 w-full">
 
-                    {/* Toggles */}
-                    <div className="absolute left-130">
-                    <div className="flex gap-12 pt-2">
-                        <ToggleSwitch
-                        label="Includes Tax"
-                        enabled={invoice.includesTax}
-                        onChange={() =>
-                            toggleField(invoice.id, "includesTax")
-                        }
-                        />
 
-                        <ToggleSwitch
-                        label="Auto Email"
-                        enabled={invoice.autoEmail}
-                        onChange={() =>
-                            toggleField(invoice.id, "autoEmail")
-                        }
-                        />
-                    </div>
-                    </div>
 
                     {/* Paid By */}
                     <div>
@@ -189,6 +170,28 @@
                     </button>
                     </div>
                 </div>
+
+                
+                    {/* Toggles */}
+                    <div className="">
+                    <div className="flex gap-12 pt-2">
+                        <ToggleSwitch
+                        label="Includes Tax"
+                        enabled={invoice.includesTax}
+                        onChange={() =>
+                            toggleField(invoice.id, "includesTax")
+                        }
+                        />
+
+                        <ToggleSwitch
+                        label="Auto Email"
+                        enabled={invoice.autoEmail}
+                        onChange={() =>
+                            toggleField(invoice.id, "autoEmail")
+                        }
+                        />
+                    </div>
+                    </div>
 
                 {/* Right Side - Invoice Preview */}
                 <div className="flex justify-center md:justify-end">

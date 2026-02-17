@@ -39,7 +39,7 @@ function OrderDetails() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 rounded-xl min-h-screen relative">
+    <div className="p-6 bg-white rounded-xl min-h-screen relative">
       {/* Status Change Popup */}
       {showStatusPopup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

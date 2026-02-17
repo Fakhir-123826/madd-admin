@@ -48,6 +48,11 @@ import CurrencyManagement from "./component/LocalCompanies/CurrencyManagement.ts
 import LanguageManagement from "./component/LocalCompanies/LanguageManagement.tsx";
 import AddLanguage from "./component/LocalCompanies/Language Management/AddLanguage.tsx";
 import AddCurrency from "./component/LocalCompanies/Currency Management/AddCurrency.tsx";
+import Translation from "./screens/Setting/Translation.tsx";
+import Updates from "./screens/Setting/Updates.tsx";
+import Backups from "./screens/Setting/Backups.tsx";
+import AddBackup from "./component/Setting/Backup/AddBackup.tsx";
+import AuditLogs from "./screens/Setting/Audit.logs.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -112,11 +117,17 @@ export const router = createBrowserRouter([
       { path: "/language-management", element: <LanguageManagement /> },
       { path: "/addlanguage", element: <AddLanguage /> },
 
-      
       // Taxes
       { path: "/taxes", element: <Taxes /> },
       { path: "/add-rule", element: <AddRule /> },
       { path: "/invoicemanagement", element: <InvoiceManagement /> },
+
+      // Settings
+      { path: "/translation", element: <Translation /> },
+      { path: "/updates", element: <Updates /> },
+      { path: "/backups", element: <Backups /> },
+      { path: "addbackup", element: <AddBackup /> },
+      { path: "auditlogs", element: <AuditLogs /> },
       
 
 
