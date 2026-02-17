@@ -229,7 +229,7 @@ const ProductBaseList  = () => {
                     {/* bottom gradient */}
                     <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
 
-                    <FaEllipsisV className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
+                    <FaEllipsisV onClick={() => navigate("/ProductBase")} className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
                   </td>
                 </tr>
 

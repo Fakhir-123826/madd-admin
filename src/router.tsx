@@ -28,6 +28,8 @@ import CreatelegalityControl from './screens/Catalog/legalityControl/Createlegal
 import CreateProductSharing from './screens/Catalog/ProductSharing/CreateProductSharing.tsx'
 import CreateProductBase from './screens/Catalog/ProductBase/CreateProductBase.tsx'
 import ProductSharingList from './screens/Catalog/ProductSharing/ProductSharingList.tsx'
+import Category from "./screens/Catalog/Category/Category.tsx";
+import ProductBase from "./screens/Catalog/ProductBase/ProductBase.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +52,7 @@ export const router = createBrowserRouter([
       {path : "/SubscriptionList" , element : <SubscriptionList/>},
       {path: "/CreateSubscription/:id", element: <CreateSubscription /> },
       {path: "/CategoryList", element: <CategoryList /> },
+      {path: "/Category", element: <Category/> },
       {path: "/CreateCategory", element: <CreateCategory/> },
       {path: "/CreateCategory/:id", element: <CreateCategory/> },
       {path: "/InventoryManagementList", element: <InventoryManagementList /> },
@@ -59,6 +62,7 @@ export const router = createBrowserRouter([
       {path: "/CreatelegalityControl", element: <CreatelegalityControl/> },
       {path: "/CreatelegalityControl/:id", element: <CreatelegalityControl/> },
       {path: "/ProductBaseList", element: <ProductBaseList/> },
+      {path: "/ProductBase", element: <ProductBase/> },
       {path: "/CreateProductBase", element: <CreateProductBase/> },
       {path: "/CreateProductBase/:id", element: <CreateProductBase/> },
       {path: "/ProductSharingList", element: <ProductSharingList/> },

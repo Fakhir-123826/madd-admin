@@ -172,7 +172,7 @@ const CategoryList  = () => {
 
         {/* TABLE */}
         {/* TABLE */}
-        <div className="rounded-t-3xl overflow-hidden">
+        <div className="rounded-t-3xl overflow-hidden ">
           <table className="w-full text-sm border-separate border-spacing-y-3">
             {/* HEADER */}
             <thead className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
@@ -222,14 +222,14 @@ const CategoryList  = () => {
                   </td>
 
                   {/* ACTION */}
-                  <td className="relative p-4 rounded-r-xl text-right">
+                  <td className="relative p-4 rounded-r-xl text-right" >
                     {/* right gradient */}
                     <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
 
                     {/* bottom gradient */}
                     <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
 
-                    <FaEllipsisV className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
+                    <FaEllipsisV onClick={() => navigate("/Category")} className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
                   </td>
                 </tr>
 
