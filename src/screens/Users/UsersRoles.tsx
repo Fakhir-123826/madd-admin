@@ -1,15 +1,11 @@
 import React, { useState } from "react";
-import { ArrowLeft, Eye } from "lucide-react";
-import { FaPlus, FaEllipsisV, FaFilter, FaRedo, FaSearch, FaEye } from "react-icons/fa";
-import RoleDetails from "../../component/Users/UserRole/RoleDetails";
-import AddRole from "../../component/Users/UserRole/AddRole";
+import { useNavigate } from "react-router-dom";
+import { FaPlus, FaFilter, FaRedo, FaSearch, FaEye } from "react-icons/fa";
 
 function UsersRoles() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState('userList');
-  const [selectedRole, setSelectedRole] = useState<any>(null);
-  const [showAddRole, setShowAddRole] = useState(false);
-  const [showEditRole, setShowEditRole] = useState(false);
+  const [activeTab, setActiveTab] = useState('roles');
   const itemsPerPage = 8;
 
   // Sample data for roles
@@ -36,60 +32,27 @@ function UsersRoles() {
   };
 
   const handleViewRole = (role: any) => {
-    setSelectedRole(role);
-    setShowAddRole(false);
-    setShowEditRole(false);
+    // Navigate to role details with role data in state
+    navigate(`/role/${role.id}`, { state: { role } });
   };
 
-  const handleEditRole = (role: any) => {
-    setSelectedRole(role);
-    setShowEditRole(true);
-    setShowAddRole(false);
+  const handleAddRole = () => {
+    // Navigate to add role page
+    navigate('/addrole');
   };
 
-  const handleAddRole = (newRole: any) => {
-    setRoles([...roles, { ...newRole, id: roles.length + 1 }]);
-    setShowAddRole(false);
-    setSelectedRole(null);
-  };
-
-  const handleUpdateRole = (updatedRole: any) => {
-    setRoles(roles.map(role => role.id === selectedRole.id ? { ...updatedRole, id: role.id } : role));
-    setShowEditRole(false);
-    setSelectedRole(null);
-  };
-
-  const handleBackToList = () => {
-    setSelectedRole(null);
-    setShowAddRole(false);
-    setShowEditRole(false);
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === 'userList') {
+      navigate('/userlist');
+    } else if (tab === 'groups') {
+      navigate('/usersgroup');
+    }
   };
 
   // Base style for table cells with gradient underlines
   const tdBase = "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
-  // If showing Add Role form
-  if (showAddRole) {
-    return <AddRole onSave={handleAddRole} onCancel={handleBackToList} />;
-  }
-
-  // If showing Edit Role form
-  if (showEditRole && selectedRole) {
-    return <AddRole onSave={handleUpdateRole} onCancel={handleBackToList} editRole={selectedRole} />;
-  }
-
-  // If showing Role Details
-  if (selectedRole && !showAddRole && !showEditRole) {
-    return (
-      <RoleDetails 
-        role={selectedRole} 
-        onBack={handleBackToList}
-        // onEdit={() => handleEditRole(selectedRole)}
-      />
-    );
-  }
-
-  // Default view - Role List
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       {/* Header */}
@@ -99,7 +62,7 @@ function UsersRoles() {
 
           {/* Add New Role Button */}
           <button
-            onClick={() => setShowAddRole(true)}
+            onClick={handleAddRole}
             className="
               flex items-center gap-3
               px-6 py-1
@@ -120,9 +83,39 @@ function UsersRoles() {
         </div>
       </div>
 
-    
+        {/* Tabs */}
+                    <div className="flex gap-6 border-b border-gray-200">
+                        <button
+                            onClick={() => navigate('/userlist')}
+                            className={`pb-2 transition-colors ${location.pathname === '/userlist'
+                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                                    : 'text-gray-500 hover:text-teal-600'
+                                }`}
+                        >
+                            User List
+                        </button>
+                        <button
+                            onClick={() => navigate('/usersroles')}
+                            className={`pb-2 transition-colors ${location.pathname === '/usersroles'
+                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                                    : 'text-gray-500 hover:text-teal-600'
+                                }`}
+                        >
+                            Roles
+                        </button>
+                        <button
+                            onClick={() => navigate('/usersgroup')}
+                            className={`pb-2 transition-colors ${location.pathname === '/usersgroup'
+                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                                    : 'text-gray-500 hover:text-teal-600'
+                                }`}
+                        >
+                            Groups
+                        </button>
+                    </div>
+
       {/* Filter Bar */}
-      <div className="flex items-center overflow-hidden h-[52px] py-10">
+      <div className="flex items-center overflow-hidden h-[52px] pt-12 py-10">
         {/* Left Side Filters */}
         <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[60%]">
           
@@ -213,7 +206,7 @@ function UsersRoles() {
                   {role.usersAssigned || '-'}
                 </td>
 
-                {/* ACTION - Eye Icon and Three Dots */}
+                {/* ACTION - Eye Icon */}
                 <td className="relative p-4 rounded-r-xl">
                   {/* Right gradient border */}
                   <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
@@ -229,7 +222,6 @@ function UsersRoles() {
                     >
                       <FaEye size={18} />
                     </button>
-
                   </div>
                 </td>
               </tr>

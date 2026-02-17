@@ -6,7 +6,7 @@ function FilterBar() {
   return (
     <div className="flex items-center overflow-hidden h-[52px] py-10">
       {/* Left Side Filters */}
-      <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[60%]">
+      <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[68%]">
         
         {/* Filter Icon */}
         <div className="px-5 flex items-center border-r border-gray-200 text-gray-600">

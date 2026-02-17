@@ -49,7 +49,17 @@ const menuItems = [
       { label: "All Category", path: "/CategoryList" }
     ],
   },
-  { label: "Users", icon: FaUsers, path: "/" },
+  // Users Section
+  {
+    label: "Users",
+    icon: FaUsers,
+    path: "/",
+    children: [
+      { label: "Users List", path: "/userlist" },
+      { label: "Roles", path: "/usersroles" },
+      { label: "Group", path: "/usersgroup" },
+    ],
+  },
   {
     label: "Vendors",
     icon: FaHandshake,
@@ -64,15 +74,47 @@ const menuItems = [
   { label: "CMS", icon: FaFileAlt, path: "/" },
   { label: "OMS", icon: FaCogs, path: "/" },
   { label: "Integrations", icon: FaGlobe, path: "/" },
-  { label: "Local Companies", icon: FaBuilding, path: "/" },
+  // { label: "Local Companies", icon: FaBuilding, path: "/" },
+  // Local Companies
+    {
+    label: "Local Companies",
+    icon: FaBuilding,
+    path: "/",
+    children: [
+      { label: "Country Management", path: "/country-management" },
+      { label: "Currency Managment", path: "/currency-management" },
+      { label: "Languages Managment", path: "/language-management" },
+    ],
+  },
   { label: "Marketplace", icon: FaShoppingBag, path: "/" },
   { label: "MLM System", icon: FaProjectDiagram, path: "/" },
-  { label: "Settings", icon: FaCog, path: "/" },
+  // { label: "Settings", icon: FaCog, path: "/" },
+  // Setting Section 
+  {
+    label: "Settings",
+    icon: FaCog,
+    path: "/",
+    children: [
+      { label: "Translation", path: "/translation" },
+      { label: "Updates", path: "/updates" },
+      { label: "Backups", path: "/backups" },
+      { label: "Audit Logs", path: "/auditlogs" },
+    ],
+  },
   { label: "Domain", icon: FaGlobe, path: "/" },
   { label: "Return Platform", icon: FaUndoAlt, path: "/" },
   { label: "Marketing", icon: FaBullhorn, path: "/" },
   { label: "Payments", icon: FaCreditCard, path: "/" },
-  { label: "Taxes", icon: FaMoneyBill, path: "/" },
+  // { label: "Taxes", icon: FaMoneyBill, path: "/taxes" },
+    {
+    label: "Taxes",
+    icon: FaMoneyBill,
+    path: "/Vendor",
+    children: [
+      { label: "Taxes", path: "/taxes" },
+      { label: "Invoice", path: "/invoicemanagement" },
+    ],
+  },
   { label: "Shipping", icon: FaTruck, path: "/" },
   { label: "Reports", icon: FaChartBar, path: "/" },
 ];

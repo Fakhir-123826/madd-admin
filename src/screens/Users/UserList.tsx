@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { FaPlus, FaEllipsisV, FaFilter, FaRedo, FaSearch } from "react-icons/fa";
-import UserDetails from "../../component/Users/UserDetails";
-import AddUser from "../..//component/Users/AddUser";
 
 function UserList() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [showAddUser, setShowAddUser] = useState(false);
   const itemsPerPage = 8;
 
   const [users, setUsers] = useState([
@@ -152,60 +149,16 @@ function UserList() {
   };
 
   const handleViewUser = (user: any) => {
-    setSelectedUser(user);
-    setShowAddUser(false);
+    navigate(`/user/${user.id}`, { state: { user } });
   };
 
   const handleAddUser = (newUser: any) => {
     setUsers([...users, { ...newUser, id: users.length + 1 }]);
-    setShowAddUser(false);
-  };
-
-  const handleBackToList = () => {
-    setSelectedUser(null);
-    setShowAddUser(false);
   };
 
   // Base style for table cells with gradient underlines
   const tdBase = "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
-  // If Add User is shown
-  if (showAddUser) {
-    return (
-      <div className="bg-white rounded-xl    shadow-sm p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleBackToList}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-lg font-semibold">Add New User</h1>
-        </div>
-        <AddUser onSave={handleAddUser} onCancel={handleBackToList} />
-      </div>
-    );
-  }
-
-  // If user details are shown
-  if (selectedUser) {
-    return (
-      <div className="bg-white shadow-sm p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleBackToList}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-lg font-semibold">User Details</h1>
-        </div>
-        <UserDetails user={selectedUser} onBack={handleBackToList} />
-      </div>
-    );
-  }
-
-  // Default view - User List
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       {/* HEADER */}
@@ -214,7 +167,7 @@ function UserList() {
           <h2 className="text-lg font-semibold">User Management</h2>
         </div>
         <button
-          onClick={() => setShowAddUser(true)}
+          onClick={() => navigate('/adduser')}
           className="
             flex items-center gap-3
             px-6 py-1
@@ -234,8 +187,43 @@ function UserList() {
         </button>
       </div>
 
+
+
+        {/* Tabs */}
+                    <div className="flex gap-6 border-b border-gray-200">
+                        <button
+                            onClick={() => navigate('/userlist')}
+                            className={`pb-2 transition-colors ${location.pathname === '/userlist'
+                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                                    : 'text-gray-500 hover:text-teal-600'
+                                }`}
+                        >
+                            User List
+                        </button>
+                        <button
+                            onClick={() => navigate('/usersroles')}
+                            className={`pb-2 transition-colors ${location.pathname === '/usersroles'
+                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                                    : 'text-gray-500 hover:text-teal-600'
+                                }`}
+                        >
+                            Roles
+                        </button>
+                        <button
+                            onClick={() => navigate('/usersgroup')}
+                            className={`pb-2 transition-colors ${location.pathname === '/usersgroup'
+                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                                    : 'text-gray-500 hover:text-teal-600'
+                                }`}
+                        >
+                            Groups
+                        </button>
+                    </div>
+
+
+
       {/* Filter Bar */}
-      <div className="flex items-center overflow-hidden h-[52px] py-10">
+      <div className="flex items-center overflow-hidden h-[52px] py-10 pt-12">
         {/* Left Side Filters */}
         <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[60%]">
           
@@ -278,6 +266,8 @@ function UserList() {
             </select>
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">▾</span>
           </div>
+
+          
 
           {/* Reset Filter Button */}
           <button className="px-5 flex items-center gap-2 text-sm text-blue-500 hover:underline">

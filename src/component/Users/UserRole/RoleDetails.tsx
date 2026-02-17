@@ -1,18 +1,25 @@
 import React, { useState } from "react";
-import { ArrowLeft, Pencil, X, Check, Save } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Pencil, X, Check } from "lucide-react";
 
-interface RoleDetailsProps {
-  role: any;
-  onBack: () => void;
-  onSave?: (updatedRole: any) => void;
-}
+function RoleDetails() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const role = location.state?.role;
 
-function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
+  // If no role data, redirect to roles list
+  if (!role) {
+    navigate('/usersroles');
+    return null;
+  }
+
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
     roleName: role.roleName,
     description: role.description || "Lorem ipsum, placeholder or dummy text used in typesetting and graphic design for previewing layouts. It features scrambled Latin text, which emphasizes the design over content of the layout.",
   });
+
+  // Permissions state with toggles
   const [permissions, setPermissions] = useState({
     catalog: { view: true, edit: true, delete: false },
     stores: { view: true, edit: true, delete: false },
@@ -33,21 +40,36 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
     }));
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave({
-        ...role,
-        ...form,
-        permissions
-      });
-    }
-    setIsEditing(false);
+  const handleBack = () => {
+    navigate('/usersroles');
+  };
+
+  const handleEdit = () => {
+    // Navigate to edit page with role data (if you want separate edit page)
+    // navigate('/addrole', { state: { role } });
+    
+    // OR enable inline editing (current approach)
+    setIsEditing(true);
   };
 
   const handleCancel = () => {
     setForm({
       roleName: role.roleName,
       description: role.description || "Lorem ipsum, placeholder or dummy text used in typesetting and graphic design for previewing layouts. It features scrambled Latin text, which emphasizes the design over content of the layout.",
+    });
+    setPermissions({
+      catalog: { view: true, edit: true, delete: false },
+      stores: { view: true, edit: true, delete: false },
+      orders: { view: true, edit: true, delete: false }
+    });
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    // Here you would save the changes
+    console.log("Saving role:", {
+      ...form,
+      permissions
     });
     setIsEditing(false);
   };
@@ -60,7 +82,7 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
         <div className="bg-gradient-to-r from-teal-500 to-green-500 px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={onBack}
+              onClick={handleBack}
               className="text-white hover:bg-white/20 p-2 rounded-xl transition-all duration-200"
               title="Go back"
             >
@@ -73,7 +95,7 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
 
           {!isEditing && (
             <button
-              onClick={() => setIsEditing(true)}
+              onClick={handleEdit}
               className="flex items-center gap-2 px-5 py-2.5 bg-white text-teal-600 rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
             >
               <Pencil size={16} />
@@ -110,6 +132,7 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
                 </p>
               </div>
 
+              {/* Permissions View */}
               <PermissionsView permissions={permissions} />
             </>
           )}
@@ -132,13 +155,13 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
               </div>
 
               {/* Description Textarea */}
-              <div className="mb-10">
+              <div className="mb-8">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Role Description <span className="text-gray-400 text-xs">(100 words max)</span>
                 </label>
                 <textarea
                   name="description"
-                  rows={5}
+                  rows={4}
                   value={form.description}
                   onChange={handleChange}
                   className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-gray-50 resize-none"
@@ -146,13 +169,14 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
                 />
               </div>
 
+              {/* Permissions Edit with Toggles */}
               <PermissionsEdit permissions={permissions} onToggle={handlePermissionToggle} />
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row justify-end gap-3 mt-10 pt-6 border-t border-gray-200">
+              <div className="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
                 <button
                   onClick={handleCancel}
-                  className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-all duration-200 shadow-md hover:shadow-lg order-2 sm:order-1"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   <X size={18} />
                   Cancel
@@ -160,9 +184,9 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
 
                 <button
                   onClick={handleSave}
-                  className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white font-medium transition-all duration-200 shadow-md hover:shadow-lg order-1 sm:order-2"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white font-medium transition-all duration-200 shadow-md hover:shadow-lg"
                 >
-                  <Save size={18} />
+                  <Check size={18} />
                   Save Changes
                 </button>
               </div>
@@ -175,7 +199,7 @@ function RoleDetails({ role, onBack, onSave }: RoleDetailsProps) {
   );
 }
 
-/* View Permissions with Better UI */
+/* View Permissions with indicators */
 function PermissionsView({ permissions }: any) {
   const categories = [
     { title: "Catalog Permissions:", key: "catalog", items: ["View Products", "Edit Products", "Delete Products"] },
@@ -198,8 +222,7 @@ function PermissionsView({ permissions }: any) {
             <div className="space-y-3">
               {cat.items.map((item, idx) => {
                 const permKey = item.split(' ')[0].toLowerCase();
-                const isActive = permissions[cat.key]?.[permKey] || 
-                                (permKey === 'delete' ? false : true);
+                const isActive = permissions[cat.key]?.[permKey];
                 return (
                   <div key={idx} className="flex items-center gap-3">
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
@@ -227,6 +250,15 @@ function PermissionsEdit({ permissions, onToggle }: any) {
     { title: "Orders Permissions", key: "orders", items: ["view", "edit", "delete"] }
   ];
 
+  const getDisplayName = (perm: string) => {
+    const names: any = {
+      view: "View",
+      edit: "Edit",
+      delete: "Delete"
+    };
+    return names[perm];
+  };
+
   return (
     <div>
       <h3 className="font-semibold text-gray-700 mb-5 flex items-center gap-2">
@@ -242,9 +274,11 @@ function PermissionsEdit({ permissions, onToggle }: any) {
             <div className="space-y-4">
               {cat.items.map((perm) => (
                 <div key={perm} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700 capitalize">{perm} Products</span>
+                  <span className="text-sm text-gray-700">
+                    {getDisplayName(perm)} {cat.key === 'catalog' ? 'Products' : cat.key === 'stores' ? 'Stores' : 'Orders'}
+                  </span>
                   <Toggle 
-                    enabled={permissions[cat.key]?.[perm] || false} 
+                    enabled={permissions[cat.key]?.[perm]} 
                     onToggle={() => onToggle(cat.key, perm)}
                   />
                 </div>
@@ -257,7 +291,7 @@ function PermissionsEdit({ permissions, onToggle }: any) {
   );
 }
 
-/* Improved Toggle Switch */
+/* Toggle Switch Component */
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
   return (
     <button
