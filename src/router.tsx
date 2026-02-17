@@ -54,6 +54,7 @@ import Backups from "./screens/Setting/Backups.tsx";
 import AddBackup from "./component/Setting/Backup/AddBackup.tsx";
 import AuditLogs from "./screens/Setting/Audit.logs.tsx";
 import ProductBase from "./screens/Catalog/ProductBase/ProductBase.tsx";
+import Category from "./screens/Catalog/Category/Category.tsx";
 
 export const router = createBrowserRouter([
   {
