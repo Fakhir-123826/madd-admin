@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import AddButton from "../../../component/AddButton";
 import { useState } from "react";
-import AutoCompleteMultiSelect from "../../../component/Inputs Feilds/AutoCompleteMultiSelect";
+import AutoCompleteMultiSelect from "./AutoCompleteMultiSelect";
+import AddButton from "../AddButton";
 
 const CreatelegalityControl = () => {
   const { id } = useParams();
@@ -19,7 +19,7 @@ const CreatelegalityControl = () => {
   ];
 
   return (
-    <div className="bg-white shadow-sm p-6">
+    <div className="bg-white shadow-sm p-6 max-w-2xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Legality Basic Info</h2>
