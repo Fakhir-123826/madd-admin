@@ -195,7 +195,7 @@ const CountryManagement = () => {
 
           {/* Filter By Text */}
           <div className="px-5 flex items-center border-r border-gray-200 text-sm font-medium text-gray-700">
-            Filter By
+            Filter_By
           </div>
 
           {/* Name Dropdown */}

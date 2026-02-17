@@ -110,7 +110,7 @@ export const router = createBrowserRouter([
       { path: "/addcurrency", element: <AddCurrency /> },
       // Languages Managment
       { path: "/language-management", element: <LanguageManagement /> },
-      { path: "/add", element: <AddLanguage /> },
+      { path: "/addlanguage", element: <AddLanguage /> },
 
       
       // Taxes
