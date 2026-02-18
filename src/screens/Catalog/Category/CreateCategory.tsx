@@ -2,7 +2,6 @@ import { useState } from "react";
 import Input from "../../../component/Inputs Feilds/Input";
 import AddButton from "../../../component/AddButton";
 import { useNavigate, useParams } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
 
 
 const CreateCategory = () => {
