@@ -55,6 +55,14 @@ import AddBackup from "./component/Setting/Backup/AddBackup.tsx";
 import AuditLogs from "./screens/Setting/Audit.logs.tsx";
 import ProductBase from "./screens/Catalog/ProductBase/ProductBase.tsx";
 import Category from "./screens/Catalog/Category/Category.tsx";
+import CouponManagement from "./screens/Return/Coupon management/CouponManagement.tsx";
+import CouponManagementList from "./screens/Return/Coupon management/CouponManagementList.tsx";
+import CreateCouponManagement from "./screens/Return/Coupon management/CreateCouponManagement.tsx";
+import CreateEmailMarketing from "./screens/Return/Email Marketing/CreateEmailMarketing.tsx";
+import CreateSEOSetting from "./screens/Return/SEO setting/CreateSEOSetting.tsx";
+import SEOSettingList from "./screens/Return/SEO setting/SEOSettingList.tsx";
+import EmailMarketingList from "./screens/Return/Email Marketing/EmailMarketingList.tsx";
+import SEOSEtting from "./screens/Return/SEO setting/SEOSetting.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -79,7 +87,7 @@ export const router = createBrowserRouter([
       { path: "/SubscriptionList", element: <SubscriptionList /> },
       { path: "/CreateSubscription/:id", element: <CreateSubscription /> },
       { path: "/CategoryList", element: <CategoryList /> },
-      { path: "/Category", element: <Category/> },
+      { path: "/Category", element: <Category /> },
       { path: "/CreateCategory", element: <CreateCategory /> },
       { path: "/CreateCategory/:id", element: <CreateCategory /> },
       { path: "/InventoryManagementList", element: <InventoryManagementList /> },
@@ -89,12 +97,21 @@ export const router = createBrowserRouter([
       { path: "/CreatelegalityControl", element: <CreatelegalityControl /> },
       { path: "/CreatelegalityControl/:id", element: <CreatelegalityControl /> },
       { path: "/ProductBaseList", element: <ProductBaseList /> },
-      { path: "/ProductBase", element: <ProductBase/> },
+      { path: "/ProductBase", element: <ProductBase /> },
       { path: "/CreateProductBase", element: <CreateProductBase /> },
       { path: "/CreateProductBase/:id", element: <CreateProductBase /> },
       { path: "/ProductSharingList", element: <ProductSharingList /> },
       { path: "/CreateProductSharing", element: <CreateProductSharing /> },
       { path: "/CreateProductSharing/:id", element: <CreateProductSharing /> },
+      { path: "/CouponManagement", element: <CouponManagement /> },
+      { path: "/CouponManagementList", element: <CouponManagementList /> },
+      { path: "/CreateCouponManagement", element: <CreateCouponManagement /> },
+      { path: "/CreateCouponManagement/:id", element: <CreateCouponManagement /> },
+      { path: "/CreateEmailMarketing" , element: <CreateEmailMarketing/>},
+      { path: "/EmailMarketingList" , element: <EmailMarketingList/>},
+      { path: "/CreateSEOSetting" , element: <CreateSEOSetting/>},
+      { path: "/SEOSettingList" , element: <SEOSettingList/>},
+      { path: "/SEOSetting" , element: <SEOSEtting/>},
       // User List Section
       { path: "/userlist", element: <UserList /> },
       { path: "/adduser", element: <AddUser /> },
@@ -109,7 +126,7 @@ export const router = createBrowserRouter([
       { path: "/usersgroup", element: <UsersGroup /> },
       { path: "/addgroup", element: <AddGroup /> },
       { path: "/group/:id", element: <GroupDetails /> },
-      
+
       // Local Companies....
       // Country Managment
       { path: "/country-management", element: <CountryManagement /> },
@@ -132,7 +149,7 @@ export const router = createBrowserRouter([
       { path: "/backups", element: <Backups /> },
       { path: "addbackup", element: <AddBackup /> },
       { path: "auditlogs", element: <AuditLogs /> },
-      
+
 
 
     ]
