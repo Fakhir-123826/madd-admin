@@ -87,7 +87,17 @@ const menuItems = [
     ],
   },
   { label: "Marketplace", icon: FaShoppingBag, path: "/" },
-  { label: "MLM System", icon: FaProjectDiagram, path: "/" },
+  // { label: "MLM System", icon: FaProjectDiagram, path: "/" },
+  {
+    label: "MLM System",
+    icon: FaProjectDiagram,
+    path: "/",
+    children: [
+      { label: "Mlm Dashboard", path: "/mlmdashboard" },
+      { label: "User Tree", path: "/usertree" },
+      { label: "Reports", path: "/reports" },
+    ],
+  },
   // { label: "Settings", icon: FaCog, path: "/" },
   // Setting Section 
   {

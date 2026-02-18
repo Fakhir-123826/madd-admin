@@ -82,7 +82,7 @@ const AuditLogs = () => {
       ...filters,
       [e.target.name]: e.target.value
     });
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1);
   };
 
   const resetFilters = () => {
@@ -96,11 +96,9 @@ const AuditLogs = () => {
 
   // Filter logs based on filters and search
   const filteredLogs = logs.filter(log => {
-    // Apply filters
     if (filters.module && log.module !== filters.module) return false;
     if (filters.status && log.status !== filters.status) return false;
     
-    // Apply search
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
@@ -123,9 +121,6 @@ const AuditLogs = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  // Base style for table cells with gradient underlines
-  const tdBase = "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -224,32 +219,56 @@ const AuditLogs = () => {
           <tbody>
             {currentLogs.length > 0 ? (
               currentLogs.map((log, index) => (
-                <tr key={index} className="bg-white shadow-sm hover:shadow-md transition">
-                  <td className={`${tdBase} font-medium rounded-l-xl text-black`}>
+                <tr key={index} className="bg-white shadow-sm hover:shadow-md transition relative">
+                  {/* Timestamp Cell */}
+                  <td className="relative p-4 font-medium rounded-l-xl text-black">
                     {log.timestamp}
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
                   </td>
 
-                  <td className={tdBase}>
+                  {/* User Cell */}
+                  <td className="relative p-4 text-gray-600">
                     {log.user}
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
                   </td>
 
-                  <td className={tdBase}>
+                  {/* Role Cell */}
+                  <td className="relative p-4 text-gray-600">
                     {log.role}
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
                   </td>
 
-                  <td className={tdBase}>
+                  {/* Action Cell */}
+                  <td className="relative p-4 text-gray-600">
                     {log.action}
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
                   </td>
 
-                  <td className={tdBase}>
+                  {/* Module Cell */}
+                  <td className="relative p-4 text-gray-600">
                     {log.module}
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
                   </td>
 
-                  <td className={tdBase}>
+                  {/* IP Cell */}
+                  <td className="relative p-4 text-gray-600">
                     {log.ip}
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
                   </td>
 
-                  <td className={`${tdBase} rounded-r-xl`}>
+                  {/* Status Cell with Right and Bottom Borders */}
+                  <td className="relative p-4 rounded-r-xl">
+                    {/* Right gradient border */}
+                    <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
+                    {/* Bottom gradient border */}
+                    <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
+                    
                     <span
                       className={`px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
                         log.status
@@ -271,7 +290,7 @@ const AuditLogs = () => {
         </table>
       </div>
 
-      {/* PAGINATION - Only show if there are results */}
+      {/* PAGINATION */}
       {filteredLogs.length > 0 && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-600">
           <button

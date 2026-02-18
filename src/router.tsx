@@ -55,6 +55,12 @@ import AddBackup from "./component/Setting/Backup/AddBackup.tsx";
 import AuditLogs from "./screens/Setting/Audit.logs.tsx";
 import ProductBase from "./screens/Catalog/ProductBase/ProductBase.tsx";
 import Category from "./screens/Catalog/Category/Category.tsx";
+import MlmDashboard from "./screens/MlmDashboard/MlmDashboard.tsx";
+import UserTree from "./component/MlmDashboard/UserTree.tsx";
+import Earning from "./component/MlmDashboard/Earning.tsx";
+import LevelWise from "./component/MlmDashboard/LevelWise.tsx";
+import MemberGrowth from "./component/MlmDashboard/MemberGrowth.tsx";
+
 
 export const router = createBrowserRouter([
   {
@@ -95,6 +101,9 @@ export const router = createBrowserRouter([
       { path: "/ProductSharingList", element: <ProductSharingList /> },
       { path: "/CreateProductSharing", element: <CreateProductSharing /> },
       { path: "/CreateProductSharing/:id", element: <CreateProductSharing /> },
+
+
+
       // User List Section
       { path: "/userlist", element: <UserList /> },
       { path: "/adduser", element: <AddUser /> },
@@ -132,6 +141,14 @@ export const router = createBrowserRouter([
       { path: "/backups", element: <Backups /> },
       { path: "addbackup", element: <AddBackup /> },
       { path: "auditlogs", element: <AuditLogs /> },
+      
+      // MMl Dashboard
+      { path: "/mlmdashboard", element: <MlmDashboard /> },
+      { path: "/usertree", element: <UserTree /> },
+      { path: "/reports", element: <Earning /> },
+      { path: "/levelwise", element: <LevelWise /> },
+      { path: "/membergrowth", element: <MemberGrowth /> },
+      
       
 
 
