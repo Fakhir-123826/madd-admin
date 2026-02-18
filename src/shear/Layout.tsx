@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Children, useState } from "react";
 import {
   FaBars,
   FaHome,
@@ -87,7 +87,17 @@ const menuItems = [
     ],
   },
   { label: "Marketplace", icon: FaShoppingBag, path: "/" },
-  { label: "MLM System", icon: FaProjectDiagram, path: "/" },
+  // { label: "MLM System", icon: FaProjectDiagram, path: "/" },
+  {
+    label: "MLM System",
+    icon: FaProjectDiagram,
+    path: "/",
+    children: [
+      { label: "Mlm Dashboard", path: "/mlmdashboard" },
+      { label: "User Tree", path: "/usertree" },
+      { label: "Reports", path: "/reports" },
+    ],
+  },
   // { label: "Settings", icon: FaCog, path: "/" },
   // Setting Section 
   {
@@ -102,7 +112,16 @@ const menuItems = [
     ],
   },
   { label: "Domain", icon: FaGlobe, path: "/" },
-  { label: "Return Platform", icon: FaUndoAlt, path: "/" },
+  { 
+    label: "Return Platform",
+    icon: FaUndoAlt,
+    path: "/",
+    children:[
+      { label: "Coupon Management", path: "/CouponManagementList" },
+      { label: "Email Marketing", path: "/EmailMarketingList" },
+      { label: "SEOSettingList", path: "/SEOSettingList" },
+    ]
+  },
   { label: "Marketing", icon: FaBullhorn, path: "/" },
   { label: "Payments", icon: FaCreditCard, path: "/" },
   // { label: "Taxes", icon: FaMoneyBill, path: "/taxes" },
