@@ -79,6 +79,8 @@ import AddShipRocket from "./component/Payment/ShipRocket/AddShipRocket.tsx";
 import Domain from "./screens/Domain/Domain.tsx";
 import Ssl from "./screens/Domain/Ssl.tsx";
 import Dns from "./screens/Domain/Dns.tsx";
+import SubDomain from "./screens/Domain/SubDomain.tsx";
+import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -194,7 +196,9 @@ export const router = createBrowserRouter([
       { path: "/domains", element: <Domain /> },
       { path: "/ssl", element: <Ssl /> },
       { path: "/dns", element: <Dns /> },
-      { path: "/subdomains", element: <Dns /> },
+      { path: "/subdomains", element: <SubDomain /> },
+      // { path: "/add-dns-record", element: <AddDnsRecord /> },
+      { path: "/add-dns-record", element: <AddDnsRecord /> },
       
 
 
