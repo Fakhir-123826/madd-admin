@@ -68,6 +68,17 @@ import UserTree from "./component/MlmDashboard/UserTree.tsx";
 import Earning from "./component/MlmDashboard/Earning.tsx";
 import LevelWise from "./component/MlmDashboard/LevelWise.tsx";
 import MemberGrowth from "./component/MlmDashboard/MemberGrowth.tsx";
+import PaymentProviderManagement from "./screens/Payment/PaymentProviderManagement.tsx";
+import PaymentProviderDetails from "./component/Payment/PaymentProviderDetails.tsx";
+import AddStripe from "./component/Payment/AddStripe.tsx";
+import AddProvider from "./component/Payment/AddProvider.tsx";
+import ShippingProviderManagement from "./screens/Payment/ShippingProviderManagement.tsx";
+import ShippingProviderDetail from "./component/Payment/ShipRocket/ShippingProviderDetail.tsx";
+import AddShipping from "./component/Payment/ShipRocket/AddShipping.tsx";
+import AddShipRocket from "./component/Payment/ShipRocket/AddShipRocket.tsx";
+import Domain from "./screens/Domain/Domain.tsx";
+import Ssl from "./screens/Domain/Ssl.tsx";
+import Dns from "./screens/Domain/Dns.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -163,8 +174,34 @@ export const router = createBrowserRouter([
       { path: "/reports", element: <Earning /> },
       { path: "/levelwise", element: <LevelWise /> },
       { path: "/membergrowth", element: <MemberGrowth /> },
+      
+      
+      
+      // Payment Provider Management 
+      { path: "/payment-providers", element: <PaymentProviderManagement /> },
+      { path: "/payment-provider/:id", element: <PaymentProviderDetails /> },
+      { path: "/addstripe", element: <AddStripe /> },
+      { path: "/addprovider", element: <AddProvider /> },
+      
+      // Shipping Provider Management
+      { path: "/shipping-mangement", element: <ShippingProviderManagement /> },
+      { path: "/add-shipping-provider", element: <AddShipping /> },
+      { path: "/add-shiprocket", element: <AddShipRocket /> },
+      { path: "/shipping-provider/:id", element: <ShippingProviderDetail /> },
+      
+      
+      // Domain Section
+      { path: "/domains", element: <Domain /> },
+      { path: "/ssl", element: <Ssl /> },
+      { path: "/dns", element: <Dns /> },
+      { path: "/subdomains", element: <Dns /> },
+      
+
+
+
     ]
   },
+  
   { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
   { path: "/pass", element: <ForgotPassword /> },
