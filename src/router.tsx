@@ -81,6 +81,8 @@ import Ssl from "./screens/Domain/Ssl.tsx";
 import Dns from "./screens/Domain/Dns.tsx";
 import SubDomain from "./screens/Domain/SubDomain.tsx";
 import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
+import AddSubdomain from "./component/Domain/AddSubDomain.tsx";
+import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -197,8 +199,9 @@ export const router = createBrowserRouter([
       { path: "/ssl", element: <Ssl /> },
       { path: "/dns", element: <Dns /> },
       { path: "/subdomains", element: <SubDomain /> },
-      // { path: "/add-dns-record", element: <AddDnsRecord /> },
       { path: "/add-dns-record", element: <AddDnsRecord /> },
+      { path: "/add-subdomain", element: <AddSubdomain /> },
+      { path: "/add-ssl-certificate", element: <AddSslCertificate /> },
       
 
 

@@ -291,22 +291,22 @@ const ShippingProviderDetail = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-gray-200">
                 {zones.map((zone) => (
                   <tr key={zone.id} className="bg-white hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-800">
+                    <td className="px-4 py-3 font-medium text-gray-800 border-r border-gray-200">
                       {zone.zoneName}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 border-r border-gray-200">
                       {zone.country}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 border-r border-gray-200">
                       {zone.rule}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 border-r border-gray-200">
                       {zone.cost}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 border-r border-gray-200">
                       <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600 font-medium">
                         {zone.status}
                       </span>
@@ -333,162 +333,199 @@ const ShippingProviderDetail = () => {
       </div>
 
       {/* Add Zone Modal */}
-      {showZoneModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-2xl w-[500px] max-h-[90vh] overflow-y-auto p-6 relative">
-            
-            <button
-              onClick={() => setShowZoneModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <FiX size={20} />
-            </button>
+     {showZoneModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+    <div className="bg-white rounded-2xl w-[550px] max-h-[90vh] overflow-y-auto shadow-2xl">
+      
+      {/* Modal Header with Gradient */}
+      <div className="bg-gradient-to-r from-teal-500 to-green-500 px-6 py-4 rounded-t-2xl flex items-center justify-between sticky top-0 z-10">
+        <h2 className="text-white font-semibold text-lg">Add New Shipping Zone</h2>
+        <button
+          onClick={() => setShowZoneModal(false)}
+          className="text-white/80 hover:text-white bg-white/20 hover:bg-white/30 p-1.5 rounded-lg transition-all"
+        >
+          <FiX size={20} />
+        </button>
+      </div>
 
-            <h2 className="text-xl font-semibold mb-6">Add New Zone</h2>
+      {/* Modal Body */}
+      <div className="p-6">
+        <form onSubmit={handleZoneSubmit} className="space-y-5">
+          
+          {/* Zone Name */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700">
+              Zone Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={newZone.zoneName}
+              onChange={(e) => setNewZone({...newZone, zoneName: e.target.value})}
+              placeholder="e.g., North Zone, South Zone"
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-white transition-all"
+              required
+            />
+            <p className="text-xs text-gray-500">Enter a unique name for this shipping zone</p>
+          </div>
 
-            <form onSubmit={handleZoneSubmit} className="space-y-4">
-              {/* Zone Name */}
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Zone Name
-                </label>
-                <input
-                  type="text"
-                  value={newZone.zoneName}
-                  onChange={(e) => setNewZone({...newZone, zoneName: e.target.value})}
-                  placeholder="e.g., North Zone"
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-400 outline-none"
-                />
-              </div>
+          {/* Country / State */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700">
+              Country / State <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={newZone.country}
+              onChange={(e) => setNewZone({...newZone, country: e.target.value})}
+              placeholder="e.g., Punjab, PK or United States"
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-white transition-all"
+              required
+            />
+          </div>
 
-              {/* Country */}
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Country / State
-                </label>
-                <input
-                  type="text"
-                  value={newZone.country}
-                  onChange={(e) => setNewZone({...newZone, country: e.target.value})}
-                  placeholder="e.g., Punjab, PK"
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-400 outline-none"
-                />
-              </div>
+          {/* Rule Type - Without Icons */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-700">
+              Rule Type <span className="text-red-500">*</span>
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { value: "flat", label: "Flat rate" },
+                { value: "weight", label: "Weight based" },
+                { value: "free", label: "Free" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setNewZone({...newZone, rule: option.value})}
+                  className={`px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                    newZone.rule === option.value
+                      ? "bg-teal-50 border-teal-500 text-teal-700"
+                      : "bg-white border-gray-200 text-gray-600 hover:border-teal-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-              {/* Rule Type */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Rule Type
-                </label>
-                <div className="flex gap-4">
-                  {[
-                    { value: "flat", label: "Flat rate" },
-                    { value: "weight", label: "Weight based" },
-                    { value: "free", label: "Free" },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setNewZone({...newZone, rule: option.value})}
-                      className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
-                        newZone.rule === option.value
-                          ? "bg-teal-500 text-white border-teal-500"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-teal-400"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+          {/* Conditional Fields with better styling */}
+          {newZone.rule === "weight" && (
+            <div className="bg-gray-50 p-4 rounded-xl border-2 border-gray-200 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <span className="w-1 h-4 bg-teal-500 rounded-full"></span>
+                Weight Based Configuration
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-gray-600">
+                    Weight Range
+                  </label>
+                  <input
+                    type="text"
+                    value={newZone.weight}
+                    onChange={(e) => setNewZone({...newZone, weight: e.target.value})}
+                    placeholder="e.g., <5kg, 5-10kg"
+                    className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
+                  />
                 </div>
-              </div>
-
-              {/* Weight & Price (if weight based) */}
-              {newZone.rule === "weight" && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Weight
-                    </label>
-                    <input
-                      type="text"
-                      value={newZone.weight}
-                      onChange={(e) => setNewZone({...newZone, weight: e.target.value})}
-                      placeholder="e.g., <5kg"
-                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-400 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Price
-                    </label>
-                    <input
-                      type="text"
-                      value={newZone.price}
-                      onChange={(e) => setNewZone({...newZone, price: e.target.value})}
-                      placeholder="e.g., Rs. 300"
-                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-400 outline-none"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Price for flat rate */}
-              {newZone.rule === "flat" && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Price
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-gray-600">
+                    Shipping Price
                   </label>
                   <input
                     type="text"
                     value={newZone.price}
                     onChange={(e) => setNewZone({...newZone, price: e.target.value})}
-                    placeholder="e.g., Rs. 500"
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-400 outline-none"
+                    placeholder="e.g., Rs. 300"
+                    className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
                   />
                 </div>
-              )}
+              </div>
+            </div>
+          )}
 
-              {/* Status Toggle */}
-              <div className="flex items-center gap-4 py-2">
-                <span className="text-sm font-medium">Status</span>
-                <button
-                  type="button"
-                  onClick={() => setNewZone({...newZone, status: !newZone.status})}
-                  className={`relative w-12 h-6 rounded-full transition ${
-                    newZone.status ? "bg-teal-500" : "bg-gray-300"
+          {newZone.rule === "flat" && (
+            <div className="bg-gray-50 p-4 rounded-xl border-2 border-gray-200 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <span className="w-1 h-4 bg-teal-500 rounded-full"></span>
+                Flat Rate Configuration
+              </h3>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                  Shipping Price
+                </label>
+                <input
+                  type="text"
+                  value={newZone.price}
+                  onChange={(e) => setNewZone({...newZone, price: e.target.value})}
+                  placeholder="e.g., Rs. 500"
+                  className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
+                />
+              </div>
+            </div>
+          )}
+
+          {newZone.rule === "free" && (
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
+              <p className="text-green-700 text-sm font-medium">
+                Free shipping will be applied for this zone
+              </p>
+            </div>
+          )}
+
+          {/* Status Toggle - Improved */}
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
+            <div>
+              <span className="text-sm font-semibold text-gray-700 block">Zone Status</span>
+              <span className="text-xs text-gray-500">Enable or disable this shipping zone</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-medium ${!newZone.status ? 'text-gray-600' : 'text-gray-400'}`}>
+                Inactive
+              </span>
+              <button
+                type="button"
+                onClick={() => setNewZone({...newZone, status: !newZone.status})}
+                className={`relative w-14 h-7 rounded-full transition-all duration-300 ${
+                  newZone.status ? "bg-teal-500" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ${
+                    newZone.status ? "right-1" : "left-1"
                   }`}
-                >
-                  <span
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition ${
-                      newZone.status ? "right-1" : "left-1"
-                    }`}
-                  />
-                </button>
-                <span className="text-sm">
-                  {newZone.status ? "Active" : "Inactive"}
-                </span>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowZoneModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
-                >
-                  Add Zone
-                </button>
-              </div>
-            </form>
+                />
+              </button>
+              <span className={`text-sm font-medium ${newZone.status ? 'text-teal-600' : 'text-gray-400'}`}>
+                Active
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+
+          {/* Action Buttons - Redesigned */}
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={() => setShowZoneModal(false)}
+              className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 hover:border-gray-400 transition-all duration-300 font-medium text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all duration-300 font-medium text-sm shadow-md hover:shadow-lg flex items-center gap-2"
+            >
+              <FiPlus size={16} />
+              Add Zone
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Delete Provider Modal */}
       {showDeleteModal && (

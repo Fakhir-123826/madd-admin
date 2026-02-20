@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FiPlus } from "react-icons/fi";
 
 const Ssl = () => {
   const navigate = useNavigate();
@@ -32,6 +33,12 @@ const Ssl = () => {
     return status === "Active" ? "Renew SSL" : "Install SSL";
   };
 
+  const getButtonStyle = (status: string) => {
+    return status === "Active"
+      ? "bg-teal-500 text-white hover:bg-teal-600"
+      : "bg-blue-500 text-white hover:bg-blue-600";
+  };
+
   // Set active tab based on current path
   const getActiveTabFromPath = () => {
     if (location.pathname === '/domains') return 'domains';
@@ -47,10 +54,26 @@ const Ssl = () => {
     navigate(path);
   };
 
+  const handleAddSsl = () => {
+    navigate('/add-ssl-certificate');
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
-      {/* Header */}
-      <h2 className="text-lg font-semibold mb-6">SSL Management</h2>
+      {/* Header with Add SSL Button */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-gray-800">SSL Management</h2>
+
+        <button
+          onClick={handleAddSsl}
+          className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium shadow-md hover:from-teal-500 hover:to-green-600 transition-all"
+        >
+          <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
+            <FiPlus className="text-teal-500 text-lg" />
+          </span>
+          Add SSL Certificate
+        </button>
+      </div>
 
       {/* Tabs */}
       <div className="flex gap-6 border-b border-gray-200 mb-6">
@@ -102,8 +125,8 @@ const Ssl = () => {
         <div className="grid grid-cols-4 bg-gray-50 px-6 py-3 text-sm font-medium text-gray-600 border-b">
           <span>Domain Name</span>
           <span>Expiry Date</span>
-          <span>SSL Status</span>
-          <span>Action</span>
+          <span className="text-center">SSL Status</span>
+          <span className="text-center">Action</span>
         </div>
 
         {/* Table Rows */}
@@ -111,13 +134,16 @@ const Ssl = () => {
           {sslData.map((item, index) => (
             <div
               key={index}
-              className="grid grid-cols-4 items-center px-6 py-3 text-sm hover:bg-gray-50 transition"
+              className="grid grid-cols-4 items-center px-6 py-4 text-sm hover:bg-gray-50 transition"
             >
-              <span className="text-gray-800">{item.domain}</span>
+              {/* Domain Name */}
+              <span className="text-gray-800 font-medium">{item.domain}</span>
+              
+              {/* Expiry Date */}
               <span className="text-gray-600">{item.expiry}</span>
 
-              {/* Status Badge */}
-              <span>
+              {/* Status Badge - Centered */}
+              <div className="flex justify-center">
                 <span
                   className={`px-3 py-1 text-xs rounded-full font-medium ${getStatusStyle(
                     item.status
@@ -125,18 +151,14 @@ const Ssl = () => {
                 >
                   {item.status}
                 </span>
-              </span>
+              </div>
 
-              {/* Action Button */}
-              <span>
-                <button className={`px-4 py-1.5 text-xs font-medium rounded-lg transition ${
-                  item.status === "Active"
-                    ? "bg-teal-500 text-white hover:bg-teal-600"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
-                }`}>
+              {/* Action Button - Centered */}
+              <div className="flex justify-center">
+                <button className={`px-4 py-1.5 text-xs font-medium rounded-lg transition ${getButtonStyle(item.status)}`}>
                   {getButtonText(item.status)}
                 </button>
-              </span>
+              </div>
             </div>
           ))}
         </div>

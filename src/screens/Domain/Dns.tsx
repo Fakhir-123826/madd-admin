@@ -36,14 +36,6 @@ const Dns = () => {
     navigate(path);
   };
 
-  const toggleDropdown = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
-  const handleAddRecord = (domain: string) => {
-    console.log("Add record for:", domain);
-  };
-
   const handleAddNewRecord = () => {
     navigate('/add-dns-record');
   };
@@ -125,14 +117,14 @@ const Dns = () => {
               {/* Domain Header */}
               <div
                 className="flex justify-between items-center px-4 py-3 cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-                onClick={() => toggleDropdown(index)}
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium text-gray-800">
                     {domain.name}
                   </span>
                   <span className="text-xs bg-teal-100 text-teal-600 px-2 py-0.5 rounded-full">
-                    {domain.records} records
+                    {/* {domain.records} records */}
                   </span>
                 </div>
 
@@ -143,8 +135,8 @@ const Dns = () => {
                 )}
               </div>
 
-              {/* Dropdown Content */}
-              {openIndex === index && (
+              {/* Dropdown Content - Show only one record per domain */}
+              {openIndex === index && dnsRecords[index] && (
                 <div className="p-4 border-t border-gray-200">
                   {/* Table Header */}
                   <div className="grid grid-cols-5 text-xs font-medium text-gray-500 border-b border-gray-200 pb-2 mb-3">
@@ -155,38 +147,22 @@ const Dns = () => {
                     <span className="text-center">Action</span>
                   </div>
 
-                  {/* Rows */}
+                  {/* Single Record Row */}
                   <div className="space-y-3">
-                    {dnsRecords.map((record, idx) => (
-                      <div
-                        key={idx}
-                        className="grid grid-cols-5 items-center text-sm py-2 hover:bg-gray-50 rounded-lg transition"
-                      >
-                        <span className="font-medium text-gray-700">{record.type}</span>
-                        <span className="text-gray-600">{record.host}</span>
-                        <span className="text-gray-600 truncate pr-2">{record.value}</span>
-                        <span className="text-gray-600">{record.ttl}</span>
-                        <span className="flex justify-center gap-3">
-                          <button className="text-red-500 hover:text-red-600 transition" title="Delete">
-                            <FiTrash2 size={16} />
-                          </button>
-                          <button className="text-gray-500 hover:text-teal-600 transition" title="Edit">
-                            <FiEdit2 size={16} />
-                          </button>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add Record Button */}
-                  <div className="mt-4 pt-3 border-t border-gray-200">
-                    <button
-                      onClick={() => handleAddRecord(domain.name)}
-                      className="flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-600 rounded-lg hover:bg-teal-100 transition text-sm font-medium"
-                    >
-                      <FiPlus size={16} />
-                      Add DNS Record
-                    </button>
+                    <div className="grid grid-cols-5 items-center text-sm py-2 hover:bg-gray-50 rounded-lg transition">
+                      <span className="font-medium text-gray-700">{dnsRecords[index].type}</span>
+                      <span className="text-gray-600">{dnsRecords[index].host}</span>
+                      <span className="text-gray-600 truncate pr-2">{dnsRecords[index].value}</span>
+                      <span className="text-gray-600">{dnsRecords[index].ttl}</span>
+                      <span className="flex justify-center gap-3">
+                        <button className="text-red-500 hover:text-red-600 transition" title="Delete">
+                          <FiTrash2 size={16} />
+                        </button>
+                        <button className="text-gray-500 hover:text-teal-600 transition" title="Edit">
+                          <FiEdit2 size={16} />
+                        </button>
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}

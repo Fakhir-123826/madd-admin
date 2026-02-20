@@ -29,7 +29,7 @@ const Domain = () => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       {/* Header */}
-      <h2 className="text-lg font-semibold mb-6">Domains</h2>
+      <h2 className="text-lg font-semibold mb-8 mt-3">Domains</h2>
 
       {/* Tabs */}
       <div className="flex gap-6 border-b border-gray-200 mb-6">
