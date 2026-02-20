@@ -35,6 +35,7 @@ const menuItems = [
     path: "/store",
     children: [
       { label: "All Subscription", path: "/SubscriptionList" },
+      { label: "Stores list", path: "/storeList" },
     ],
   },
   {

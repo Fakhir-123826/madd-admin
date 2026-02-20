@@ -90,13 +90,17 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: "/", element: <Dashboard /> },
+      // Store Section
       { path: "/storeList", element: <StoreList /> },
       { path: "/storeCardList", element: <StoreCardList /> },
       { path: "/store", element: <Store /> },
+      { path: "/CreateStore", element: <CreateStore /> },
+      
+      // Order Section
       { path: "/orderlist", element: <OrderList /> },
       { path: "/addorder", element: <AddOrder /> },
       { path: "/order/:id", element: <OrderDetails /> },
-      { path: "/CreateStore", element: <CreateStore /> },
+      
       { path: "/Verdor", element: <VendorList /> },
       { path: "/Verder1", element: <Vendor /> },
       { path: "/CreateVerder", element: <CreateVendor /> },

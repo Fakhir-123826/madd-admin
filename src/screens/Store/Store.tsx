@@ -73,11 +73,11 @@ const Store = () => {
         <div>
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Stores Management</h2>
-                <AddButton
+                {/* <AddButton
                     label="Add New Store"
                     type="button" 
                     onClick={() => console.log("Clicked")}
-                />
+                /> */}
             </div>
 
             <div className="bg-white p-6 rounded-lg">
@@ -154,7 +154,7 @@ const Store = () => {
                         <div className="h-44 w-full rounded-lg overflow-hidden bg-gray-100">
                             {/* Replace with real map later */}
                             <img
-                                src="https://maps.googleapis.com/maps/api/staticmap?center=Arizona,USA&zoom=10&size=600x300"
+                                src="https://media.geeksforgeeks.org/wp-content/uploads/20200517113201/out17.jpg"
                                 alt="Map"
                                 className="w-full h-full object-cover"
                             />

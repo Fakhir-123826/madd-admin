@@ -1,5 +1,8 @@
 import { type FC } from "react";
 import { FaEllipsisV, FaMapMarkerAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+
 
 type StoreCardProps = {
   name: string;
@@ -21,6 +24,10 @@ const CardForStoreList: FC<StoreCardProps> = ({
   status,
   onView,
 }) => {
+
+
+
+let navigate = useNavigate();
   return (
     <div className="relative w-[300px] rounded-2xl bg-white shadow-md p-5">
       {/* Top row */}
@@ -31,7 +38,7 @@ const CardForStoreList: FC<StoreCardProps> = ({
           {status}
         </span>
 
-        <FaEllipsisV className="text-gray-400 cursor-pointer hover:text-gray-600" />
+        <FaEllipsisV onClick={()=>{navigate("/store")}} className="text-gray-400 cursor-pointer hover:text-gray-600" />
       </div>
 
       {/* Avatar */}
