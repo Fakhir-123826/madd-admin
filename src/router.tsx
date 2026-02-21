@@ -83,6 +83,13 @@ import SubDomain from "./screens/Domain/SubDomain.tsx";
 import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
 import AddSubdomain from "./component/Domain/AddSubDomain.tsx";
 import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
+import SocialLoginIntegration from "./screens/Integration/SocialLoginIntegration.tsx";
+import PaymentGatewayIntegration from "./screens/Integration/PaymentGatewayIntegration.tsx";
+import ShippingIntegration from "./screens/Integration/ShippingIntegration.tsx";
+import ErpIntergration from "./screens/Integration/ErpIntergration.tsx";
+import WhatsappIntegration from "./screens/Integration/WhatsappIntegration.tsx";
+import AnalyticsIntegration from "./screens/Integration/AnalyticsIntegration.tsx";
+import CrmIntegration from "./screens/Integration/CrmIntegration.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -136,6 +143,9 @@ export const router = createBrowserRouter([
       { path: "/CreateSEOSetting" , element: <CreateSEOSetting/>},
       { path: "/SEOSettingList" , element: <SEOSettingList/>},
       { path: "/SEOSetting" , element: <SEOSEtting/>},
+
+
+
       // User List Section
       { path: "/userlist", element: <UserList /> },
       { path: "/adduser", element: <AddUser /> },
@@ -207,9 +217,15 @@ export const router = createBrowserRouter([
       { path: "/add-subdomain", element: <AddSubdomain /> },
       { path: "/add-ssl-certificate", element: <AddSslCertificate /> },
       
-
-
-
+      
+      // Integration Section
+      { path: "/social-login-integration", element: <SocialLoginIntegration /> },
+      { path: "/payment-gateway-integration", element: <PaymentGatewayIntegration /> },
+      { path: "/shipping-integration", element: <ShippingIntegration /> },
+      { path: "/erp-integration", element: <ErpIntergration /> },
+      { path: "/whatsapp-integration", element: <WhatsappIntegration /> },
+      { path: "/analytics-integration", element: <AnalyticsIntegration /> },
+      { path: "/crm-integration", element: <CrmIntegration /> },
     ]
   },
   

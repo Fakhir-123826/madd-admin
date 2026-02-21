@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaCirclePlus } from "react-icons/fa6";
 import { ArrowLeft, X, ChevronDown, ChevronUp } from "lucide-react";
 
 interface FormData {
@@ -321,7 +322,7 @@ const AddShipRocket: React.FC = () => {
                 onClick={toggleZoneSection}
                 className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors"
               >
-                <span className="font-medium text-gray-700">Zones & Rules</span>
+                <span className="font-medium text-gray-700 flex items-center gap-2"><FaCirclePlus color="green" size={20}/> Zones & Rules</span>
                 {showZoneSection ? (
                   <ChevronUp className="text-gray-500" size={20} />
                 ) : (

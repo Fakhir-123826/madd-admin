@@ -88,7 +88,7 @@ const AddShipping: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white rounded-xl p-4 md:p-8">
-      <div className="w-full max-w-5xl mx-auto">
+      <div className="w-full  mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-500 to-green-500 px-6 py-4 rounded-t-2xl flex items-center gap-4 shadow-lg">
           <button

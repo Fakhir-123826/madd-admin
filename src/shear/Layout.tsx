@@ -74,8 +74,21 @@ const menuItems = [
   { label: "Settlements", icon: FaExchangeAlt, path: "/" },
   { label: "CMS", icon: FaFileAlt, path: "/" },
   { label: "OMS", icon: FaCogs, path: "/" },
-  { label: "Integrations", icon: FaGlobe, path: "/" },
-  // { label: "Local Companies", icon: FaBuilding, path: "/" },
+  // { label: "Integrations", icon: FaGlobe, path: "/" },
+    {
+    label: "Integrations",
+    icon: FaGlobe,
+    path: "/",
+    children: [
+      { label: "Social Login Integration", path: "/social-login-integration" },
+      { label: "Payment Intergration", path: "/payment-gateway-integration" },
+      { label: "Shipping Intergration", path: "/shipping-integration" },
+      { label: "ERP Intergration", path: "/erp-integration" },
+      { label: "Whatsapp Intergration", path: "/whatsapp-integration" },
+      { label: "Analytics Intergration", path: "/analytics-integration" },
+      { label: "CRM Intergration", path: "/crm-integration" },
+    ],
+  },
   // Local Companies
     {
     label: "Local Companies",
