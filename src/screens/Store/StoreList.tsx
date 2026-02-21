@@ -2,6 +2,7 @@ import { FaPlus, FaEllipsisV, FaSearch, FaFilter, FaRedo } from "react-icons/fa"
 import AddButton from "../../component/AddButton";
 import Searchbar from "../../component/Searchbar";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const stores = [
     {
@@ -134,6 +135,8 @@ const StoreList = () => {
     const ITEMS_PER_PAGE = 8;
     const [page, setPage] = useState(1);
 
+    let navigate = useNavigate();
+
     const totalPages = Math.ceil(stores.length / ITEMS_PER_PAGE);
 
     const paginatedStores = stores.slice(
@@ -148,12 +151,42 @@ const StoreList = () => {
                 <h2 className="text-lg font-semibold">Stores Management</h2>
                 <AddButton
                     label="Add New Store"
-                    type="button" 
-                    onClick={() => console.log("Clicked")}
+                    type="button"
+                    onClick={() => navigate("/CreateStore")}
                 />
             </div>
 
+            {/* Tabs */}
+            <div className="flex gap-6 border-b border-gray-200">
+                <button
+                    onClick={() => navigate('/storeList')}
+                    className={`pb-2 transition-colors ${location.pathname === '/storeList'
+                        ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                        : 'text-gray-500 hover:text-teal-600'
+                        }`}
+                >
+                    View Data in List
+                </button>
+                <button
+                    onClick={() => navigate('/storeCardList')}
+                    className={`pb-2 transition-colors ${location.pathname === '/storeCardList'
+                        ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+                        : 'text-gray-500 hover:text-teal-600'
+                        }`}
+                >
+                    View Data in Cards
+                </button>
+
+            </div>
+
+
+
+
             <Searchbar />
+
+
+
+
 
 
             {/* TABLE */}
@@ -223,7 +256,7 @@ const StoreList = () => {
                                     {/* BOTTOM GRADIENT */}
                                     <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
 
-                                    <FaEllipsisV className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
+                                    <FaEllipsisV onClick={() => { navigate("/store") }} className="relative text-gray-400 cursor-pointer hover:text-gray-600" />
                                 </td>
                             </tr>
                         ))}

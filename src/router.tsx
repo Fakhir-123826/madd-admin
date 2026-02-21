@@ -68,6 +68,21 @@ import UserTree from "./component/MlmDashboard/UserTree.tsx";
 import Earning from "./component/MlmDashboard/Earning.tsx";
 import LevelWise from "./component/MlmDashboard/LevelWise.tsx";
 import MemberGrowth from "./component/MlmDashboard/MemberGrowth.tsx";
+import PaymentProviderManagement from "./screens/Payment/PaymentProviderManagement.tsx";
+import PaymentProviderDetails from "./component/Payment/PaymentProviderDetails.tsx";
+import AddStripe from "./component/Payment/AddStripe.tsx";
+import AddProvider from "./component/Payment/AddProvider.tsx";
+import ShippingProviderManagement from "./screens/Payment/ShippingProviderManagement.tsx";
+import ShippingProviderDetail from "./component/Payment/ShipRocket/ShippingProviderDetail.tsx";
+import AddShipping from "./component/Payment/ShipRocket/AddShipping.tsx";
+import AddShipRocket from "./component/Payment/ShipRocket/AddShipRocket.tsx";
+import Domain from "./screens/Domain/Domain.tsx";
+import Ssl from "./screens/Domain/Ssl.tsx";
+import Dns from "./screens/Domain/Dns.tsx";
+import SubDomain from "./screens/Domain/SubDomain.tsx";
+import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
+import AddSubdomain from "./component/Domain/AddSubDomain.tsx";
+import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -75,13 +90,17 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: "/", element: <Dashboard /> },
+      // Store Section
       { path: "/storeList", element: <StoreList /> },
       { path: "/storeCardList", element: <StoreCardList /> },
       { path: "/store", element: <Store /> },
+      { path: "/CreateStore", element: <CreateStore /> },
+      
+      // Order Section
       { path: "/orderlist", element: <OrderList /> },
       { path: "/addorder", element: <AddOrder /> },
       { path: "/order/:id", element: <OrderDetails /> },
-      { path: "/CreateStore", element: <CreateStore /> },
+      
       { path: "/Verdor", element: <VendorList /> },
       { path: "/Verder1", element: <Vendor /> },
       { path: "/CreateVerder", element: <CreateVendor /> },
@@ -163,8 +182,37 @@ export const router = createBrowserRouter([
       { path: "/reports", element: <Earning /> },
       { path: "/levelwise", element: <LevelWise /> },
       { path: "/membergrowth", element: <MemberGrowth /> },
+      
+      
+      
+      // Payment Provider Management 
+      { path: "/payment-providers", element: <PaymentProviderManagement /> },
+      { path: "/payment-provider/:id", element: <PaymentProviderDetails /> },
+      { path: "/addstripe", element: <AddStripe /> },
+      { path: "/addprovider", element: <AddProvider /> },
+      
+      // Shipping Provider Management
+      { path: "/shipping-mangement", element: <ShippingProviderManagement /> },
+      { path: "/add-shipping-provider", element: <AddShipping /> },
+      { path: "/add-shiprocket", element: <AddShipRocket /> },
+      { path: "/shipping-provider/:id", element: <ShippingProviderDetail /> },
+      
+      
+      // Domain Section
+      { path: "/domains", element: <Domain /> },
+      { path: "/ssl", element: <Ssl /> },
+      { path: "/dns", element: <Dns /> },
+      { path: "/subdomains", element: <SubDomain /> },
+      { path: "/add-dns-record", element: <AddDnsRecord /> },
+      { path: "/add-subdomain", element: <AddSubdomain /> },
+      { path: "/add-ssl-certificate", element: <AddSslCertificate /> },
+      
+
+
+
     ]
   },
+  
   { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
   { path: "/pass", element: <ForgotPassword /> },

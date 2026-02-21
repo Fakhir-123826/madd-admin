@@ -35,6 +35,7 @@ const menuItems = [
     path: "/store",
     children: [
       { label: "All Subscription", path: "/SubscriptionList" },
+      { label: "Stores list", path: "/storeList" },
     ],
   },
   {
@@ -111,7 +112,7 @@ const menuItems = [
       { label: "Audit Logs", path: "/auditlogs" },
     ],
   },
-  { label: "Domain", icon: FaGlobe, path: "/" },
+  { label: "Domain", icon: FaGlobe, path: "/domains" },
   { 
     label: "Return Platform",
     icon: FaUndoAlt,
@@ -123,8 +124,14 @@ const menuItems = [
     ]
   },
   { label: "Marketing", icon: FaBullhorn, path: "/" },
-  { label: "Payments", icon: FaCreditCard, path: "/" },
-  // { label: "Taxes", icon: FaMoneyBill, path: "/taxes" },
+  // Payment
+  { label: "Payments", icon: FaCreditCard, path: "/payment-providers" },
+  
+  // Shipping
+  { label: "Shipping", icon: FaTruck, path: "/shipping-mangement" },
+
+
+  // Taxes
     {
     label: "Taxes",
     icon: FaMoneyBill,
@@ -134,7 +141,7 @@ const menuItems = [
       { label: "Invoice", path: "/invoicemanagement" },
     ],
   },
-  { label: "Shipping", icon: FaTruck, path: "/" },
+
   { label: "Reports", icon: FaChartBar, path: "/" },
 ];
 

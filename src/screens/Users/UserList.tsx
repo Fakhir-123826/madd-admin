@@ -189,36 +189,36 @@ function UserList() {
 
 
 
-        {/* Tabs */}
-                    <div className="flex gap-6 border-b border-gray-200">
-                        <button
-                            onClick={() => navigate('/userlist')}
-                            className={`pb-2 transition-colors ${location.pathname === '/userlist'
-                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
-                                    : 'text-gray-500 hover:text-teal-600'
-                                }`}
-                        >
-                            User List
-                        </button>
-                        <button
-                            onClick={() => navigate('/usersroles')}
-                            className={`pb-2 transition-colors ${location.pathname === '/usersroles'
-                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
-                                    : 'text-gray-500 hover:text-teal-600'
-                                }`}
-                        >
-                            Roles
-                        </button>
-                        <button
-                            onClick={() => navigate('/usersgroup')}
-                            className={`pb-2 transition-colors ${location.pathname === '/usersgroup'
-                                    ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
-                                    : 'text-gray-500 hover:text-teal-600'
-                                }`}
-                        >
-                            Groups
-                        </button>
-                    </div>
+      {/* Tabs */}
+      <div className="flex gap-6 border-b border-gray-200">
+        <button
+          onClick={() => navigate('/userlist')}
+          className={`pb-2 transition-colors ${location.pathname === '/userlist'
+            ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+            : 'text-gray-500 hover:text-teal-600'
+            }`}
+        >
+          User List
+        </button>
+        <button
+          onClick={() => navigate('/usersroles')}
+          className={`pb-2 transition-colors ${location.pathname === '/usersroles'
+            ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+            : 'text-gray-500 hover:text-teal-600'
+            }`}
+        >
+          Roles
+        </button>
+        <button
+          onClick={() => navigate('/usersgroup')}
+          className={`pb-2 transition-colors ${location.pathname === '/usersgroup'
+            ? 'text-teal-600 border-b-2 border-teal-500 font-medium'
+            : 'text-gray-500 hover:text-teal-600'
+            }`}
+        >
+          Groups
+        </button>
+      </div>
 
 
 
@@ -226,7 +226,7 @@ function UserList() {
       <div className="flex items-center overflow-hidden h-[52px] py-10 pt-12">
         {/* Left Side Filters */}
         <div className="flex items-center bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[52px] w-[60%]">
-          
+
           {/* Filter Icon */}
           <div className="px-5 flex items-center border-r border-gray-200 text-gray-600">
             <FaFilter />
@@ -267,7 +267,7 @@ function UserList() {
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">▾</span>
           </div>
 
-          
+
 
           {/* Reset Filter Button */}
           <button className="px-5 flex items-center gap-2 text-sm text-blue-500 hover:underline">
@@ -369,11 +369,10 @@ function UserList() {
           <button
             key={i}
             onClick={() => handlePageChange(i + 1)}
-            className={`px-3 py-1 rounded-md ${
-              currentPage === i + 1
+            className={`px-3 py-1 rounded-md ${currentPage === i + 1
                 ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
                 : "hover:bg-gray-100"
-            }`}
+              }`}
           >
             {i + 1}
           </button>
