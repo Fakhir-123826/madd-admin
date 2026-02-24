@@ -83,6 +83,8 @@ import SubDomain from "./screens/Domain/SubDomain.tsx";
 import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
 import AddSubdomain from "./component/Domain/AddSubDomain.tsx";
 import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
+import MagentoOrderList from "./screens/Magento/Order/MagentoOrderList.tsx";
+import MagentoProductList from "./screens/Magento/Product/MAgentoProductList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -173,31 +175,22 @@ export const router = createBrowserRouter([
       { path: "/backups", element: <Backups /> },
       { path: "addbackup", element: <AddBackup /> },
       { path: "auditlogs", element: <AuditLogs /> },
-
-    
-
    // MMl Dashboard
       { path: "/mlmdashboard", element: <MlmDashboard /> },
       { path: "/usertree", element: <UserTree /> },
       { path: "/reports", element: <Earning /> },
       { path: "/levelwise", element: <LevelWise /> },
       { path: "/membergrowth", element: <MemberGrowth /> },
-      
-      
-      
       // Payment Provider Management 
       { path: "/payment-providers", element: <PaymentProviderManagement /> },
       { path: "/payment-provider/:id", element: <PaymentProviderDetails /> },
       { path: "/addstripe", element: <AddStripe /> },
       { path: "/addprovider", element: <AddProvider /> },
-      
       // Shipping Provider Management
       { path: "/shipping-mangement", element: <ShippingProviderManagement /> },
       { path: "/add-shipping-provider", element: <AddShipping /> },
       { path: "/add-shiprocket", element: <AddShipRocket /> },
       { path: "/shipping-provider/:id", element: <ShippingProviderDetail /> },
-      
-      
       // Domain Section
       { path: "/domains", element: <Domain /> },
       { path: "/ssl", element: <Ssl /> },
@@ -206,10 +199,10 @@ export const router = createBrowserRouter([
       { path: "/add-dns-record", element: <AddDnsRecord /> },
       { path: "/add-subdomain", element: <AddSubdomain /> },
       { path: "/add-ssl-certificate", element: <AddSslCertificate /> },
-      
 
-
-
+      //Magento 
+      {path : "/MagentoOrders" , element : <MagentoOrderList/>},
+      {path : "/MagentoProducts" , element : <MagentoProductList/>}
     ]
   },
   

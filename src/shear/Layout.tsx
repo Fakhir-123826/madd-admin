@@ -28,6 +28,13 @@ import logo from "../../public/madd-admin.png";
 
 const menuItems = [
   { label: "Dashboard", icon: FaHome, path: "/" },
+  {
+    label: "Magento", icon: FaHome, path: "/",
+    children: [
+      { label: "All Magento Products", path: "/MagentoProducts" },
+      { label: "All Magento Orders", path: "/MagentoOrders" },
+    ]
+  },
   { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },
   {
     label: "Stores",
@@ -77,7 +84,7 @@ const menuItems = [
   { label: "Integrations", icon: FaGlobe, path: "/" },
   // { label: "Local Companies", icon: FaBuilding, path: "/" },
   // Local Companies
-    {
+  {
     label: "Local Companies",
     icon: FaBuilding,
     path: "/",
@@ -113,11 +120,11 @@ const menuItems = [
     ],
   },
   { label: "Domain", icon: FaGlobe, path: "/domains" },
-  { 
+  {
     label: "Return Platform",
     icon: FaUndoAlt,
     path: "/",
-    children:[
+    children: [
       { label: "Coupon Management", path: "/CouponManagementList" },
       { label: "Email Marketing", path: "/EmailMarketingList" },
       { label: "SEOSettingList", path: "/SEOSettingList" },
@@ -126,13 +133,13 @@ const menuItems = [
   { label: "Marketing", icon: FaBullhorn, path: "/" },
   // Payment
   { label: "Payments", icon: FaCreditCard, path: "/payment-providers" },
-  
+
   // Shipping
   { label: "Shipping", icon: FaTruck, path: "/shipping-mangement" },
 
 
   // Taxes
-    {
+  {
     label: "Taxes",
     icon: FaMoneyBill,
     path: "/Vendor",
