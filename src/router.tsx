@@ -84,7 +84,8 @@ import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
 import AddSubdomain from "./component/Domain/AddSubDomain.tsx";
 import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
 import MagentoOrderList from "./screens/Magento/Order/MagentoOrderList.tsx";
-import MagentoProductList from "./screens/Magento/Product/MAgentoProductList.tsx";
+import MagentoProductList from "./screens/Magento/Product/MagentoProductList.tsx";
+import AddMagentoProduct from "./screens/Magento/Product/AddMagentoProduct.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -202,7 +203,8 @@ export const router = createBrowserRouter([
 
       //Magento 
       {path : "/MagentoOrders" , element : <MagentoOrderList/>},
-      {path : "/MagentoProducts" , element : <MagentoProductList/>}
+      {path : "/MagentoProducts" , element : <MagentoProductList/>},
+      {path : "/addMagentoProduct" , element: <AddMagentoProduct/>}
     ]
   },
   
