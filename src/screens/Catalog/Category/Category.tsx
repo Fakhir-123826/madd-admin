@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AddButton from "../../../component/AddButton";
 
 
@@ -35,6 +35,7 @@ const getStatusStyle = (status: Order["status"]) => {
 const Category = () => {
     const { id } = useParams();
     const isEdit = Boolean(id);
+    const navigate = useNavigate();
     return (
         <div>
             <div className="bg-white shadow-sm p-6">
@@ -44,9 +45,7 @@ const Category = () => {
                         label={isEdit ? "Update Category" : "Create Category"}
                         type="button"
 
-                        onClick={() => {
-                            console.log("pop")
-                        }}
+                      onClick={() => navigate("/CreateCategory")}
                     />
                 </div>
 

@@ -86,6 +86,8 @@ import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
 import MagentoOrderList from "./screens/Magento/Order/MagentoOrderList.tsx";
 import MagentoProductList from "./screens/Magento/Product/MagentoProductList.tsx";
 import AddMagentoProduct from "./screens/Magento/Product/AddMagentoProduct.tsx";
+import AddMagentoCategory from "./screens/Magento/Category/AddMagentoCategory.tsx";
+import MagentoCategoryList from "./screens/Magento/Category/MagentoCategoryList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -204,7 +206,10 @@ export const router = createBrowserRouter([
       //Magento 
       {path : "/MagentoOrders" , element : <MagentoOrderList/>},
       {path : "/MagentoProducts" , element : <MagentoProductList/>},
-      {path : "/addMagentoProduct" , element: <AddMagentoProduct/>}
+      {path : "/addMagentoProduct" , element: <AddMagentoProduct/>},
+      {path : "/AddMagentoCategory" , element: <AddMagentoCategory/>},
+      {path : "/AddMagentoCategory/:id" , element: <AddMagentoCategory/>},
+      {path : "/MagentoCategoryList" , element: <MagentoCategoryList/>},
     ]
   },
   

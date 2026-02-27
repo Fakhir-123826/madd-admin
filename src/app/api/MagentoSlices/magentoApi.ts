@@ -50,7 +50,7 @@ export const magentoApi = createApi({
     baseUrl: 'http://127.0.0.1:8000/api/magento/',
   }),
 
-  tagTypes: ['MagentoOrders', 'MagentoProducts','products'],
+  tagTypes: ['MagentoOrders', 'MagentoProducts', 'products'],
 
   endpoints: (builder) => ({
     // ✅ ORDERS
@@ -69,11 +69,21 @@ export const magentoApi = createApi({
       query: ({ page, pageSize }) => `products?page=${page}&pageSize=${pageSize}`,
       providesTags: ['products'],
     }),
+
+    createProduct: builder.mutation<MagentoProduct, Partial<MagentoProduct>>({
+      query: (newProduct) => ({
+        url: 'products',
+        method: 'POST',
+        body: newProduct,
+      }),
+      invalidatesTags: ['MagentoProducts', 'products'],
+    }),
   }),
 })
 
 export const {
   useGetOrdersFromApiQuery,
   useGetProductsFromApiQuery,
-  useProductsQuery
+  useProductsQuery,
+  useCreateProductMutation
 } = magentoApi

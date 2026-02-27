@@ -21,6 +21,7 @@ import {
   FaBullhorn,
   FaCreditCard,
   FaShoppingCart,
+  FaMagento
 } from "react-icons/fa";
 
 import { Link, Outlet } from "react-router-dom";
@@ -29,10 +30,12 @@ import logo from "../../public/madd-admin.png";
 const menuItems = [
   { label: "Dashboard", icon: FaHome, path: "/" },
   {
-    label: "Magento", icon: FaHome, path: "/",
+    label: "Magento", icon: FaMagento, path: "/",
     children: [
+      
       { label: "All Magento Products", path: "/MagentoProducts" },
-      { label: "All Magento Orders", path: "/MagentoOrders" },
+      // { label: "All Magento Category", path: "/CategoryList" },
+      { label: "All Magento Category", path: "/MagentoCategoryList" },
     ]
   },
   { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },
