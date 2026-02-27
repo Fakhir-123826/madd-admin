@@ -36,6 +36,7 @@ const menuItems = [
       { label: "All Magento Products", path: "/MagentoProducts" },
       // { label: "All Magento Category", path: "/CategoryList" },
       { label: "All Magento Category", path: "/MagentoCategoryList" },
+      { label: "All Magento Customer", path: "/MagentoCustomerList" },
     ]
   },
   { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },

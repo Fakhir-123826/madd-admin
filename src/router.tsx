@@ -88,6 +88,8 @@ import MagentoProductList from "./screens/Magento/Product/MagentoProductList.tsx
 import AddMagentoProduct from "./screens/Magento/Product/AddMagentoProduct.tsx";
 import AddMagentoCategory from "./screens/Magento/Category/AddMagentoCategory.tsx";
 import MagentoCategoryList from "./screens/Magento/Category/MagentoCategoryList.tsx";
+import MagentoCustomerList from "./screens/Magento/Customers/MagentoCustomerList.tsx";
+import AddMagentoCustomer from "./screens/Magento/Customers/AddMagentoCustomer.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -210,6 +212,8 @@ export const router = createBrowserRouter([
       {path : "/AddMagentoCategory" , element: <AddMagentoCategory/>},
       {path : "/AddMagentoCategory/:id" , element: <AddMagentoCategory/>},
       {path : "/MagentoCategoryList" , element: <MagentoCategoryList/>},
+      {path : "/AddMagentoCustomer" , element: <AddMagentoCustomer/>},
+      {path : "/MagentoCustomerList" , element: <MagentoCustomerList/>},
     ]
   },
   
