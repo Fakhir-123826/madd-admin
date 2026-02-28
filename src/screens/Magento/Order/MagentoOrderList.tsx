@@ -10,7 +10,7 @@ function MagentoOrderList() {
   const { data, isLoading, error } = useGetOrdersFromApiQuery();
 
   // const orders = data?.data?.items || []; // ✅ Magento items
-const orders = data?.data?.items || []
+  const orders = data?.items || [];
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -31,7 +31,8 @@ const orders = data?.data?.items || []
   };
 
   // ✅ Pagination
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  // const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const totalPages = Math.ceil((data?.total_count || 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentOrders = orders.slice(startIndex, startIndex + itemsPerPage);
 
@@ -128,11 +129,10 @@ const orders = data?.data?.items || []
           <button
             key={i}
             onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === i + 1
-                ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-                : "bg-gray-100"
-            }`}
+            className={`px-3 py-1 rounded ${currentPage === i + 1
+              ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
+              : "bg-gray-100"
+              }`}
           >
             {i + 1}
           </button>

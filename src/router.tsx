@@ -208,12 +208,15 @@ export const router = createBrowserRouter([
       //Magento 
       {path : "/MagentoOrders" , element : <MagentoOrderList/>},
       {path : "/MagentoProducts" , element : <MagentoProductList/>},
-      {path : "/addMagentoProduct" , element: <AddMagentoProduct/>},
+      {path : "/AddMagentoProduct" , element: <AddMagentoProduct/>},
+      {path : "/AddMagentoProduct/:sku" , element: <AddMagentoProduct/>},
       {path : "/AddMagentoCategory" , element: <AddMagentoCategory/>},
       {path : "/AddMagentoCategory/:id" , element: <AddMagentoCategory/>},
       {path : "/MagentoCategoryList" , element: <MagentoCategoryList/>},
       {path : "/AddMagentoCustomer" , element: <AddMagentoCustomer/>},
       {path : "/MagentoCustomerList" , element: <MagentoCustomerList/>},
+      {path : "/AddMagentoCustomer/:id" , element: <AddMagentoCustomer/>},
+      {path : "/customers/:id" , element: <AddMagentoCustomer/>},
     ]
   },
   
