@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Eye } from "lucide-react"
 import { FaPlus } from "react-icons/fa"
 import FilterBar from "../../../component/orderManagement/FilterBar"
-import { useGetProductsQuery } from "../../../app/api/ProductSlice/ProductSlice"
+import { useGetProductsQuery } from "../../../app/api/MagentoSlices/ProductSlice"
 import Pagination from "../../../component/Pagination"
 
 /* ================= TYPES ================= */

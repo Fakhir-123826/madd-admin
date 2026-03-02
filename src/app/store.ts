@@ -3,9 +3,10 @@ import counterReducer from "./Slices/counterSlice";
 import { authApi } from "./api/AuthSlices/AuthSlices";
 import { subscriptionApi } from "./api/SubscriptionSclices/SubscriptionSclices";
 import { magentoApi } from "./api/MagentoSlices/magentoApi";
-import { magentoCategoryApi } from "./api/CategorySlice/CategorySlice"; // ✅ import the category API
-import { magentoCustomerApi } from "./api/CustomerSlice/CustomerSlice";
-import { productApi } from "./api/ProductSlice/ProductSlice"
+import { magentoCategoryApi } from "./api/MagentoSlices/CategorySlice"; // ✅ import the category API
+import { magentoCustomerApi } from "./api/MagentoSlices/CustomerSlice";
+import { productApi } from "./api/MagentoSlices/ProductSlice"
+import { orderApi } from "./api/MagentoSlices/OrderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     [magentoCategoryApi.reducerPath]: magentoCategoryApi.reducer,
     [magentoCustomerApi.reducerPath]: magentoCustomerApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
+    [orderApi.reducerPath] : orderApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -24,7 +26,8 @@ export const store = configureStore({
       magentoApi.middleware,
       magentoCategoryApi.middleware,
       magentoCustomerApi.middleware,
-      productApi.middleware 
+      productApi.middleware,
+      orderApi.middleware
     ),
 });
 

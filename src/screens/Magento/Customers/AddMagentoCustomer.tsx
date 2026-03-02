@@ -6,7 +6,7 @@ import {
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useGetCustomersQuery,
-} from "../../../app/api/CustomerSlice/CustomerSlice";
+} from "../../../app/api/MagentoSlices/CustomerSlice";
 
 const AddMagentoCustomer = () => {
   const navigate = useNavigate();

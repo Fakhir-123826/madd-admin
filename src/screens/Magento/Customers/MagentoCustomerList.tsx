@@ -8,7 +8,7 @@ import {
   useGetCustomersQuery,
   type MagentoCustomer,
   useDeleteCustomerMutation,
-} from "../../../app/api/CustomerSlice/CustomerSlice";
+} from "../../../app/api/MagentoSlices/CustomerSlice";
 
 function MagentoCustomerList() {
   const navigate = useNavigate();

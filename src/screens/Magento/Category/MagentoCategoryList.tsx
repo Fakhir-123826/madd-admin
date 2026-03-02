@@ -7,7 +7,7 @@ import Pagination from "../../../component/Pagination";
 import {
   useGetCategoriesQuery,
   type MagentoCategory,
-} from "../../../app/api/CategorySlice/CategorySlice";
+} from "../../../app/api/MagentoSlices/CategorySlice";
 
 function MagentoCategoryList() {
   const navigate = useNavigate();

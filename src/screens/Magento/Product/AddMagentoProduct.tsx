@@ -7,8 +7,8 @@ import {
   useUpdateProductMutation,
   useGetProductsQuery,
   useGetProductQuery
-} from "../../../app/api/ProductSlice/ProductSlice";
-import { useGetCategoriesQuery, type MagentoCategory } from "../../../app/api/CategorySlice/CategorySlice";
+} from "../../../app/api/MagentoSlices/ProductSlice";
+import { useGetCategoriesQuery, type MagentoCategory } from "../../../app/api/MagentoSlices/CategorySlice";
 import AutoCompleteMultiSelect from "../../../component/Inputs Feilds/AutoCompleteMultiSelect";
 
 interface CustomAttribute {

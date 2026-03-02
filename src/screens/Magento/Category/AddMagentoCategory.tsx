@@ -7,7 +7,7 @@ import {
     useUpdateCategoryMutation,
     useGetCategoryByIdQuery,
     type MagentoCategory
-} from "../../../app/api/CategorySlice/CategorySlice";
+} from "../../../app/api/MagentoSlices/CategorySlice";
 
 interface CustomAttribute {
     attribute_code: string;

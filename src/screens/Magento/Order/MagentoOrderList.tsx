@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
 import FilterBar from "../../../component/orderManagement/FilterBar";
-import { useGetOrdersFromApiQuery } from "../../../app/api/MagentoSlices/magentoApi";
+import { useGetOrdersQuery } from "../../../app/api/MagentoSlices/OrderSlice";
 
 function MagentoOrderList() {
   const navigate = useNavigate();
-  const { data, isLoading, error } = useGetOrdersFromApiQuery();
+  const { data, isLoading, error } = useGetOrdersQuery();
 
   // const orders = data?.data?.items || []; // ✅ Magento items
   const orders = data?.items || [];
@@ -37,7 +37,7 @@ function MagentoOrderList() {
   const currentOrders = orders.slice(startIndex, startIndex + itemsPerPage);
 
   const handleViewOrder = (order: any) => {
-    navigate(`/order/${order.entity_id}`, { state: { order } });
+    navigate(`/MogentoOrder/${order.entity_id}`, { state: { order } });
   };
 
   const tdBase =
