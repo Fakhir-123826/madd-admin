@@ -47,7 +47,7 @@ export const magentoApi = createApi({
   reducerPath: 'magentoApi',
 
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://127.0.0.1:8000/api/magento/',
+    baseUrl: 'http://127.0.0.1:8000/api/',
   }),
 
   tagTypes: ['MagentoOrders', 'MagentoProducts', 'products'],

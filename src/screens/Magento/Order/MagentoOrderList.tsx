@@ -3,17 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
 import FilterBar from "../../../component/orderManagement/FilterBar";
-import { useGetOrdersQuery } from "../../../app/api/MagentoSlices/OrderSlice";
+import { useGetOrdersQuery, type OrderFilters } from "../../../app/api/MagentoSlices/OrderSlice";
+import OrderFilter from "./OrderFilter";
 
 function MagentoOrderList() {
   const navigate = useNavigate();
-  const { data, isLoading, error } = useGetOrdersQuery();
-
-  // const orders = data?.data?.items || []; // ✅ Magento items
-  const orders = data?.items || [];
-
+  const [appliedFilters, setAppliedFilters] = useState<OrderFilters>({});  // ✅ add
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const { data, isLoading, error } = useGetOrdersQuery({
+    filters: appliedFilters,
+    page: currentPage,
+    pageSize: itemsPerPage,
+  });
+  const handleApplyFilters = (filters: any) => {
+    setAppliedFilters(filters);
+    setCurrentPage(1);
+  };
+
+  const handleCancelFilters = () => {
+    setAppliedFilters({});
+    setCurrentPage(1);
+  };
+  // const orders = data?.data?.items || []; // ✅ Magento items
+  const orders = data?.items || [];
 
   const statusStyle = (status: string) => {
     switch (status) {
@@ -63,7 +76,14 @@ function MagentoOrderList() {
         </button>
       </div>
 
-      <FilterBar />
+      {/* <FilterBar /> */}
+      <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+        <h2 className="text-lg font-semibold mb-4">Filter Orders</h2>
+        <OrderFilter
+          onApply={handleApplyFilters}      // ✅ connected
+          // onCancel={handleCancelFilters}    // ✅ cancel pe filters reset
+        />
+      </div>
 
       {/* TABLE */}
       <div className="rounded-t-3xl overflow-hidden mt-6">
@@ -81,7 +101,7 @@ function MagentoOrderList() {
           </thead>
 
           <tbody>
-            {currentOrders.map((order: any) => (
+            {orders.map((order: any) => ( 
               <tr key={order.entity_id} className="bg-white shadow-sm hover:shadow-md">
                 <td className={`${tdBase} font-medium text-black`}>
                   #{order.increment_id}

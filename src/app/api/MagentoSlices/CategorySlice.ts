@@ -23,19 +23,19 @@ export const magentoCategoryApi = createApi({
   endpoints: (builder) => ({
     // ✅ Get All Categories
     getCategories: builder.query<MagentoCategory[], void>({
-      query: () => "magento/categories",
+      query: () => "categories",
       providesTags: ["Categories"],
     }),
 
     // ✅ Get Category By ID
     getCategoryById: builder.query<MagentoCategory, number>({
-      query: (id) => `magento/categories/${id}`,
+      query: (id) => `categories/${id}`,
     }),
 
     // ✅ Create Category
     createCategory: builder.mutation<MagentoCategory, Partial<MagentoCategory>>({
       query: (body) => ({
-        url: "magento/categories",
+        url: "categories",
         method: "POST",
         body,
       }),
@@ -48,7 +48,7 @@ export const magentoCategoryApi = createApi({
       { id: number; data: Partial<MagentoCategory> }
     >({
       query: ({ id, data }) => ({
-        url: `magento/categories/${id}`,
+        url: `categories/${id}`,
         method: "PUT",
         body: data,
       }),

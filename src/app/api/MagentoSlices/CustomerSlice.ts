@@ -21,20 +21,20 @@ export const magentoCustomerApi = createApi({
   endpoints: (builder) => ({
     // Get all customers
     getCustomers: builder.query<MagentoCustomer[], void>({
-      query: () => "magento/customers",
+      query: () => "customers",
       providesTags: ["Customers"],
     }),
 
     // Get customer by ID
     getCustomerById: builder.query<MagentoCustomer, number>({
-      query: (id) => `magento/customers/${id}`,
+      query: (id) => `customers/${id}`,
       providesTags: (result, error, id) => [{ type: "Customers", id }],
     }),
 
     // Create customer
     createCustomer: builder.mutation<MagentoCustomer, Partial<MagentoCustomer>>({
       query: (body) => ({
-        url: "magento/customers",
+        url: "customers",
         method: "POST",
         body,
       }),
@@ -47,7 +47,7 @@ export const magentoCustomerApi = createApi({
       { id: number; data: Partial<MagentoCustomer> }
     >({
       query: ({ id, data }) => ({
-        url: `magento/customers/${id}`,
+        url: `customers/${id}`,
         method: "PUT",
         body: data,
       }),
@@ -57,7 +57,7 @@ export const magentoCustomerApi = createApi({
     // Delete customer
     deleteCustomer: builder.mutation<{ success: boolean }, number>({
       query: (id) => ({
-        url: `magento/customers/${id}`,
+        url: `customers/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error, id) => [{ type: "Customers", id }],

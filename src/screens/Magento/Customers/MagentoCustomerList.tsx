@@ -9,6 +9,7 @@ import {
   type MagentoCustomer,
   useDeleteCustomerMutation,
 } from "../../../app/api/MagentoSlices/CustomerSlice";
+import CustomerFilter from "./CustomerFilter";
 
 function MagentoCustomerList() {
   const navigate = useNavigate();
@@ -54,7 +55,8 @@ function MagentoCustomerList() {
         </button>
       </div>
 
-      <FilterBar />
+      {/* <FilterBar /> */}
+      <CustomerFilter />
 
       {/* TABLE */}
       <div className="rounded-t-3xl overflow-x-auto mt-6">

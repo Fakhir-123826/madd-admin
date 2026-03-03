@@ -135,7 +135,7 @@ type FlattenedCategory = MagentoCategory & { level: number };
 
     try {
       if (isEditMode) {
-        await updateProduct({ sku, product: payload }).unwrap(); // use SKU
+        await updateProduct({ sku: sku!, product: payload }).unwrap();
       } else {
         await createProduct(payload).unwrap();
       }
