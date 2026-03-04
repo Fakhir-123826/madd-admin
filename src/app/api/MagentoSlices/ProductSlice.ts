@@ -13,6 +13,10 @@ export interface MagentoProduct {
     updated_at?: string;
     extension_attributes?: any;
     custom_attributes?: any[];
+    product_links?: any[];
+    options?: any[];
+    media_gallery_entries?: any[];
+    tier_prices?: any[];
 }
 
 interface ProductListResponse {

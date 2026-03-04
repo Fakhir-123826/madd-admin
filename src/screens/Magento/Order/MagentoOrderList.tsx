@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaFilter } from "react-icons/fa";
 import FilterBar from "../../../component/orderManagement/FilterBar";
 import { useGetOrdersQuery, type OrderFilters } from "../../../app/api/MagentoSlices/OrderSlice";
 import OrderFilter from "./OrderFilter";
@@ -10,6 +10,7 @@ function MagentoOrderList() {
   const navigate = useNavigate();
   const [appliedFilters, setAppliedFilters] = useState<OrderFilters>({});  // ✅ add
   const [currentPage, setCurrentPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(false);
   const itemsPerPage = 8;
   const { data, isLoading, error } = useGetOrdersQuery({
     filters: appliedFilters,
@@ -65,25 +66,37 @@ function MagentoOrderList() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Magento Orders</h2>
-        <button
-          onClick={() => navigate("/addorder")}
-          className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
-        >
-          <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
-            <FaPlus className="text-teal-500 text-sm" />
-          </span>
-          Add Order
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Filter Toggle Button */}
+          <button
+            onClick={() => setShowFilter((prev) => !prev)}
+            className="flex items-center cursor-pointer gap-2 px-6 py-2 rounded-full border border-teal-400 text-teal-500 text-sm font-medium hover:bg-teal-50 transition-colors"
+          >
+            <FaFilter className="text-sm" />
+            {showFilter ? "Hide Filters" : "Show Filters"}
+          </button>
+          <button
+            onClick={() => navigate("/addorder")}
+            className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
+          >
+            <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
+              <FaPlus className="text-teal-500 text-sm" />
+            </span>
+            Add Order
+          </button>
+        </div>
       </div>
 
       {/* <FilterBar /> */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-        <h2 className="text-lg font-semibold mb-4">Filter Orders</h2>
-        <OrderFilter
-          onApply={handleApplyFilters}      // ✅ connected
+      {showFilter && (
+        <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+          <h2 className="text-lg font-semibold mb-4">Filter Orders</h2>
+          <OrderFilter
+            onApply={handleApplyFilters}      // ✅ connected
           // onCancel={handleCancelFilters}    // ✅ cancel pe filters reset
-        />
-      </div>
+          />
+        </div>
+      )}
 
       {/* TABLE */}
       <div className="rounded-t-3xl overflow-hidden mt-6">
@@ -101,7 +114,7 @@ function MagentoOrderList() {
           </thead>
 
           <tbody>
-            {orders.map((order: any) => ( 
+            {orders.map((order: any) => (
               <tr key={order.entity_id} className="bg-white shadow-sm hover:shadow-md">
                 <td className={`${tdBase} font-medium text-black`}>
                   #{order.increment_id}

@@ -1,35 +1,36 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaFilter } from "react-icons/fa";
 import Pagination from "../../../component/Pagination";
 import ProductFilter from "./ProductFilter";
-import { useGetProductsQuery, type ProductFilters } from "../../../app/api/MagentoSlices/ProductSlice";
+import { useGetProductsQuery, type MagentoProduct, type ProductFilters } from "../../../app/api/MagentoSlices/ProductSlice";
 
-export interface MagentoProduct {
-  id: number;
-  sku: string;
-  name: string;
-  attribute_set_id: number;
-  price: number;
-  status: number;
-  visibility: number;
-  type_id: string;
-  created_at: string;
-  updated_at: string;
-  extension_attributes: any;
-  product_links: any[];
-  options: any[];
-  media_gallery_entries: any[];
-  tier_prices: any[];
-  custom_attributes: any[];
-}
+// export interface MagentoProduct {
+//   id: number;
+//   sku: string;
+//   name: string;
+//   attribute_set_id: number;
+//   price: number;
+//   status: number;
+//   visibility: number;
+//   type_id: string;
+//   created_at: string;
+//   updated_at: string;
+//   extension_attributes: any;
+//   product_links: any[];
+//   options: any[];
+//   media_gallery_entries: any[];
+//   tier_prices: any[];
+//   custom_attributes: any[];
+// }
 
 /* ================= COMPONENT ================= */
 
 function MagentoProductList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(false);
 
   // Yeh state sirf "Apply Filters" button pe update hoga
   const [appliedFilters, setAppliedFilters] = useState<ProductFilters>({
@@ -77,23 +78,38 @@ function MagentoProductList() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Magento Products</h2>
-        <button
-          onClick={() => navigate("/AddMagentoProduct")}
-          className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
-        >
-          <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
-            <FaPlus className="text-teal-500 text-sm" />
-          </span>
-          Add Product
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Filter Toggle Button */}
+          <button
+            onClick={() => setShowFilter((prev) => !prev)}
+            className="flex items-center gap-2 cursor-pointer px-6 py-2 rounded-full border border-teal-400 text-teal-500 text-sm font-medium hover:bg-teal-50 transition-colors"
+          >
+            <FaFilter className="text-sm" />
+            {showFilter ? "Hide Filters" : "Show Filters"}
+          </button>
+
+          {/* Add Product Button */}
+          <button
+            onClick={() => navigate("/AddMagentoProduct")}
+            className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
+          >
+            <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
+              <FaPlus className="text-teal-500 text-sm" />
+            </span>
+            Add Product
+          </button>
+        </div>
       </div>
 
       {/* FILTER BAR (sirf button pe apply hoga) */}
-      <ProductFilter
-        onApply={(newFilters) => {
-          setAppliedFilters(newFilters);   // ← sirf yahan table update hoga
-        }}
-      />
+      {showFilter && (
+        <ProductFilter
+          onApply={(newFilters) => {
+            setAppliedFilters(newFilters);
+            setShowFilter(false); // optional: apply pe filter hide ho jaye
+          }}
+        />
+      )}
 
       {/* TABLE - yeh sirf Apply Filters pe update hoga */}
       <div className="rounded-t-3xl overflow-x-auto mt-6">
@@ -138,7 +154,7 @@ function MagentoProductList() {
                   </td>
                   <td className={tdBase}>{product.type_id}</td>
                   <td className={tdBase}>
-                    {new Date(product.created_at).toLocaleDateString()}
+                    {new Date(product.created_at ?? '').toLocaleDateString()}
                   </td>
                   <td className="relative p-4 text-right">
                     <button

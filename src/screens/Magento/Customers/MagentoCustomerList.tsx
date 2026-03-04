@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Trash2, Edit } from "lucide-react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus ,FaFilter } from "react-icons/fa";
 import FilterBar from "../../../component/orderManagement/FilterBar";
 import Pagination from "../../../component/Pagination";
 import {
@@ -14,6 +14,7 @@ import CustomerFilter from "./CustomerFilter";
 function MagentoCustomerList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(false);
   const itemsPerPage = 10;
 
   const { data, isLoading, isFetching, error } = useGetCustomersQuery();
@@ -43,20 +44,31 @@ function MagentoCustomerList() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Magento Customers</h2>
-
-        <button
-          onClick={() => navigate("/AddMagentoCustomer")}
-          className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
-        >
-          <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
-            <FaPlus className="text-teal-500 text-sm" />
-          </span>
-          Add Customer
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Filter Toggle Button */}
+          <button
+            onClick={() => setShowFilter((prev) => !prev)}
+            className="flex items-center gap-2 cursor-pointer px-6 py-2 rounded-full border border-teal-400 text-teal-500 text-sm font-medium hover:bg-teal-50 transition-colors"
+          >
+            <FaFilter className="text-sm" />
+            {showFilter ? "Hide Filters" : "Show Filters"}
+          </button>
+          <button
+            onClick={() => navigate("/AddMagentoCustomer")}
+            className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
+          >
+            <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
+              <FaPlus className="text-teal-500 text-sm" />
+            </span>
+            Add Customer
+          </button>
+        </div>
       </div>
 
       {/* <FilterBar /> */}
-      <CustomerFilter />
+      {showFilter && (
+        <CustomerFilter />
+      )}
 
       {/* TABLE */}
       <div className="rounded-t-3xl overflow-x-auto mt-6">
