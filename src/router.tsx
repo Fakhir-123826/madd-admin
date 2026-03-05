@@ -91,6 +91,8 @@ import MagentoCategoryList from "./screens/Magento/Category/MagentoCategoryList.
 import MagentoCustomerList from "./screens/Magento/Customers/MagentoCustomerList.tsx";
 import AddMagentoCustomer from "./screens/Magento/Customers/AddMagentoCustomer.tsx";
 import MogentoOrder from "./screens/Magento/Order/MagentoOrder.tsx";
+import ProtectedRoute from "./ProtectedRoute.tsx";
+import MagentoStoreList from "./screens/Magento/Store/MagentoStoreList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -207,18 +209,24 @@ export const router = createBrowserRouter([
       { path: "/add-ssl-certificate", element: <AddSslCertificate /> },
 
       //Magento 
-      {path : "/MagentoOrders" , element : <MagentoOrderList/>},
-      {path : "/MogentoOrder/:id" , element : <MogentoOrder/>},
-      {path : "/MagentoProducts" , element : <MagentoProductList/>},
-      {path : "/AddMagentoProduct" , element: <AddMagentoProduct/>},
-      {path : "/AddMagentoProduct/:sku" , element: <AddMagentoProduct/>},
-      {path : "/AddMagentoCategory" , element: <AddMagentoCategory/>},
-      {path : "/AddMagentoCategory/:id" , element: <AddMagentoCategory/>},
-      {path : "/MagentoCategoryList" , element: <MagentoCategoryList/>},
-      {path : "/AddMagentoCustomer" , element: <AddMagentoCustomer/>},
-      {path : "/MagentoCustomerList" , element: <MagentoCustomerList/>},
-      {path : "/AddMagentoCustomer/:id" , element: <AddMagentoCustomer/>},
-      {path : "/customers/:id" , element: <AddMagentoCustomer/>},
+      {
+        element: <ProtectedRoute />,
+           children: [
+          { path: "/MagentoOrders", element: <MagentoOrderList /> },
+          { path: "/MogentoOrder/:id", element: <MogentoOrder /> },
+          { path: "/MagentoProducts", element: <MagentoProductList /> },
+          { path: "/AddMagentoProduct", element: <AddMagentoProduct /> },
+          { path: "/AddMagentoProduct/:sku", element: <AddMagentoProduct /> },
+          { path: "/AddMagentoCategory", element: <AddMagentoCategory /> },
+          { path: "/AddMagentoCategory/:id", element: <AddMagentoCategory /> },
+          { path: "/MagentoCategoryList", element: <MagentoCategoryList /> },
+          { path: "/AddMagentoCustomer", element: <AddMagentoCustomer /> },
+          { path: "/MagentoCustomerList", element: <MagentoCustomerList /> },
+          { path: "/AddMagentoCustomer/:id", element: <AddMagentoCustomer /> },
+          { path: "/customers/:id", element: <AddMagentoCustomer /> },
+          { path: "/MagentoStoreList", element: <MagentoStoreList /> },
+        ]
+      },
     ]
   },
   

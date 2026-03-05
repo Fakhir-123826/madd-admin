@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Trash2, Edit } from "lucide-react";
-import { FaPlus ,FaFilter } from "react-icons/fa";
+import { FaPlus, FaFilter } from "react-icons/fa";
 import FilterBar from "../../../component/orderManagement/FilterBar";
 import Pagination from "../../../component/Pagination";
 import {
@@ -10,14 +10,32 @@ import {
   useDeleteCustomerMutation,
 } from "../../../app/api/MagentoSlices/CustomerSlice";
 import CustomerFilter from "./CustomerFilter";
+import { type CustomerFilters } from "../../../app/api/MagentoSlices/CustomerSlice";
+
 
 function MagentoCustomerList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilter, setShowFilter] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<CustomerFilters>({});
   const itemsPerPage = 10;
 
-  const { data, isLoading, isFetching, error } = useGetCustomersQuery();
+  const { data, isLoading, isFetching, error } = useGetCustomersQuery({
+    filters: appliedFilters,
+    page: currentPage,
+    pageSize: itemsPerPage,
+  });
+
+
+  const handleApplyFilters = (filters: CustomerFilters) => {
+    setAppliedFilters(filters);
+    setCurrentPage(1);
+  };
+
+  const handleCancelFilters = () => {
+    setAppliedFilters({});
+    setCurrentPage(1);
+  };
 
   const [deleteCustomer] = useDeleteCustomerMutation();
 
@@ -48,7 +66,7 @@ function MagentoCustomerList() {
           {/* Filter Toggle Button */}
           <button
             onClick={() => setShowFilter((prev) => !prev)}
-            className="flex items-center gap-2 cursor-pointer px-6 py-2 rounded-full border border-teal-400 text-teal-500 text-sm font-medium hover:bg-teal-50 transition-colors"
+            className="flex items-center  gap-2 cursor-pointer px-6 py-2 rounded-full border border-teal-400 text-teal-500 text-sm font-medium hover:bg-teal-50 transition-colors"
           >
             <FaFilter className="text-sm" />
             {showFilter ? "Hide Filters" : "Show Filters"}
@@ -65,9 +83,11 @@ function MagentoCustomerList() {
         </div>
       </div>
 
-      {/* <FilterBar /> */}
       {showFilter && (
-        <CustomerFilter />
+        <CustomerFilter
+          onApply={handleApplyFilters}
+          // onCancel={handleCancelFilters}
+        />
       )}
 
       {/* TABLE */}

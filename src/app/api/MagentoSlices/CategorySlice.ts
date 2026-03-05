@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "../baseQueryWithAuth";
 
 export interface MagentoCategory {
   id?: number;
@@ -14,9 +15,7 @@ export interface MagentoCategory {
 export const magentoCategoryApi = createApi({
   reducerPath: "magentoCategoryApi",
 
-  baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000/api/",
-  }),
+  baseQuery: baseQueryWithAuth,
 
   tagTypes: ["Categories"],
 

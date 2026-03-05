@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "../baseQueryWithAuth";
 
 export interface MagentoProduct {
     id?: number;
@@ -67,9 +68,7 @@ const flattenParams = (obj: Record<string, any>, parentPrefix = ""): [string, st
 
 export const productApi = createApi({
     reducerPath: "productApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: "http://127.0.0.1:8000/api/",
-    }),
+    baseQuery: baseQueryWithAuth,
     tagTypes: ["Product"],
     endpoints: (builder) => ({
         // ✅ Yeh wala endpoint use karo (GET with query string)

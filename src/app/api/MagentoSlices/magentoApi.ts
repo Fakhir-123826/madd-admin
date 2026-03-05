@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { baseQueryWithAuth } from '../baseQueryWithAuth'
 
 /* =========================
    ORDER TYPES
@@ -46,9 +47,7 @@ export interface MagentoProductResponse {
 export const magentoApi = createApi({
   reducerPath: 'magentoApi',
 
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'http://127.0.0.1:8000/api/',
-  }),
+  baseQuery: baseQueryWithAuth,
 
   tagTypes: ['MagentoOrders', 'MagentoProducts', 'products'],
 
