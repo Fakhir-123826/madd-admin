@@ -1,4 +1,4 @@
-import { Children, useState } from "react";
+import { Children, useState, useEffect } from "react";
 import {
   FaBars,
   FaHome,
@@ -24,20 +24,21 @@ import {
   FaMagento
 } from "react-icons/fa";
 
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../../public/madd-admin.png";
 
 const menuItems = [
   { label: "Dashboard", icon: FaHome, path: "/" },
   {
-    label: "Magento", icon: FaMagento, path: "/",
+    label: "Magento", icon: FaMagento, path: "/magento",
     children: [
-      
+
       { label: "All Magento Products", path: "/MagentoProducts" },
       // { label: "All Magento Category", path: "/CategoryList" },
       { label: "All Magento Category", path: "/MagentoCategoryList" },
       { label: "All Magento Customer", path: "/MagentoCustomerList" },
       { label: "All Magento Order", path: "/MagentoOrders" },
+      { label: "All Magento Store", path: "/MagentoStoreList" },
     ]
   },
   { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },
@@ -53,7 +54,7 @@ const menuItems = [
   {
     label: "Catalog",
     icon: FaBox,
-    path: "/",
+    path: "/catalog",
     children: [
       { label: "All Inventiries", path: "/InventoryManagementList" },
       { label: "All Product Bases", path: "/ProductBaseList" },
@@ -66,7 +67,7 @@ const menuItems = [
   {
     label: "Users",
     icon: FaUsers,
-    path: "/",
+    path: "/users",
     children: [
       { label: "Users List", path: "/userlist" },
       { label: "Roles", path: "/usersroles" },
@@ -76,35 +77,35 @@ const menuItems = [
   {
     label: "Vendors",
     icon: FaHandshake,
-    path: "/Vendor",
+    path: "/vendors",
     children: [
       { label: "All Vendors", path: "/Verdor" },
       { label: "Add Vendor Onboard", path: "/CreateVerderOnboard" },
       { label: "Vendor Requests", path: "/vendor/requests" },
     ],
   },
-  { label: "Settlements", icon: FaExchangeAlt, path: "/" },
-  { label: "CMS", icon: FaFileAlt, path: "/" },
-  { label: "OMS", icon: FaCogs, path: "/" },
-  { label: "Integrations", icon: FaGlobe, path: "/" },
+  { label: "Settlements", icon: FaExchangeAlt, path: "/settlements" },
+  { label: "CMS", icon: FaFileAlt, path: "/cms" },
+  { label: "OMS", icon: FaCogs, path: "/oms" },
+  { label: "Integrations", icon: FaGlobe, path: "/integrations" },
   // { label: "Local Companies", icon: FaBuilding, path: "/" },
   // Local Companies
   {
     label: "Local Companies",
     icon: FaBuilding,
-    path: "/",
+    path: "/local-companies",
     children: [
       { label: "Country Management", path: "/country-management" },
       { label: "Currency Managment", path: "/currency-management" },
       { label: "Languages Managment", path: "/language-management" },
     ],
   },
-  { label: "Marketplace", icon: FaShoppingBag, path: "/" },
+  { label: "Marketplace", icon: FaShoppingBag, path: "/marketplace" },
   // { label: "MLM System", icon: FaProjectDiagram, path: "/" },
   {
     label: "MLM System",
     icon: FaProjectDiagram,
-    path: "/",
+    path: "/mlm",
     children: [
       { label: "Mlm Dashboard", path: "/mlmdashboard" },
       { label: "User Tree", path: "/usertree" },
@@ -116,7 +117,7 @@ const menuItems = [
   {
     label: "Settings",
     icon: FaCog,
-    path: "/",
+    path: "/settings",
     children: [
       { label: "Translation", path: "/translation" },
       { label: "Updates", path: "/updates" },
@@ -128,14 +129,14 @@ const menuItems = [
   {
     label: "Return Platform",
     icon: FaUndoAlt,
-    path: "/",
+    path: "/return-platform",
     children: [
       { label: "Coupon Management", path: "/CouponManagementList" },
       { label: "Email Marketing", path: "/EmailMarketingList" },
       { label: "SEOSettingList", path: "/SEOSettingList" },
     ]
   },
-  { label: "Marketing", icon: FaBullhorn, path: "/" },
+  { label: "Marketing", icon: FaBullhorn, path: "/marketing" },
   // Payment
   { label: "Payments", icon: FaCreditCard, path: "/payment-providers" },
 
@@ -147,23 +148,53 @@ const menuItems = [
   {
     label: "Taxes",
     icon: FaMoneyBill,
-    path: "/Vendor",
+    path: "/taxes-management",
     children: [
       { label: "Taxes", path: "/taxes" },
       { label: "Invoice", path: "/invoicemanagement" },
     ],
   },
 
-  { label: "Reports", icon: FaChartBar, path: "/" },
+  { label: "Reports", icon: FaChartBar, path: "/reports-main" },
 ];
 
 
 const Layout = () => {
+  const location = useLocation()
   const [collapsed, setCollapsed] = useState(false);
   const [active, setActive] = useState("Dashboard");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
+  useEffect(() => {
+    const currentPath = location.pathname;
 
+    menuItems.forEach((item) => {
+      // ✅ Direct route - exact match karo
+      if (item.path === currentPath && !item.children) {
+        setActive(item.label);
+        setOpenMenu(null);
+      }
+
+      // ✅ Child route match - exact match karo, startsWith nahi
+      if (item.children) {
+        item.children.forEach((child) => {
+          if (currentPath === child.path) { // ✅ startsWith → === karo
+            setActive(child.label);
+            setOpenMenu(item.label);
+          }
+        });
+      }
+    });
+  }, [location.pathname]);// ✅ route change hone pe run karo
+
+  const getActiveParentLabel = () => {
+    for (const item of menuItems) {
+      if (item.children?.some(child => active === child.label)) {
+        return item.label; // ✅ parent ka label return karo
+      }
+    }
+    return active;
+  };
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* SIDEBAR */}
@@ -185,60 +216,29 @@ const Layout = () => {
           className={`flex-1 px-4 space-y-2 text-sm ${!collapsed ? "mt-6" : ""
             }`}
         >
-          {/* {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = active === item.label;
-
-            return (
-              <div key={item.label} className="relative">
-                {isActive && (
-                  <span className="absolute -left-4 top-3 bottom-3 w-1 rounded-full bg-blue-500" />
-                )}
-
-                <Link to={item.path}>
-
-                  <div
-                    onClick={() => setActive(item.label)}
-                    className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-6"
-                      } py-4 rounded-xl cursor-pointer transition-all
-                  ${isActive
-                        ? "bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 text-white shadow-md"
-                        : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                  >
-                    <Icon className="text-lg" />
-                    {!collapsed && (
-                      <span className="font-medium">{item.label}</span>
-                    )}
-                  </div>
-
-                </Link>
-              </div>
-
-            );
-          })} */}
-
 
           {menuItems.map((item) => {
             const Icon = item.icon;
             const hasChildren = Array.isArray(item.children) && item.children.length > 0;
-            const isActive = active === item.label;
+            const isActive = active === item.label ||
+              (item.children?.some(child => active === child.label));
             const isOpen = openMenu === item.label;
 
             const MenuContent = (
               <div
                 onClick={() => {
-                  setActive(item.label);
+                  // ❌ setActive(item.label);  // ye hata do parent ke liye
 
                   if (hasChildren) {
-                    setOpenMenu(isOpen ? null : item.label);
+                    setOpenMenu(isOpen ? null : item.label); // ✅ sirf dropdown toggle karo
                   } else {
+                    setActive(item.label); // ✅ sirf non-parent items pe active set karo
                     setOpenMenu(null);
                   }
                 }}
                 className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-6"
                   } py-4 rounded-xl cursor-pointer transition-all
-                    ${isActive
+        ${isActive
                     ? "bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 text-white"
                     : "text-gray-600 hover:bg-gray-100"
                   }`}
@@ -262,13 +262,19 @@ const Layout = () => {
                 )}
 
                 {/* SUB MENU */}
+
+                {/* SUB MENU */}
                 {!collapsed && hasChildren && isOpen && (
-                  <div className="ml-10 mt-2 space-y-1">
+                  <div className="ml-4 mt-1 space-y-1">
                     {item.children!.map((child) => (
                       <Link key={child.label} to={child.path}>
                         <div
                           onClick={() => setActive(child.label)}
-                          className="py-2 px-4 rounded-lg text-gray-600 hover:bg-gray-100 text-sm"
+                          className={`py-2 px-4 rounded-lg text-sm transition-all
+                            ${active === child.label
+                              ? "bg-blue-50 text-blue-600 font-medium"
+                              : "text-gray-600 hover:bg-gray-100"
+                            }`}
                         >
                           {child.label}
                         </div>
@@ -279,11 +285,8 @@ const Layout = () => {
               </div>
             );
           })}
-
-
-
-        </nav>
-      </aside>
+        </nav>  {/* ✅ nav close */}
+      </aside>  {/* ✅ aside close */}
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-6 space-y-6">
@@ -296,7 +299,7 @@ const Layout = () => {
             >
               <FaBars />
             </button>
-            <span className="font-medium">{active}</span>
+            <span className="font-medium">{getActiveParentLabel()}</span>
           </div>
 
           <div className="flex items-center gap-4">
