@@ -7,6 +7,7 @@ type InputProps = {
   value?: string | number;
   name?: string;
   className?: string; // ✅ add this
+  disabled?: boolean; 
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -17,7 +18,8 @@ const Input: React.FC<InputProps> = ({
   value,
   onChange,
   name,
-  className = "", // default empty string
+  className = "",
+  disabled = false // default empty string
 }) => {
   return (
     <div className="mb-4">
@@ -33,6 +35,7 @@ const Input: React.FC<InputProps> = ({
         value={value}
         placeholder={placeholder}
         onChange={onChange}
+        disabled={disabled}
         className={`
           w-full rounded-md
           border border-gray-300

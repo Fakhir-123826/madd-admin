@@ -12,8 +12,12 @@ export interface MagentoCustomer {
 }
 
 export interface MagentoCustomerResponse {
-  items: MagentoCustomer[];
-  total_count: number;
+  success: boolean;
+  message: string;
+  data: {
+    items: MagentoCustomer[];
+    total_count: number;
+  }
 }
 
 // ✅ CustomerFilter ke saath match karta hai
@@ -92,25 +96,33 @@ export const magentoCustomerApi = createApi({
       providesTags: ["Customers"],
     }),
 
-    getCustomerById: builder.query<MagentoCustomer, number>({
+    getCustomerById: builder.query<any, number>({  // any use karo abhi
       query: (id) => `customers/${id}`,
       providesTags: (result, error, id) => [{ type: "Customers", id }],
     }),
-
-    createCustomer: builder.mutation<MagentoCustomer, Partial<MagentoCustomer>>({
+    createCustomer: builder.mutation<MagentoCustomer, {
+      customer: {
+        email: string;
+        firstname: string;
+        lastname: string;
+        website_id?: number;
+        group_id?: number;
+      };
+      password: string;
+    }>({
       query: (body) => ({
         url: "customers",
         method: "POST",
-        body,
+        body, // ✅ exact format bhejo
       }),
       invalidatesTags: ["Customers"],
     }),
 
-    updateCustomer: builder.mutation<MagentoCustomer, { id: number; data: Partial<MagentoCustomer> }>({
+    updateCustomer: builder.mutation<any, { id: number; data: Partial<MagentoCustomer> }>({
       query: ({ id, data }) => ({
         url: `customers/${id}`,
         method: "PUT",
-        body: data,
+        body: { customer: data }, // ✅ customer wrap karo
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Customers", id }],
     }),

@@ -109,7 +109,7 @@ function MagentoOrderList() {
               <th className="p-4 text-left">Date</th>
               <th className="p-4 text-left">Total</th>
               <th className="p-4 text-left">Status</th>
-              <th className="p-4"></th>
+              {/* <th className="p-4"></th> */}
             </tr>
           </thead>
 
@@ -142,14 +142,14 @@ function MagentoOrderList() {
                   </span>
                 </td>
 
-                <td className="relative p-4 text-right">
+                {/* <td className="relative p-4 text-right">
                   <button
                     onClick={() => handleViewOrder(order)}
                     className="text-gray-400 hover:text-gray-600"
                   >
                     <Eye size={18} />
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

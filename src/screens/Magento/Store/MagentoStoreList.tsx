@@ -15,7 +15,7 @@ function MagentoStoreList() {
     pageSize: itemsPerPage,
   });
 
-  const stores = data?.data || [];
+  const stores = Array.isArray(data) ? data : [];
 
   const tdBase =
     "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
@@ -56,11 +56,10 @@ function MagentoStoreList() {
             <tr>
               <th className="p-4 text-left">ID</th>
               <th className="p-4 text-left">Code</th>
+              <th className="p-4 text-left">Name</th>
               <th className="p-4 text-left">Website ID</th>
-              <th className="p-4 text-left">Locale</th>
-              <th className="p-4 text-left">Currency</th>
-              <th className="p-4 text-left">Timezone</th>
-              <th className="p-4 text-left">Base URL</th>
+              <th className="p-4 text-left">Group ID</th>
+              <th className="p-4 text-left">Status</th>
               <th className="p-4"></th>
             </tr>
           </thead>
@@ -77,31 +76,20 @@ function MagentoStoreList() {
                       {store.code}
                     </span>
                   </td>
+                  <td className={tdBase}>{store.name}</td>
                   <td className={tdBase}>{store.website_id}</td>
+                  <td className={tdBase}>{store.store_group_id}</td>
                   <td className={tdBase}>
-                    <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium">
-                      {store.locale}
+                    <span className={`px-2 py-1 rounded-md text-xs font-medium ${store.is_active
+                        ? "bg-green-50 text-green-600"
+                        : "bg-red-50 text-red-600"
+                      }`}>
+                      {store.is_active ? "Active" : "Inactive"}
                     </span>
-                  </td>
-                  <td className={tdBase}>
-                    <span className="px-2 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium">
-                      {store.base_currency_code}
-                    </span>
-                  </td>
-                  <td className={tdBase}>{store.timezone}</td>
-                  <td className={tdBase}>
-                    <a
-                      href={store.base_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-teal-500 hover:underline text-xs truncate max-w-[150px] block"
-                    >
-                      {store.base_url}
-                    </a>
                   </td>
                   <td className="relative p-4 text-right">
                     <button
-                      onClick={() => navigate(`/store/${store.id}`, { state: { store } })}
+                      onClick={() => navigate(`/MagentoStoreList/${store.id}`, { state: { store } })}
                       className="text-gray-400 hover:text-gray-600"
                     >
                       <Eye size={18} />
@@ -111,7 +99,7 @@ function MagentoStoreList() {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="text-center py-6 text-gray-400">
+                <td colSpan={7} className="text-center py-6 text-gray-400">
                   No stores found.
                 </td>
               </tr>

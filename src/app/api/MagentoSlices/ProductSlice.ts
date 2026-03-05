@@ -72,8 +72,8 @@ export const productApi = createApi({
     tagTypes: ["Product"],
     endpoints: (builder) => ({
         // ✅ Yeh wala endpoint use karo (GET with query string)
-        getProducts: builder.query<ProductListResponse, { filters?: ProductFilters; page?: number; pageSize?: number }>({
-            query: ({ filters = {}, page = 1, pageSize = 10 }) => {
+        getProducts: builder.query<ProductListResponse, { filters?: ProductFilters; page?: number; pageSize?: number; website_id?: number }>({
+            query: ({ filters = {}, page = 1, pageSize = 10, website_id }) => {
                 const paramsObj: Record<string, any> = {
                     page,
                     pageSize,
@@ -102,7 +102,9 @@ export const productApi = createApi({
                     if (filters.quantityFrom) filterObj.quantity.from = filters.quantityFrom;
                     if (filters.quantityTo) filterObj.quantity.to = filters.quantityTo;
                 }
-
+                // if (website_id !== undefined) {
+                //     filterObj.website_id = { eq: website_id };
+                // }
                 // === Text / Partial Search ===
                 if (filters.sku) filterObj.sku = `%${filters.sku}%`;
                 if (filters.name) filterObj.name = `%${filters.name}%`;
@@ -153,7 +155,7 @@ export const productApi = createApi({
             query: ({ sku, product }) => ({
                 url: `products/${sku}`,
                 method: "PUT",
-                body: {product},
+                body: { product },
             }),
             invalidatesTags: (result, error, { sku }) => [{ type: "Product", id: sku }],
         }),

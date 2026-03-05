@@ -26,7 +26,7 @@ function MagentoCustomerList() {
     pageSize: itemsPerPage,
   });
 
-
+  console.log(data)
   const handleApplyFilters = (filters: CustomerFilters) => {
     setAppliedFilters(filters);
     setCurrentPage(1);
@@ -40,16 +40,22 @@ function MagentoCustomerList() {
   const [deleteCustomer] = useDeleteCustomerMutation();
 
   // Pagination
-  const customers: MagentoCustomer[] = Array.isArray(data?.items)
-    ? data.items
-    : [];
+  // const customers: MagentoCustomer[] = Array.isArray(data?.items)
+  //   ? data.items
+  //   : [];
 
-  const totalPages = Math.ceil((data?.total_count || 0) / itemsPerPage);
+  // const totalPages = Math.ceil((data?.total_count || 0) / itemsPerPage);
 
-  const paginatedCustomers = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return customers.slice(start, start + itemsPerPage);
-  }, [customers, currentPage, itemsPerPage]);
+  const customers = Array.isArray(data?.data?.items) ? data.data.items : [];
+  const totalPages = Math.ceil((data?.data?.total_count || 0) / itemsPerPage);
+
+
+  // const paginatedCustomers = useMemo(() => {
+  //   const start = (currentPage - 1) * itemsPerPage;
+  //   return customers.slice(start, start + itemsPerPage);
+  // }, [customers, currentPage, itemsPerPage]);
+
+  const paginatedCustomers = customers;
 
   const tdBase =
     "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
@@ -86,7 +92,7 @@ function MagentoCustomerList() {
       {showFilter && (
         <CustomerFilter
           onApply={handleApplyFilters}
-          // onCancel={handleCancelFilters}
+        // onCancel={handleCancelFilters}
         />
       )}
 
