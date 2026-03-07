@@ -9,6 +9,8 @@ import { productApi } from "./api/MagentoSlices/ProductSlice"
 import { orderApi } from "./api/MagentoSlices/OrderSlice";
 import authReducer from "./api/AuthSlices/authSlice";
 import { storeApi } from "./api/MagentoSlices/StoreSlice";
+import { inventoryApi } from "./api/MagentoSlices/InventoryApi";
+import { attributeApi } from "./api/MagentoSlices/Attributes";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +24,8 @@ export const store = configureStore({
     [productApi.reducerPath]: productApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
     [storeApi.reducerPath]: storeApi.reducer,
+    [inventoryApi.reducerPath]: inventoryApi.reducer,
+    [attributeApi.reducerPath]: attributeApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -32,7 +36,9 @@ export const store = configureStore({
       magentoCustomerApi.middleware,
       productApi.middleware,
       orderApi.middleware,
-      storeApi.middleware
+      storeApi.middleware ,
+      inventoryApi.middleware ,
+      attributeApi.middleware 
     ),
 });
 

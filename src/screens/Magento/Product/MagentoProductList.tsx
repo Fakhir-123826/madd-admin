@@ -6,6 +6,9 @@ import Pagination from "../../../component/Pagination";
 import ProductFilter from "./ProductFilter";
 import { useGetProductsQuery, type MagentoProduct, type ProductFilters } from "../../../app/api/MagentoSlices/ProductSlice";
 import axios from "axios"; // ✅ ye add karo
+import StoreViewDropdown from "../../../component/StoreViewDropdown";
+import type { StoreViewSelection } from "../../../model/MagentoProduct/StoreViewSelection";
+
 
 // export interface MagentoProduct {
 //   id: number;
@@ -35,6 +38,8 @@ function MagentoProductList() {
   const [websites, setWebsites] = useState<any[]>([]);
   const [selectedWebsite, setSelectedWebsite] = useState<string>("");
   const [showWebsiteDropdown, setShowWebsiteDropdown] = useState(false);
+  const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
+
   // Yeh state sirf "Apply Filters" button pe update hoga
   const [appliedFilters, setAppliedFilters] = useState<ProductFilters>({
     idFrom: "",
@@ -57,32 +62,10 @@ function MagentoProductList() {
   });
 
   const itemsPerPage = 10;
-const fetchWebsites = async () => {
-      try {
-        const token = localStorage.getItem("admin_token");
-        const res = await axios.get("http://127.0.0.1:8000/api/websites", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setWebsites(res.data);
-      } catch (err) {
-        console.error("Websites fetch error:", err);
-      }
-    };
-  // Page reset on filter apply
-  // useEffect(() => {
-    
-  //   fetchWebsites();
-  //   setCurrentPage(1);
-  // }, [appliedFilters, selectedWebsite]);
-
 
   useEffect(() => {
-    fetchWebsites();
-}, []); // ✅ sirf ek baar
-
-useEffect(() => {
     setCurrentPage(1);
-}, [appliedFilters]);
+  }, [appliedFilters]);
 
   // ✅ RTK Query — sirf appliedFilters use karega
   const { data, error, isLoading, isFetching } = useGetProductsQuery({
@@ -93,12 +76,23 @@ useEffect(() => {
   });
 
   const allProducts: MagentoProduct[] = data?.items || [];
-  const products: MagentoProduct[] = allProducts.filter((product) => {
-    if (selectedWebsite === "") return true;
-    const websiteIds = product.extension_attributes?.website_ids || [];
-    return websiteIds.includes(Number(selectedWebsite));
-  });
+  // const products: MagentoProduct[] = allProducts.filter((product) => {
+  //   if (selectedWebsite === "") return true;
+  //   const websiteIds = product.extension_attributes?.website_ids || [];
+  //   return websiteIds.includes(Number(selectedWebsite));
+  // });
 
+  const products = allProducts.filter((product) => {
+    if (storeSelection.type === "all") return true;
+    const websiteIds = product.extension_attributes?.website_ids || [];
+    if (storeSelection.type === "website")
+      return websiteIds.includes(storeSelection.website.id);
+    if (storeSelection.type === "store")
+      return websiteIds.includes(storeSelection.store.website_id);
+    if (storeSelection.type === "storeView")
+      return websiteIds.includes(storeSelection.storeView.website_id);
+    return true;
+  });
   const totalPages = Math.ceil((data?.total_count || 0) / itemsPerPage);
 
   const tdBase =
@@ -113,41 +107,7 @@ useEffect(() => {
         <div className="flex items-center gap-3">
 
           {/* ✅ Website Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setShowWebsiteDropdown(prev => !prev)}
-              className="flex items-center gap-2 px-5 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <FaGlobe className="text-teal-500" />
-              {selectedWebsite
-                ? websites.find(w => w.id === Number(selectedWebsite))?.name
-                : "All Websites"}
-              <FaChevronDown className={`text-xs transition-transform ${showWebsiteDropdown ? "rotate-180" : ""}`} />
-            </button>
-
-            {showWebsiteDropdown && (
-              <div className="absolute right-0 top-12 z-50 bg-white rounded-xl shadow-lg border border-gray-100 w-48 overflow-hidden">
-                <div
-                  onClick={() => { setSelectedWebsite(""); setShowWebsiteDropdown(false); }}
-                  className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-50 transition
-              ${selectedWebsite === "" ? "text-teal-600 font-semibold bg-teal-50" : "text-gray-600"}`}
-                >
-                  All Websites
-                </div>
-                {websites.map((website) => (
-                  <div
-                    key={website.id}
-                    onClick={() => { setSelectedWebsite(String(website.id)); setShowWebsiteDropdown(false); }}
-                    className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-50 transition border-t border-gray-50
-                ${selectedWebsite === String(website.id) ? "text-teal-600 font-semibold bg-teal-50" : "text-gray-600"}`}
-                  >
-                    <div className="font-medium">{website.name}</div>
-                    <div className="text-xs text-gray-400">{website.code}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <StoreViewDropdown onChange={(sel) => setStoreSelection(sel)} />
 
           {/* Filter Button */}
           <button
@@ -170,12 +130,7 @@ useEffect(() => {
           </button>
         </div>
       </div>
-
-      {/* ✅ Backdrop - bahar click pe close */}
-      {showWebsiteDropdown && (
-        <div className="fixed inset-0 z-40" onClick={() => setShowWebsiteDropdown(false)} />
-      )}
-
+ 
       {/* FILTER BAR (sirf button pe apply hoga) */}
       {showFilter && (
         <ProductFilter

@@ -11,6 +11,8 @@ import {
 } from "../../../app/api/MagentoSlices/CustomerSlice";
 import CustomerFilter from "./CustomerFilter";
 import { type CustomerFilters } from "../../../app/api/MagentoSlices/CustomerSlice";
+import StoreViewDropdown from "../../../component/StoreViewDropdown";
+import type { StoreViewSelection } from "../../../model/MagentoProduct/StoreViewSelection";
 
 
 function MagentoCustomerList() {
@@ -19,6 +21,7 @@ function MagentoCustomerList() {
   const [showFilter, setShowFilter] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<CustomerFilters>({});
   const itemsPerPage = 10;
+  const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
 
   const { data, isLoading, isFetching, error } = useGetCustomersQuery({
     filters: appliedFilters,
@@ -69,6 +72,8 @@ function MagentoCustomerList() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Magento Customers</h2>
         <div className="flex items-center gap-3">
+          <StoreViewDropdown onChange={(sel) => setStoreSelection(sel)} />
+
           {/* Filter Toggle Button */}
           <button
             onClick={() => setShowFilter((prev) => !prev)}

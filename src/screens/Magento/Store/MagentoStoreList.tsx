@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { FaPlus, FaFilter } from "react-icons/fa";
 import { useGetAllStoresQuery } from "../../../app/api/MagentoSlices/StoreSlice";
+import StoreViewDropdown from "../../../component/StoreViewDropdown";
+import type { StoreViewSelection } from "../../../model/MagentoProduct/StoreViewSelection";
 
 function MagentoStoreList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilter, setShowFilter] = useState(false);
+   const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
   const itemsPerPage = 8;
 
   const { data, isLoading, error } = useGetAllStoresQuery({
@@ -28,7 +31,8 @@ function MagentoStoreList() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Magento Stores</h2>
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
+          <StoreViewDropdown onChange={(sel) => setStoreSelection(sel)} />
           {/* Filter Toggle */}
           <button
             onClick={() => setShowFilter((prev) => !prev)}

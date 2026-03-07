@@ -93,6 +93,10 @@ import AddMagentoCustomer from "./screens/Magento/Customers/AddMagentoCustomer.t
 import MogentoOrder from "./screens/Magento/Order/MagentoOrder.tsx";
 import ProtectedRoute from "./ProtectedRoute.tsx";
 import MagentoStoreList from "./screens/Magento/Store/MagentoStoreList.tsx";
+import MagentoInventoryList from "./screens/Magento/Inventory/MagentoInventoryList.tsx";
+import UpdateMagentoInventory from "./screens/Magento/Inventory/UpdateMagentoInventory.tsx";
+import MagentoAttributesLits from "./screens/Magento/Attributes/MagentoAttributesLits.tsx";
+import AddMagentoAttribute from "./screens/Magento/Attributes/AddMagentoAttribute.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -225,6 +229,11 @@ export const router = createBrowserRouter([
           { path: "/AddMagentoCustomer/:id", element: <AddMagentoCustomer /> },
           { path: "/customers/:id", element: <AddMagentoCustomer /> },
           { path: "/MagentoStoreList", element: <MagentoStoreList /> },
+          { path: "/MagentoInventoryList", element: <MagentoInventoryList /> },
+          { path: "/UpdateMagentoInventory/:sku/:itemId", element: <UpdateMagentoInventory /> },
+          { path: "/MagentoAttributesLits", element: <MagentoAttributesLits /> },
+          { path: "/AddMagentoAttribute", element:<AddMagentoAttribute/> }
+
         ]
       },
     ]

@@ -10,6 +10,8 @@ import {
 } from "../../../app/api/MagentoSlices/ProductSlice";
 import { useGetCategoriesQuery, type MagentoCategory } from "../../../app/api/MagentoSlices/CategorySlice";
 import AutoCompleteMultiSelect from "../../../component/Inputs Feilds/AutoCompleteMultiSelect";
+import type { MagentoAttribute } from "../../../app/api/MagentoSlices/Attributes";
+import AttributeSelector from "../Attributes/Attributeselector";
 
 interface CustomAttribute {
   attribute_code: string;
@@ -21,22 +23,25 @@ const AddMagentoProductFull = () => {
   const navigate = useNavigate();
   const { sku } = useParams(); // URL param
   const isEditMode = !!sku;
+  // ye attrribute k lia hy
+  const [showAttributeSelector, setShowAttributeSelector] = useState(false);
+  const [selectedAttributes, setSelectedAttributes] = useState<MagentoAttribute[]>([]);
 
   const { data: productData, isFetching: productLoading } = useGetProductQuery(sku!);// fetch all products to find by SKU
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const { data: categoryData, isLoading: categoriesLoading } = useGetCategoriesQuery();
-type FlattenedCategory = MagentoCategory & { level: number };
+  type FlattenedCategory = MagentoCategory & { level: number };
   // Flatten nested categories for multi-select
   const flattenCategories = (cat: MagentoCategory, level = 0): FlattenedCategory[] => {
-  let result: FlattenedCategory[] = [{ ...cat, level }]; // now level is guaranteed
-  if (cat.children_data && cat.children_data.length > 0) {
-    cat.children_data.forEach(child => {
-      result = result.concat(flattenCategories(child, level + 1));
-    });
-  }
-  return result;
-};
+    let result: FlattenedCategory[] = [{ ...cat, level }]; // now level is guaranteed
+    if (cat.children_data && cat.children_data.length > 0) {
+      cat.children_data.forEach(child => {
+        result = result.concat(flattenCategories(child, level + 1));
+      });
+    }
+    return result;
+  };
 
   const categories: MagentoCategory[] = categoryData
     ? Array.isArray(categoryData)
@@ -97,16 +102,16 @@ type FlattenedCategory = MagentoCategory & { level: number };
   }, [isEditMode, productData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
 
-  const { name, value, type } = target;
-  const checked = (target as HTMLInputElement).checked; // only exists on input
+    const { name, value, type } = target;
+    const checked = (target as HTMLInputElement).checked; // only exists on input
 
-  setFormData({
-    ...formData,
-    [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value
-  });
-};
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -151,11 +156,13 @@ type FlattenedCategory = MagentoCategory & { level: number };
   }));
 
   return (
-    <div className="max-w-5xl mx-auto bg-gray-50 p-8 rounded-2xl shadow-md">
+    <div className="w-full bg-white p-8 rounded-2xl shadow-md">
+
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
         {isEditMode ? "Update Product" : "Create Product"}
-      </h2>
 
+      </h2>
+      <AddButton label="Add Attribute" onClick={() => {setShowAttributeSelector(true)}}/>
       <form onSubmit={handleSubmit} className="space-y-8">
 
         {/* ===== Basic Info Card ===== */}
@@ -256,6 +263,12 @@ type FlattenedCategory = MagentoCategory & { level: number };
           />
         </div>
       </form>
+      <AttributeSelector
+        isOpen={showAttributeSelector}
+        onClose={() => setShowAttributeSelector(false)}
+        onAddSelected={(attrs) => setSelectedAttributes(prev => [...prev, ...attrs])}
+        alreadySelected={selectedAttributes.map(a => a.attribute_code)}
+      />
     </div>
   );
 };

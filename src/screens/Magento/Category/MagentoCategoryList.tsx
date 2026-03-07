@@ -8,11 +8,14 @@ import {
   useGetCategoriesQuery,
   type MagentoCategory,
 } from "../../../app/api/MagentoSlices/CategorySlice";
+import StoreViewDropdown from "../../../component/StoreViewDropdown";
+import type { StoreViewSelection } from "../../../model/MagentoProduct/StoreViewSelection";
 
 function MagentoCategoryList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
 
   const queryArgs = useMemo(
     () => ({ page: currentPage, pageSize: itemsPerPage }),
@@ -60,16 +63,19 @@ function MagentoCategoryList() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Magento Categories</h2>
+        <div className="flex items-center gap-3">
+          <StoreViewDropdown onChange={(sel) => setStoreSelection(sel)} />
+          <button
+            onClick={() => navigate("/AddMagentoCategory")}
+            className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
+          >
+            <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
+              <FaPlus className="text-teal-500 text-sm" />
+            </span>
+            Add Category
+          </button>
+        </div>
 
-        <button
-          onClick={() => navigate("/AddMagentoCategory")}
-          className="flex items-center gap-3 px-6 py-1 rounded-full bg-gradient-to-r from-teal-400 to-green-500 text-white text-sm font-medium"
-        >
-          <span className="relative -left-5 flex items-center justify-center w-10 h-10 rounded-full bg-white">
-            <FaPlus className="text-teal-500 text-sm" />
-          </span>
-          Add Category
-        </button>
       </div>
 
       <FilterBar />
@@ -126,11 +132,10 @@ function MagentoCategoryList() {
 
                     <td className={tdBase}>
                       <span
-                        className={`px-3 py-1 rounded-md text-xs font-medium ${
-                          category.is_active
+                        className={`px-3 py-1 rounded-md text-xs font-medium ${category.is_active
                             ? "bg-green-100 text-green-600"
                             : "bg-red-100 text-red-600"
-                        }`}
+                          }`}
                       >
                         {category.is_active ? "Active" : "Inactive"}
                       </span>
