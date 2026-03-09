@@ -1,4 +1,4 @@
-import { Children, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   FaBars,
   FaHome,
@@ -21,42 +21,243 @@ import {
   FaBullhorn,
   FaCreditCard,
   FaShoppingCart,
-  FaMagento
+  FaMagento,
+  FaChevronDown,
+  FaChevronRight,
 } from "react-icons/fa";
-
 import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../../public/madd-admin.png";
 
-const menuItems = [
+// ============ TYPES ============
+interface MenuItem {
+  label: string;
+  path?: string;
+  icon?: any;
+  children?: MenuItem[];
+}
+
+// ============ MENU ITEMS ============
+const menuItems: MenuItem[] = [
   { label: "Dashboard", icon: FaHome, path: "/" },
   {
     label: "Magento", icon: FaMagento, path: "/magento",
     children: [
-
-      { label: "All Magento Products", path: "/MagentoProducts" },
-      // { label: "All Magento Category", path: "/CategoryList" },
-      { label: "All Magento Category", path: "/MagentoCategoryList" },
-      { label: "All Magento Customer", path: "/MagentoCustomerList" },
-      { label: "All Magento Order", path: "/MagentoOrders" },
-      { label: "All Magento Store", path: "/MagentoStoreList" },
+      // { label: "All Magento Products", path: "/MagentoProducts" },
+      // { label: "All Magento Category", path: "/MagentoCategoryList" },
+      // { label: "All Magento Customer", path: "/MagentoCustomerList" },
+      // { label: "All Magento Order", path: "/MagentoOrders" },
+      // { label: "All Magento Store", path: "/MagentoStoreList" },
       { label: "All Magento Inventory", path: "/MagentoInventoryList" },
-      { label: "All Magento Attributes", path: "/MagentoAttributesLits" },
+      // { label: "All Attributes", path: "/MagentoAttributesLits" },
+      // { label: "Attribute Sets", path: "/MagentoAttributeSets" },
+      {
+        label: "Sales", icon: FaStore,
+        children: [
+          { label: "Orders", path: "/MagentoOrders" },
+          { label: "Payment Service", path: "/storeList1" },
+          { label: "Invoice", path: "/storeList2" },
+          { label: "Shipment", path: "/storeList3" },
+          { label: "Credit Memos", path: "/storeList4" },
+          { label: "Billing Agreements", path: "/storeList5" },
+          { label: "Transactions", path: "/storeList6" },
+          { label: "Braintree Virtual Terminal", path: "/storeList7" },
+        ],
+      },
+      {
+        label: "Catalog", icon: FaStore,
+        children: [
+          { label: "Products", path: "/MagentoProducts" },
+          { label: "Categories", path: "/MagentoCategoryList" },
+        ],
+      },
+      {
+        label: "Customers", icon: FaStore,
+        children: [
+          { label: "All Customers", path: "/MagentoCustomerList" },
+          { label: "Now Online", path: "/storeList11" },
+          { label: "Login as Customer Log", path: "/storeList12" },
+          { label: "Customer Groups", path: "/storeList12" },
+        ],
+      },
+      {
+        label: "Marketing", icon: FaStore,
+        children: [
+          {
+            label: "Promotions", icon: FaStore,
+            children: [
+              { label: "Catalog Price Rule", path: "/SubscriptionList10" },
+              { label: "Cart Price Rules", path: "/storeList11" },
+            ]
+          },
+          {
+            label: "SEO & Search", icon: FaStore,
+            children: [
+              { label: "URL Rewrites", path: "/SubscriptionList10" },
+              { label: "Search Terms", path: "/storeList11" },
+              { label: "Search Synonyms", path: "/storeList12" },
+              { label: "Site Map", path: "/storeList12" },
+            ]
+          },
+          {
+            label: "Communications", icon: FaStore,
+            children: [
+              { label: "Email Templates", path: "/SubscriptionList10" },
+              { label: "Newsletter Templates", path: "/storeList11" },
+              { label: "Newsletter Queue", path: "/storeList12" },
+              { label: "Newsletter Subscribers", path: "/storeList12" },
+            ]
+          },
+          {
+            label: "User Content", icon: FaStore,
+            children: [
+              { label: "All Reviews", path: "/SubscriptionList10" },
+              { label: "Pending Reviews", path: "/storeList11" },
+            ]
+          },
+        ],
+      },
+      {
+        label: "Content", icon: FaStore,
+        children: [
+          {
+            label: "Elements", icon: FaStore,
+            children: [
+              { label: "Pages", path: "/SubscriptionList10" },
+              { label: "Blogs", path: "/SubscriptionList10" },
+              { label: "Widgets", path: "/SubscriptionList10" },
+              { label: "Templates", path: "/SubscriptionList10" },
+            ]
+          },
+          {
+            label: "Media", icon: FaStore,
+            children: [
+              { label: "Media Gallery", path: "/SubscriptionList10" },
+            ]
+          },
+          {
+            label: "Design", icon: FaStore,
+            children: [
+              { label: "Configuration", path: "/SubscriptionList10" },
+              { label: "Themes", path: "/SubscriptionList10" },
+              { label: "Schedule", path: "/SubscriptionList10" },
+            ]
+          },
+        ],
+      },
+      {
+        label: "Reports", icon: FaChartBar,
+        children: [
+          {
+            label: "Marketing",
+            children: [
+              { label: "Products in Cart", path: "/reports/products-in-cart" },
+              { label: "Search Terms", path: "/reports/search-terms" },
+              { label: "Abandoned Carts", path: "/reports/abandoned-carts" },
+              { label: "Newsletter Problem Reports", path: "/reports/newsletter-problems" },
+            ]
+          },
+          {
+            label: "Reviews",
+            children: [
+              { label: "By Customers", path: "/reports/reviews-customers" },
+              { label: "By Products", path: "/reports/reviews-products" },
+            ]
+          },
+          {
+            label: "Sales",
+            children: [
+              { label: "Orders", path: "/reports/orders" },
+              { label: "Tax", path: "/reports/tax" },
+              { label: "Invoiced", path: "/reports/invoiced" },
+              { label: "Shipping", path: "/reports/shipping" },
+              { label: "Refunds", path: "/reports/refunds" },
+              { label: "Coupons", path: "/reports/coupons" },
+              { label: "PayPal Settlement", path: "/reports/paypal-settlement" },
+              { label: "Braintree Settlement", path: "/reports/braintree-settlement" },
+            ]
+          },
+          {
+            label: "Customers",
+            children: [
+              { label: "Order Total", path: "/reports/order-total" },
+              { label: "Order Count", path: "/reports/order-count" },
+              { label: "New", path: "/reports/new-customers" },
+            ]
+          },
+          {
+            label: "Products",
+            children: [
+              { label: "Views", path: "/reports/product-views" },
+              { label: "Bestsellers", path: "/reports/bestsellers" },
+              { label: "Low Stock", path: "/reports/low-stock" },
+              { label: "Ordered", path: "/reports/ordered" },
+              { label: "Downloads", path: "/reports/downloads" },
+            ]
+          },
+          {
+            label: "Business Intelligence",
+            children: [
+              { label: "Advanced Reporting", path: "/reports/advanced-reporting" },
+              { label: "BI Essentials", path: "/reports/bi-essentials" },
+            ]
+          },
+        ],
+      },
+      {
+        label: "Stores", icon: FaStore,
+        children: [
+          {
+            label: "Settings",
+            children: [
+              { label: "All Stores", path: "/MagentoStoreList" },
+              { label: "Configuration", path: "/stores/configuration" },
+              { label: "Terms and Conditions", path: "/stores/terms-conditions" },
+              { label: "Order Status", path: "/stores/order-status" },
+            ]
+          },
+          {
+            label: "Inventory",
+            children: [
+              { label: "Sources", path: "/stores/sources" },
+              { label: "Stocks", path: "/stores/stocks" },
+            ]
+          },
+          {
+            label: "Taxes",
+            children: [
+              { label: "Tax Rules", path: "/stores/tax-rules" },
+              { label: "Tax Zones and Rates", path: "/stores/tax-zones" },
+            ]
+          },
+          {
+            label: "Currency",
+            children: [
+              { label: "Currency Rates", path: "/stores/currency-rates" },
+              { label: "Currency Symbols", path: "/stores/currency-symbols" },
+            ]
+          },
+          {
+            label: "Attributes",
+            children: [
+              { label: "Product", path: "/MagentoAttributesLits" },
+              { label: "Attribute Set", path: "/MagentoAttributeSets" },
+              { label: "Rating", path: "/MagentoAttributeSets" },
+            ]
+          },
+        ],
+      },
     ]
   },
   { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },
   {
-    label: "Stores",
-    icon: FaStore,
-    path: "/store",
+    label: "Stores", icon: FaStore, path: "/store",
     children: [
       { label: "All Subscription", path: "/SubscriptionList" },
       { label: "Stores list", path: "/storeList" },
     ],
   },
   {
-    label: "Catalog",
-    icon: FaBox,
-    path: "/catalog",
+    label: "Catalog", icon: FaBox, path: "/catalog",
     children: [
       { label: "All Inventiries", path: "/InventoryManagementList" },
       { label: "All Product Bases", path: "/ProductBaseList" },
@@ -65,11 +266,8 @@ const menuItems = [
       { label: "All Category", path: "/CategoryList" }
     ],
   },
-  // Users Section
   {
-    label: "Users",
-    icon: FaUsers,
-    path: "/users",
+    label: "Users", icon: FaUsers, path: "/users",
     children: [
       { label: "Users List", path: "/userlist" },
       { label: "Roles", path: "/usersroles" },
@@ -77,9 +275,7 @@ const menuItems = [
     ],
   },
   {
-    label: "Vendors",
-    icon: FaHandshake,
-    path: "/vendors",
+    label: "Vendors", icon: FaHandshake, path: "/vendors",
     children: [
       { label: "All Vendors", path: "/Verdor" },
       { label: "Add Vendor Onboard", path: "/CreateVerderOnboard" },
@@ -90,12 +286,8 @@ const menuItems = [
   { label: "CMS", icon: FaFileAlt, path: "/cms" },
   { label: "OMS", icon: FaCogs, path: "/oms" },
   { label: "Integrations", icon: FaGlobe, path: "/integrations" },
-  // { label: "Local Companies", icon: FaBuilding, path: "/" },
-  // Local Companies
   {
-    label: "Local Companies",
-    icon: FaBuilding,
-    path: "/local-companies",
+    label: "Local Companies", icon: FaBuilding, path: "/local-companies",
     children: [
       { label: "Country Management", path: "/country-management" },
       { label: "Currency Managment", path: "/currency-management" },
@@ -103,23 +295,16 @@ const menuItems = [
     ],
   },
   { label: "Marketplace", icon: FaShoppingBag, path: "/marketplace" },
-  // { label: "MLM System", icon: FaProjectDiagram, path: "/" },
   {
-    label: "MLM System",
-    icon: FaProjectDiagram,
-    path: "/mlm",
+    label: "MLM System", icon: FaProjectDiagram, path: "/mlm",
     children: [
       { label: "Mlm Dashboard", path: "/mlmdashboard" },
       { label: "User Tree", path: "/usertree" },
       { label: "Reports", path: "/reports" },
     ],
   },
-  // { label: "Settings", icon: FaCog, path: "/" },
-  // Setting Section 
   {
-    label: "Settings",
-    icon: FaCog,
-    path: "/settings",
+    label: "Settings", icon: FaCog, path: "/settings",
     children: [
       { label: "Translation", path: "/translation" },
       { label: "Updates", path: "/updates" },
@@ -129,9 +314,7 @@ const menuItems = [
   },
   { label: "Domain", icon: FaGlobe, path: "/domains" },
   {
-    label: "Return Platform",
-    icon: FaUndoAlt,
-    path: "/return-platform",
+    label: "Return Platform", icon: FaUndoAlt, path: "/return-platform",
     children: [
       { label: "Coupon Management", path: "/CouponManagementList" },
       { label: "Email Marketing", path: "/EmailMarketingList" },
@@ -139,156 +322,224 @@ const menuItems = [
     ]
   },
   { label: "Marketing", icon: FaBullhorn, path: "/marketing" },
-  // Payment
   { label: "Payments", icon: FaCreditCard, path: "/payment-providers" },
-
-  // Shipping
   { label: "Shipping", icon: FaTruck, path: "/shipping-mangement" },
-
-
-  // Taxes
   {
-    label: "Taxes",
-    icon: FaMoneyBill,
-    path: "/taxes-management",
+    label: "Taxes", icon: FaMoneyBill, path: "/taxes-management",
     children: [
       { label: "Taxes", path: "/taxes" },
       { label: "Invoice", path: "/invoicemanagement" },
     ],
   },
-
   { label: "Reports", icon: FaChartBar, path: "/reports-main" },
 ];
 
+// ============ HELPER — check if any child/grandchild path is active ============
+const isDescendantActive = (item: MenuItem, currentPath: string): boolean => {
+  if (item.path && item.path === currentPath) return true;
+  if (item.children) {
+    return item.children.some(child => isDescendantActive(child, currentPath));
+  }
+  return false;
+};
 
+// ============ RECURSIVE MENU ITEM ============
+interface RecursiveMenuItemProps {
+  item: MenuItem;
+  depth?: number;
+  collapsed: boolean;
+  currentPath: string;
+  openMenus: string[];
+  toggleMenu: (key: string) => void;
+}
+
+const RecursiveMenuItem = ({
+  item,
+  depth = 0,
+  collapsed,
+  currentPath,
+  openMenus,
+  toggleMenu,
+}: RecursiveMenuItemProps) => {
+  const Icon = item.icon;
+  const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+
+  // Unique key for this menu item
+  const menuKey = `${depth}-${item.label}`;
+  const isOpen = openMenus.includes(menuKey);
+
+  // Is this item or any descendant active?
+  const isActive = item.path
+    ? item.path === currentPath
+    : isDescendantActive(item, currentPath);
+
+  // Indent based on depth
+  const paddingLeft = depth === 0 ? "px-6" : `pl-${4 + depth * 4} pr-4`;
+
+  const content = (
+    <div
+      onClick={() => {
+        if (hasChildren) {
+          toggleMenu(menuKey);
+        }
+      }}
+      className={`flex items-center justify-between ${collapsed && depth === 0 ? "justify-center px-0" : paddingLeft
+        } py-3 rounded-xl cursor-pointer transition-all
+        ${isActive
+          ? depth === 0
+            ? "bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 text-white"
+            : "bg-blue-50 text-blue-600 font-medium"
+          : "text-gray-600 hover:bg-gray-100"
+        }`}
+    >
+      <div className="flex items-center gap-3">
+        {/* Icon — sirf depth 0 pe */}
+        {Icon && depth === 0 && !collapsed && <Icon className="text-lg flex-shrink-0" />}
+        {Icon && depth === 0 && collapsed && <Icon className="text-lg" />}
+
+
+
+        {/* Label */}
+        {!collapsed && (
+          <span className="text-sm font-medium truncate">{item.label}</span>
+        )}
+      </div>
+
+      {/* Chevron — sirf children wale pe */}
+      {hasChildren && !collapsed && (
+        <span className="text-xs opacity-60">
+          {isOpen ? <FaChevronDown /> : <FaChevronRight />}
+        </span>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="relative">
+      {/* Active left bar — sirf depth 0 pe */}
+      {isActive && (
+        <span className="absolute -left-4 top-2 bottom-2 w-1 rounded-full bg-blue-500" />
+      )}
+      {/* Item — link ya div */}
+      {!hasChildren && item.path ? (
+        <Link to={item.path}>{content}</Link>
+      ) : (
+        content
+      )}
+
+      {/* Children — recursive */}
+      {hasChildren && isOpen && !collapsed && (
+        <div className={`mt-1 space-y-0.5 ${depth === 0 ? "ml-3 border-l-2 border-gray-200 pl-2" : "ml-3 border-l-2 border-gray-200 pl-2"}`}>
+          {item.children!.map((child) => (
+            <RecursiveMenuItem
+              key={child.label}
+              item={child}
+              depth={depth + 1}
+              collapsed={collapsed}
+              currentPath={currentPath}
+              openMenus={openMenus}
+              toggleMenu={toggleMenu}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ LAYOUT ============
 const Layout = () => {
-  const location = useLocation()
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const [active, setActive] = useState("Dashboard");
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [openMenus, setOpenMenus] = useState<string[]>([]);
 
+  // Auto open parent menus based on current path
   useEffect(() => {
-    const currentPath = location.pathname;
+    const autoOpen: string[] = [];
 
-    menuItems.forEach((item) => {
-      // ✅ Direct route - exact match karo
-      if (item.path === currentPath && !item.children) {
-        setActive(item.label);
-        setOpenMenu(null);
-      }
-
-      // ✅ Child route match - exact match karo, startsWith nahi
-      if (item.children) {
-        item.children.forEach((child) => {
-          if (currentPath === child.path) { // ✅ startsWith → === karo
-            setActive(child.label);
-            setOpenMenu(item.label);
+    const findOpenMenus = (items: MenuItem[], depth: number) => {
+      items.forEach((item) => {
+        if (item.children) {
+          const menuKey = `${depth}-${item.label}`;
+          if (isDescendantActive(item, location.pathname)) {
+            autoOpen.push(menuKey);
+            findOpenMenus(item.children, depth + 1);
           }
-        });
-      }
-    });
-  }, [location.pathname]);// ✅ route change hone pe run karo
+        }
+      });
+    };
 
-  const getActiveParentLabel = () => {
-    for (const item of menuItems) {
-      if (item.children?.some(child => active === child.label)) {
-        return item.label; // ✅ parent ka label return karo
-      }
-    }
-    return active;
+    findOpenMenus(menuItems, 0);
+    setOpenMenus(autoOpen);
+  }, [location.pathname]);
+
+  const toggleMenu = (key: string) => {
+    setOpenMenus(prev =>
+      prev.includes(key)
+        ? prev.filter(k => k !== key)
+        : [...prev, key]
+    );
   };
+
+  // Active label for top bar
+  const getActiveLabel = (): string => {
+    const findActive = (items: MenuItem[]): string => {
+      for (const item of items) {
+        if (item.path === location.pathname) return item.label;
+        if (item.children) {
+          const found = findActive(item.children);
+          if (found) return found;
+        }
+      }
+      return "Dashboard";
+    };
+    return findActive(menuItems);
+  };
+
+  // Active parent label for top bar
+  const getActiveParentLabel = (): string => {
+    const findParent = (items: MenuItem[], child: string): string => {
+      for (const item of items) {
+        if (item.children?.some(c => c.label === child)) return item.label;
+        if (item.children) {
+          const found = findParent(item.children, child);
+          if (found) return found;
+        }
+      }
+      return "";
+    };
+    const active = getActiveLabel();
+    return findParent(menuItems, active) || active;
+  };
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* SIDEBAR */}
-      <aside
-        className={`${collapsed ? "w-20" : "w-64"
-          } bg-white flex flex-col transition-all duration-300`}
-      >
+      <aside className={`${collapsed ? "w-20" : "w-64"} bg-white flex flex-col transition-all duration-300`}>
+
         {/* LOGO */}
         <div className="h-20 flex items-center justify-center">
           <img
             src={logo}
-            className={`transition-all duration-300 ${collapsed ? "w-8" : "w-40"
-              }`}
+            className={`transition-all duration-300 ${collapsed ? "w-8" : "w-40"}`}
           />
         </div>
 
         {/* NAV */}
-        <nav
-          className={`flex-1 px-4 space-y-2 text-sm ${!collapsed ? "mt-6" : ""
-            }`}
-        >
-
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const hasChildren = Array.isArray(item.children) && item.children.length > 0;
-            const isActive = active === item.label ||
-              (item.children?.some(child => active === child.label));
-            const isOpen = openMenu === item.label;
-
-            const MenuContent = (
-              <div
-                onClick={() => {
-                  // ❌ setActive(item.label);  // ye hata do parent ke liye
-
-                  if (hasChildren) {
-                    setOpenMenu(isOpen ? null : item.label); // ✅ sirf dropdown toggle karo
-                  } else {
-                    setActive(item.label); // ✅ sirf non-parent items pe active set karo
-                    setOpenMenu(null);
-                  }
-                }}
-                className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-6"
-                  } py-4 rounded-xl cursor-pointer transition-all
-        ${isActive
-                    ? "bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                  }`}
-              >
-                <Icon className="text-lg" />
-                {!collapsed && <span className="font-medium">{item.label}</span>}
-              </div>
-            );
-
-            return (
-              <div key={item.label} className="relative">
-                {isActive && (
-                  <span className="absolute -left-4 top-3 bottom-3 w-1 rounded-full bg-blue-500" />
-                )}
-
-                {/* MAIN ITEM */}
-                {hasChildren ? (
-                  MenuContent
-                ) : (
-                  <Link to={item.path}>{MenuContent}</Link>
-                )}
-
-                {/* SUB MENU */}
-
-                {/* SUB MENU */}
-                {!collapsed && hasChildren && isOpen && (
-                  <div className="ml-4 mt-1 space-y-1">
-                    {item.children!.map((child) => (
-                      <Link key={child.label} to={child.path}>
-                        <div
-                          onClick={() => setActive(child.label)}
-                          className={`py-2 px-4 rounded-lg text-sm transition-all
-                            ${active === child.label
-                              ? "bg-blue-50 text-blue-600 font-medium"
-                              : "text-gray-600 hover:bg-gray-100"
-                            }`}
-                        >
-                          {child.label}
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>  {/* ✅ nav close */}
-      </aside>  {/* ✅ aside close */}
+        <nav className={`flex-1 px-4 space-y-1 text-sm overflow-y-auto ${!collapsed ? "mt-6" : ""}`}>
+          {menuItems.map((item) => (
+            <RecursiveMenuItem
+              key={item.label}
+              item={item}
+              depth={0}
+              collapsed={collapsed}
+              currentPath={location.pathname}
+              openMenus={openMenus}
+              toggleMenu={toggleMenu}
+            />
+          ))}
+        </nav>
+      </aside>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-6 space-y-6">
@@ -303,7 +554,6 @@ const Layout = () => {
             </button>
             <span className="font-medium">{getActiveParentLabel()}</span>
           </div>
-
           <div className="flex items-center gap-4">
             <button className="px-4 py-1 rounded-lg bg-green-500 text-white text-sm">
               Yearly

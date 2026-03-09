@@ -11,6 +11,7 @@ import authReducer from "./api/AuthSlices/authSlice";
 import { storeApi } from "./api/MagentoSlices/StoreSlice";
 import { inventoryApi } from "./api/MagentoSlices/InventoryApi";
 import { attributeApi } from "./api/MagentoSlices/Attributes";
+import { attributeSetApi } from "./api/MagentoSlices/AttributeSetApi";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     [storeApi.reducerPath]: storeApi.reducer,
     [inventoryApi.reducerPath]: inventoryApi.reducer,
     [attributeApi.reducerPath]: attributeApi.reducer,
+    [attributeSetApi.reducerPath]: attributeSetApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -38,7 +40,8 @@ export const store = configureStore({
       orderApi.middleware,
       storeApi.middleware ,
       inventoryApi.middleware ,
-      attributeApi.middleware 
+      attributeApi.middleware,
+      attributeSetApi.middleware
     ),
 });
 

@@ -97,6 +97,8 @@ import MagentoInventoryList from "./screens/Magento/Inventory/MagentoInventoryLi
 import UpdateMagentoInventory from "./screens/Magento/Inventory/UpdateMagentoInventory.tsx";
 import MagentoAttributesLits from "./screens/Magento/Attributes/MagentoAttributesLits.tsx";
 import AddMagentoAttribute from "./screens/Magento/Attributes/AddMagentoAttribute.tsx";
+import MagentoAttributeSetsList from "./screens/Magento/AttributeSet/MagentoAttributeSetsList.tsx";
+import AddMagentoAttributeSet from "./screens/Magento/AttributeSet/AddMagentoAttributeSet.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -109,12 +111,12 @@ export const router = createBrowserRouter([
       { path: "/storeCardList", element: <StoreCardList /> },
       { path: "/store", element: <Store /> },
       { path: "/CreateStore", element: <CreateStore /> },
-      
+
       // Order Section
       { path: "/orderlist", element: <OrderList /> },
       { path: "/addorder", element: <AddOrder /> },
       { path: "/order/:id", element: <OrderDetails /> },
-      
+
       { path: "/Verdor", element: <VendorList /> },
       { path: "/Verder1", element: <Vendor /> },
       { path: "/CreateVerder", element: <CreateVendor /> },
@@ -145,11 +147,11 @@ export const router = createBrowserRouter([
       { path: "/CouponManagementList", element: <CouponManagementList /> },
       { path: "/CreateCouponManagement", element: <CreateCouponManagement /> },
       { path: "/CreateCouponManagement/:id", element: <CreateCouponManagement /> },
-      { path: "/CreateEmailMarketing" , element: <CreateEmailMarketing/>},
-      { path: "/EmailMarketingList" , element: <EmailMarketingList/>},
-      { path: "/CreateSEOSetting" , element: <CreateSEOSetting/>},
-      { path: "/SEOSettingList" , element: <SEOSettingList/>},
-      { path: "/SEOSetting" , element: <SEOSEtting/>},
+      { path: "/CreateEmailMarketing", element: <CreateEmailMarketing /> },
+      { path: "/EmailMarketingList", element: <EmailMarketingList /> },
+      { path: "/CreateSEOSetting", element: <CreateSEOSetting /> },
+      { path: "/SEOSettingList", element: <SEOSettingList /> },
+      { path: "/SEOSetting", element: <SEOSEtting /> },
       // User List Section
       { path: "/userlist", element: <UserList /> },
       { path: "/adduser", element: <AddUser /> },
@@ -187,7 +189,7 @@ export const router = createBrowserRouter([
       { path: "/backups", element: <Backups /> },
       { path: "addbackup", element: <AddBackup /> },
       { path: "auditlogs", element: <AuditLogs /> },
-   // MMl Dashboard
+      // MMl Dashboard
       { path: "/mlmdashboard", element: <MlmDashboard /> },
       { path: "/usertree", element: <UserTree /> },
       { path: "/reports", element: <Earning /> },
@@ -215,7 +217,7 @@ export const router = createBrowserRouter([
       //Magento 
       {
         element: <ProtectedRoute />,
-           children: [
+        children: [
           { path: "/MagentoOrders", element: <MagentoOrderList /> },
           { path: "/MogentoOrder/:id", element: <MogentoOrder /> },
           { path: "/MagentoProducts", element: <MagentoProductList /> },
@@ -232,14 +234,17 @@ export const router = createBrowserRouter([
           { path: "/MagentoInventoryList", element: <MagentoInventoryList /> },
           { path: "/UpdateMagentoInventory/:sku/:itemId", element: <UpdateMagentoInventory /> },
           { path: "/MagentoAttributesLits", element: <MagentoAttributesLits /> },
-          { path: "/AddMagentoAttribute", element:<AddMagentoAttribute/> },
-          {path:"/AddMagentoAttribute/:attribute_code" ,element:<AddMagentoAttribute />}
+          { path: "/AddMagentoAttribute", element: <AddMagentoAttribute /> },
+          { path: "/AddMagentoAttribute/:attribute_code", element: <AddMagentoAttribute /> },
+          { path: "/MagentoAttributeSets", element: <MagentoAttributeSetsList /> },
+          { path: "/AddMagentoAttributeSet", element: <AddMagentoAttributeSet /> },
+          // { path: "/AddMagentoAttributeSet/:id", element: <AddMagentoAttributeSet /> }
 
         ]
       },
     ]
   },
-  
+
   { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
   { path: "/pass", element: <ForgotPassword /> },
