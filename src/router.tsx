@@ -99,6 +99,7 @@ import MagentoAttributesLits from "./screens/Magento/Attributes/MagentoAttribute
 import AddMagentoAttribute from "./screens/Magento/Attributes/AddMagentoAttribute.tsx";
 import MagentoAttributeSetsList from "./screens/Magento/AttributeSet/MagentoAttributeSetsList.tsx";
 import AddMagentoAttributeSet from "./screens/Magento/AttributeSet/AddMagentoAttributeSet.tsx";
+import NotFound from "./component/NotFound.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -244,7 +245,8 @@ export const router = createBrowserRouter([
       },
     ]
   },
-
+  
+  {path:"*", element:<NotFound />},
   { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
   { path: "/pass", element: <ForgotPassword /> },
