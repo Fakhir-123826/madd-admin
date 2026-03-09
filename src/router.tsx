@@ -232,7 +232,8 @@ export const router = createBrowserRouter([
           { path: "/MagentoInventoryList", element: <MagentoInventoryList /> },
           { path: "/UpdateMagentoInventory/:sku/:itemId", element: <UpdateMagentoInventory /> },
           { path: "/MagentoAttributesLits", element: <MagentoAttributesLits /> },
-          { path: "/AddMagentoAttribute", element:<AddMagentoAttribute/> }
+          { path: "/AddMagentoAttribute", element:<AddMagentoAttribute/> },
+          {path:"/AddMagentoAttribute/:attribute_code" ,element:<AddMagentoAttribute />}
 
         ]
       },

@@ -152,7 +152,7 @@ function MagentoAttributesList() {
                   <td className="relative p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => navigate(`/MagentoAttribute/${attr.attribute_code}`)}
+                        onClick={() => navigate(`/AddMagentoAttribute/${attr.attribute_code}`)}
                         className="text-gray-400 hover:text-teal-500 transition-colors"
                         title="View / Edit"
                       >

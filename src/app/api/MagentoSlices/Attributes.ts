@@ -34,6 +34,13 @@ export interface AttributeApiResponse {
     message: string;
     data: AttributeListResponse;
 }
+
+export interface SingleAttributeApiResponse {
+    success: boolean;
+    status: number;
+    message: string;
+    data: MagentoAttribute;
+}
 // ============ API SLICE ============
 export const attributeApi = createApi({
     reducerPath: "attributeApi",
@@ -51,7 +58,7 @@ export const attributeApi = createApi({
         }),
 
         // GET /attributes/{attribute_code}
-        getAttribute: builder.query<MagentoAttribute, string>({
+        getAttribute: builder.query<SingleAttributeApiResponse, string>({
             query: (attribute_code) => `attributes/${attribute_code}`,
             providesTags: (result, error, attribute_code) => [{ type: "Attribute", id: attribute_code }],
         }),
