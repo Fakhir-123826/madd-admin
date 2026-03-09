@@ -6,7 +6,10 @@ const ProtectedRoute = () => {
         (state: any) => state.auth.isAuthenticated
     );
 
-    if (!isAuthenticated) {
+    // localStorage se bhi check karo
+    const token = localStorage.getItem("admin_token");
+
+    if (!isAuthenticated && !token) {
         return <Navigate to="/login" replace />;
     }
 

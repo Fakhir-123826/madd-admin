@@ -25,7 +25,7 @@ import {
   FaChevronDown,
   FaChevronRight,
 } from "react-icons/fa";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../public/madd-admin.png";
 
 // ============ TYPES ============
@@ -449,10 +449,25 @@ const RecursiveMenuItem = ({
 
 // ============ LAYOUT ============
 const Layout = () => {
+
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+  // Admin info localStorage se
+  const adminRaw = localStorage.getItem("admin");
+  const admin = adminRaw ? JSON.parse(adminRaw) : null;
+  const initials = admin
+    ? `${admin.firstname?.[0] ?? ""}${admin.lastname?.[0] ?? ""}`.toUpperCase()
+    : "A";
 
+  const handleLogout = () => {
+    localStorage.removeItem("admin");
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("token");
+    navigate("/login"); // ya jo bhi login route ho
+  };
   // Auto open parent menus based on current path
   useEffect(() => {
     const autoOpen: string[] = [];
@@ -558,9 +573,46 @@ const Layout = () => {
             <button className="px-4 py-1 rounded-lg bg-green-500 text-white text-sm">
               Yearly
             </button>
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-blue-200" />
-              <span className="text-sm">Admin Portal</span>
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-2 hover:bg-gray-50 px-3 py-1.5 rounded-xl transition-all"
+              >
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                  {initials}
+                </div>
+                <span className="text-sm text-gray-700 font-medium">
+                  {admin ? `${admin.firstname} ${admin.lastname}` : "Admin"}
+                </span>
+                <span className="text-gray-400 text-xs">•••</span>
+              </button>
+
+              {showDropdown && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowDropdown(false)}
+                  />
+                  {/* Dropdown */}
+                  <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-lg border border-gray-100 w-52 overflow-hidden">
+                    {/* Admin info */}
+                    <div className="px-4 py-3 border-b border-gray-50">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {admin ? `${admin.firstname} ${admin.lastname}` : "Admin"}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate">{admin?.email ?? ""}</p>
+                    </div>
+                    {/* Logout */}
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 transition-all flex items-center gap-2"
+                    >
+                      <span>🚪</span> Logout
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
