@@ -37,7 +37,7 @@ const AddMagentoCustomer = () => {
   const [success, setSuccess] = useState("");
 
   // ✅ Pre-fill form in edit/view mode
- useEffect(() => {
+  useEffect(() => {
     if (customerData?.data) {  // ✅ .data add karo
       const c = customerData.data; // ✅ shortcut
       setFormData({
@@ -49,7 +49,7 @@ const AddMagentoCustomer = () => {
         group_id: String(c.group_id || "1"),
       });
     }
-}, [customerData]);
+  }, [customerData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -95,9 +95,10 @@ const AddMagentoCustomer = () => {
       // ✅ error check karo
       if (result?.error) {
         const errData = result.error?.data;
-        const message =
-          errData?.details?.details?.message ||
-          errData?.details?.message ||
+        const validationErrors = errData?.details?.validation_errors;
+        const message = validationErrors?.length
+          ? validationErrors.join(", ")
+          : errData?.details?.message ||
           errData?.message ||
           "Something went wrong.";
         setError(message);
@@ -107,7 +108,12 @@ const AddMagentoCustomer = () => {
       // ✅ response ka success check karo
       const data = result?.data;
       if (data?.success === false) {
-        setError(data?.details.details.message || "Something went wrong.");
+        const valErrors = data?.details?.validation_errors;
+        setError(
+          valErrors?.length
+            ? valErrors.join(", ")
+            : data?.details?.message || data?.message || "Something went wrong."
+        );
         return; // ✅ redirect mat karo
       }
 

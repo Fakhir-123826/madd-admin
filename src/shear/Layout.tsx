@@ -54,10 +54,10 @@ const menuItems: MenuItem[] = [
         label: "Sales", icon: FaStore,
         children: [
           { label: "Orders", path: "/MagentoOrders" },
-          { label: "Payment Service", path: "/storeList1" },
-          { label: "Invoice", path: "/storeList2" },
-          { label: "Shipment", path: "/storeList3" },
-          { label: "Credit Memos", path: "/storeList4" },
+          { label: "Payment Service", path: "/MagentoPaymentService" },
+          { label: "Invoice", path: "/MagentoInvoiceList" },
+          { label: "Shipment", path: "/MagentoShipments" },
+          { label: "Credit Memos", path: "/MagentoCreditMemos" },
           { label: "Billing Agreements", path: "/storeList5" },
           { label: "Transactions", path: "/storeList6" },
           { label: "Braintree Virtual Terminal", path: "/storeList7" },
@@ -74,9 +74,9 @@ const menuItems: MenuItem[] = [
         label: "Customers", icon: FaStore,
         children: [
           { label: "All Customers", path: "/MagentoCustomerList" },
-          { label: "Now Online", path: "/storeList11" },
+          { label: "Now Online", path: "/OnlineCustomers" },
           { label: "Login as Customer Log", path: "/storeList12" },
-          { label: "Customer Groups", path: "/storeList12" },
+          { label: "Customer Groups", path: "/MagentoCreditMemoList" },
         ],
       },
       {

@@ -152,7 +152,9 @@ const Signup = () => {
     const navigate = useNavigate();
 
     const [register, { isLoading, error }] = useRegisterAdminMutation();
-
+    const errorData = (error as any)?.data;
+    const fieldErrors = errorData?.errors;
+    const generalError = errorData?.message;
     const handleSignup = async () => {
         try {
             const result = await register({
@@ -234,21 +236,20 @@ const Signup = () => {
                 {/* Form */}
                 <div className="flex-1 flex flex-col justify-center px-10 lg:px-16 py-8 gap-5 w-full">
 
-                    {/* Error */}
                     {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">
-                            Something went wrong. Please try again.
+                        <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg flex flex-col gap-1">
+                            {fieldErrors ? (
+                                Object.values(fieldErrors).flat().map((msg: any, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        <span className="text-red-400">•</span>
+                                        <span>{msg}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <span>{generalError ?? "Something went wrong."}</span>
+                            )}
                         </div>
                     )}
-
-
-                    {
-                        error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">
-                                Something went wrong. Please try again.
-                            </div>
-                        )
-                    }
 
                     {/* ✅ Green success box */}
                     {

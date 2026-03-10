@@ -100,6 +100,14 @@ import AddMagentoAttribute from "./screens/Magento/Attributes/AddMagentoAttribut
 import MagentoAttributeSetsList from "./screens/Magento/AttributeSet/MagentoAttributeSetsList.tsx";
 import AddMagentoAttributeSet from "./screens/Magento/AttributeSet/AddMagentoAttributeSet.tsx";
 import NotFound from "./component/NotFound.tsx";
+import MagentoPaymentServices from "./screens/Magento/PaymentService/MagentoPaymentServices.tsx";
+import MagentoInvoiceList from "./screens/Magento/Invoices/MagentoInvoiceList.tsx";
+import MagentoInvoiceDetail from "./screens/Magento/Invoices/MagentoInvoiceDetail.tsx";
+import MagentoShipmentList from "./screens/Magento/Shipment/Magentoshipmentlist.tsx";
+import MagentoShipmentDetail from "./screens/Magento/Shipment/Magentoshipmentdetail.tsx";
+import MagentoCreditMemoList from "./screens/Magento/CreditMemo/Magentocreditmemolist.tsx";
+import MagentoCreditMemoDetail from "./screens/Magento/CreditMemo/Magentocreditmemodetail.tsx";
+import MagentoOnlineCustomers from "./screens/Magento/NowOnline/MagentoOnlineCustomers.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -240,13 +248,23 @@ export const router = createBrowserRouter([
           { path: "/MagentoAttributeSets", element: <MagentoAttributeSetsList /> },
           { path: "/AddMagentoAttributeSet", element: <AddMagentoAttributeSet /> },
           // { path: "/AddMagentoAttributeSet/:id", element: <AddMagentoAttributeSet /> }
+          { path: "/MagentoPaymentService", element: <MagentoPaymentServices /> },
+          { path: "/MagentoInvoiceList", element: <MagentoInvoiceList /> },
+          { path: "/MagentoInvoiceDetail", element: <MagentoInvoiceDetail /> },
+          { path: "/MagentoShipments", element: <MagentoShipmentList /> },
+          { path: "/shipment/:id", element: < MagentoShipmentDetail /> },
+          { path: "/MagentoCreditMemos", element: <MagentoCreditMemoList /> },
+          { path: "/MagentoCreditMemoDetail" , element: <MagentoCreditMemoDetail /> },
+          { path: "/OnlineCustomers" , element: <MagentoOnlineCustomers /> },
+          {path:"/MagentoCreditMemoList", element:<MagentoCreditMemoList />}
+          
 
         ]
       },
     ]
   },
-  
-  {path:"*", element:<NotFound />},
+
+  { path: "*", element: <NotFound /> },
   { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
   { path: "/pass", element: <ForgotPassword /> },
