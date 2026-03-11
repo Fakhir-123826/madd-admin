@@ -76,7 +76,7 @@ const menuItems: MenuItem[] = [
           { label: "All Customers", path: "/MagentoCustomerList" },
           { label: "Now Online", path: "/OnlineCustomers" },
           { label: "Login as Customer Log", path: "/storeList12" },
-          { label: "Customer Groups", path: "/MagentoCreditMemoList" },
+          { label: "Customer Groups", path: "/MagentoCustomerGroupsList" },
         ],
       },
       {
@@ -85,17 +85,17 @@ const menuItems: MenuItem[] = [
           {
             label: "Promotions", icon: FaStore,
             children: [
-              { label: "Catalog Price Rule", path: "/SubscriptionList10" },
-              { label: "Cart Price Rules", path: "/storeList11" },
+              { label: "Catalog Price Rule", path: "/MagentoCatalogPriceRuleList" },
+              { label: "Cart Price Rules", path: "/MagentoCartPriceRulesList" },
             ]
           },
           {
             label: "SEO & Search", icon: FaStore,
             children: [
-              { label: "URL Rewrites", path: "/SubscriptionList10" },
-              { label: "Search Terms", path: "/storeList11" },
-              { label: "Search Synonyms", path: "/storeList12" },
-              { label: "Site Map", path: "/storeList12" },
+              { label: "URL Rewrites", path: "/MagentoUrlRewritesList" },
+              { label: "Search Terms", path: "/MagentoSearchTermsList" },
+              { label: "Search Synonyms", path: "/MagentoSearchSynonymsList" },
+              { label: "Site Map", path: "/MagentoSitemapList" },
             ]
           },
           {
@@ -110,7 +110,7 @@ const menuItems: MenuItem[] = [
           {
             label: "User Content", icon: FaStore,
             children: [
-              { label: "All Reviews", path: "/SubscriptionList10" },
+              { label: "All Reviews", path: "/MagentoReviewsList" },
               { label: "Pending Reviews", path: "/storeList11" },
             ]
           },

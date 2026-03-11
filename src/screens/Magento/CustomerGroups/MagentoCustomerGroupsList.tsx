@@ -12,7 +12,7 @@ const mockGroups = [
     { id: 3, group: "Retailer", taxClass: "Retail Customer" },
 ];
 
-const MagentoCustomerGroups = () => {
+const MagentoCustomerGroupsList = () => {
     const navigate = useNavigate();
     const [perPage, setPerPage] = useState(20);
     const [showFilters, setShowFilters] = useState(false);
@@ -33,7 +33,7 @@ const MagentoCustomerGroups = () => {
                         <p className="text-sm text-gray-400 mt-0.5">Manage customer groups and tax classes</p>
                     </div>
                     <button
-                        onClick={() => navigate("/AddCustomerGroup")}
+                        onClick={() => navigate("/AddMagentoCustomerGroup")}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs font-semibold hover:opacity-90 transition-all"
                         style={{ background: "linear-gradient(to right, #38bdf8, #3b82f6)" }}>
                         <FaPlus className="text-xs" /> Add New Customer Group
@@ -158,7 +158,7 @@ const MagentoCustomerGroups = () => {
                                     {/* id 0 and 1 = Edit only, others = Select dropdown */}
                                     {g.id <= 1 ? (
                                         <button
-                                            onClick={() => navigate(`/EditCustomerGroup/${g.id}`)}
+                                            onClick={() => navigate(`/AddMagentoCustomerGroup/${g.id}`)}
                                             className="text-xs font-medium text-blue-500 hover:text-blue-700 transition-colors">
                                             Edit
                                         </button>
@@ -174,7 +174,7 @@ const MagentoCustomerGroups = () => {
                                                     <div className="fixed inset-0 z-10" onClick={() => setShowSelectMenu(null)} />
                                                     <div className="absolute right-0 top-6 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-28">
                                                         <button
-                                                            onClick={() => { navigate(`/EditCustomerGroup/${g.id}`); setShowSelectMenu(null); }}
+                                                            onClick={() => { navigate(`/AddMagentoCustomerGroup/${g.id}`); setShowSelectMenu(null); }}
                                                             className="w-full text-left px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors">
                                                             Edit
                                                         </button>
@@ -199,4 +199,4 @@ const MagentoCustomerGroups = () => {
     );
 };
 
-export default MagentoCustomerGroups;
+export default MagentoCustomerGroupsList;

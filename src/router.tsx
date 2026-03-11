@@ -108,6 +108,22 @@ import MagentoShipmentDetail from "./screens/Magento/Shipment/Magentoshipmentdet
 import MagentoCreditMemoList from "./screens/Magento/CreditMemo/Magentocreditmemolist.tsx";
 import MagentoCreditMemoDetail from "./screens/Magento/CreditMemo/Magentocreditmemodetail.tsx";
 import MagentoOnlineCustomers from "./screens/Magento/NowOnline/MagentoOnlineCustomers.tsx";
+import AddMagentoCustomerGroup from "./screens/Magento/CustomerGroups/AddMagentoCustomerGroup.tsx";
+import MagentoCustomerGroupsList from "./screens/Magento/CustomerGroups/MagentoCustomerGroupsList.tsx";
+import AddMagentoCatalogPriceRule from "./screens/Magento/Marketing/CatalogPriceRule/AddMagentoCatalogPriceRule.tsx";
+import MagentoCatalogPriceRuleList from "./screens/Magento/Marketing/CatalogPriceRule/MagentoCatalogPriceRuleList.tsx";
+import MagentoCartPriceRulesList from "./screens/Magento/Marketing/CartPriceRules/MagentoCartPriceRulesList.tsx";
+import AddMagentoCartPriceRule from "./screens/Magento/Marketing/CartPriceRules/AddMagentoCartPriceRule.tsx";
+import MagentoUrlRewritesList from "./screens/Magento/Marketing/URLRewrites/MagentoUrlRewritesList.tsx";
+import AddMagentoUrlRewrite from "./screens/Magento/Marketing/URLRewrites/AddMagentoUrlRewrite.tsx";
+import AddMagentoSearchTerm from "./screens/Magento/Marketing/SearchTerms/AddMagentoSearchTerm.tsx";
+import MagentoSearchTermsList from "./screens/Magento/Marketing/SearchTerms/MagentoSearchTermsList.tsx";
+import AddMagentoSearchSynonym from "./screens/Magento/Marketing/SearchSynonyms/AddMagentoSearchSynonym.tsx";
+import MagentoSearchSynonymsList from "./screens/Magento/Marketing/SearchSynonyms/MagentoSearchSynonymsList.tsx";
+import AddMagentoSitemap from "./screens/Magento/Marketing/SiteMap/AddMagentoSitemap.tsx";
+import MagentoSitemapList from "./screens/Magento/Marketing/SiteMap/MagentoSitemapList.tsx";
+import AddMagentoReview from "./screens/Magento/Marketing/Reviews/AddMagentoReview.tsx";
+import MagentoReviewsList from "./screens/Magento/Marketing/Reviews/MagentoReviewsList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -254,11 +270,32 @@ export const router = createBrowserRouter([
           { path: "/MagentoShipments", element: <MagentoShipmentList /> },
           { path: "/shipment/:id", element: < MagentoShipmentDetail /> },
           { path: "/MagentoCreditMemos", element: <MagentoCreditMemoList /> },
-          { path: "/MagentoCreditMemoDetail" , element: <MagentoCreditMemoDetail /> },
-          { path: "/OnlineCustomers" , element: <MagentoOnlineCustomers /> },
-          {path:"/MagentoCreditMemoList", element:<MagentoCreditMemoList />}
-          
-
+          { path: "/MagentoCreditMemoDetail", element: <MagentoCreditMemoDetail /> },
+          { path: "/OnlineCustomers", element: <MagentoOnlineCustomers /> },
+          { path: "/MagentoCustomerGroupsList", element: <MagentoCustomerGroupsList /> },
+          { path: "/AddMagentoCustomerGroup/:id", element: <AddMagentoCustomerGroup /> },
+          { path: "/AddMagentoCustomerGroup", element: <AddMagentoCustomerGroup /> },
+          { path: "/AddCatalogPriceRule", element: <AddMagentoCatalogPriceRule /> },
+          { path: "/AddCatalogPriceRule/:id", element: <AddMagentoCatalogPriceRule /> },
+          { path: "/MagentoCatalogPriceRuleList", element: <MagentoCatalogPriceRuleList /> },
+          { path: "/MagentoCartPriceRulesList", element: <MagentoCartPriceRulesList /> },
+          { path: "/AddCartPriceRule", element: <AddMagentoCartPriceRule /> },
+          { path: "/AddCartPriceRule/:id", element: <AddMagentoCartPriceRule /> },
+          { path: "/MagentoUrlRewritesList", element: <MagentoUrlRewritesList /> },
+          { path: "/AddMagentoUrlRewrite", element: <AddMagentoUrlRewrite /> },
+          { path: "/AddMagentoUrlRewrite/:id", element: <AddMagentoUrlRewrite /> },
+          { path: "/MagentoSearchTermsList", element: <MagentoSearchTermsList /> },
+          { path: "/AddMagentoSearchTerm", element: <AddMagentoSearchTerm /> },
+          { path: "/AddMagentoSearchTerm/:id", element: <AddMagentoSearchTerm /> },
+          { path: "/AddMagentoSearchSynonym/:id", element: <AddMagentoSearchSynonym /> },
+          { path: "/AddMagentoSearchSynonym", element: <AddMagentoSearchSynonym /> },
+          { path: "/MagentoSearchSynonymsList", element: <MagentoSearchSynonymsList /> },
+          { path: "/MagentoSitemapList", element: <MagentoSitemapList /> },
+          { path: "/AddMagentoSitemap", element: <AddMagentoSitemap /> },
+          { path: "/AddMagentoSitemap/:id", element: <AddMagentoSitemap /> },
+          { path: "/MagentoReviewsList", element: <MagentoReviewsList /> },
+          { path: "/AddMagentoReview", element: <AddMagentoReview /> },
+          { path: "/AddMagentoReview/:id", element: <AddMagentoReview /> },
         ]
       },
     ]
