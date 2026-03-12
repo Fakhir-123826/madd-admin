@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus, FiX } from "react-icons/fi";
-import ShipRocket from "../../../../public/shiprocket.webp";
+
 
 interface Zone {
   id: string;
@@ -160,7 +160,7 @@ const ShippingProviderDetail = () => {
         {/* Card Header */}
         <div className="bg-gradient-to-r from-teal-400 to-green-400 px-6 py-4 flex items-center gap-3">
           <img
-            src={ShipRocket}
+            src="shiprocket.webp"
             alt="ShipRocket"
             className="w-8 h-8 object-contain bg-white rounded-full p-1"
           />

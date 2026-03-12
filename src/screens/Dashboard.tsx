@@ -3,7 +3,7 @@ import { IoTrendingUp, IoTrendingDown } from "react-icons/io5";
 import SalesOrdersChart from "../component/SalesOrdersChart";
 import TopSellingCategoriesChart from "../component/TopSellingCategoriesChart";
 // import { FaBars, FaHome, FaStore, FaUsers } from "react-icons/fa";
-// import logo from "../../public/madd-admin.png"
+
 
 const Dashboard = () => {
     const [collapsed, setCollapsed] = useState(false);

@@ -1,6 +1,5 @@
 
 
-import logo from "../../public/madd-admin.png"
 function EnterOTP() {
     return (
         <div>
@@ -11,7 +10,7 @@ function EnterOTP() {
                         Enter OTP
                     </h3>
                     <img
-                        src={logo}
+                        src="madd-admin.png"
                         alt="main logo"
                         className="h-16 object-contain pr-30"
                     />

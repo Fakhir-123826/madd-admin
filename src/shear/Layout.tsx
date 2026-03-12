@@ -26,7 +26,6 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../public/madd-admin.png";
 
 // ============ TYPES ============
 interface MenuItem {
@@ -101,8 +100,8 @@ const menuItems: MenuItem[] = [
           {
             label: "Communications", icon: FaStore,
             children: [
-              { label: "Email Templates", path: "/SubscriptionList10" },
-              { label: "Newsletter Templates", path: "/storeList11" },
+              { label: "Email Templates", path: "/MagentoEmailTemplatesList" },
+              { label: "Newsletter Templates", path: "/MagentoNewsletterTemplatesList" },
               { label: "Newsletter Queue", path: "/storeList12" },
               { label: "Newsletter Subscribers", path: "/storeList12" },
             ]
@@ -535,7 +534,7 @@ const Layout = () => {
         {/* LOGO */}
         <div className="h-20 flex items-center justify-center">
           <img
-            src={logo}
+            src="madd-admin.png"
             className={`transition-all duration-300 ${collapsed ? "w-8" : "w-40"}`}
           />
         </div>

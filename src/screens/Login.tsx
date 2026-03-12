@@ -109,7 +109,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginAdminMutation } from "../app/api/AuthSlices/AuthSlices";
-import logo from "../../public/madd-admin.png";
+
 
 const Login = () => {
     const [password, setPassword] = useState("");
@@ -183,7 +183,7 @@ const navigate = useNavigate()
                 {/* Top bar with logo */}
                 <div className="flex items-center justify-between px-10 py-6 border-b border-gray-100">
                     <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Log in</h2>
-                    <img src={logo} alt="MarketAdd Logo" className="h-12 object-contain" />
+                    <img src="madd-admin.png" alt="MarketAdd Logo" className="h-12 object-contain" />
                 </div>
 
                 {/* Form */}

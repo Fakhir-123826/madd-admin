@@ -92,7 +92,6 @@ import MagentoCustomerList from "./screens/Magento/Customers/MagentoCustomerList
 import AddMagentoCustomer from "./screens/Magento/Customers/AddMagentoCustomer.tsx";
 import MogentoOrder from "./screens/Magento/Order/MagentoOrder.tsx";
 import ProtectedRoute from "./ProtectedRoute.tsx";
-import MagentoStoreList from "./screens/Magento/Store/MagentoStoreList.tsx";
 import MagentoInventoryList from "./screens/Magento/Inventory/MagentoInventoryList.tsx";
 import UpdateMagentoInventory from "./screens/Magento/Inventory/UpdateMagentoInventory.tsx";
 import MagentoAttributesLits from "./screens/Magento/Attributes/MagentoAttributesLits.tsx";
@@ -124,6 +123,12 @@ import AddMagentoSitemap from "./screens/Magento/Marketing/SiteMap/AddMagentoSit
 import MagentoSitemapList from "./screens/Magento/Marketing/SiteMap/MagentoSitemapList.tsx";
 import AddMagentoReview from "./screens/Magento/Marketing/Reviews/AddMagentoReview.tsx";
 import MagentoReviewsList from "./screens/Magento/Marketing/Reviews/MagentoReviewsList.tsx";
+import MagentoEmailTemplatesList from "./screens/Magento/Marketing/EmailTemplates/MagentoEmailTemplatesList.tsx";
+import AddMagentoEmailTemplate from "./screens/Magento/Marketing/EmailTemplates/AddMagentoEmailTemplate.tsx";
+import MagentoNewsletterTemplatesList from "./screens/Magento/Marketing/NewsletterTemplates/MagentoNewsletterTemplatesList.tsx";
+import AddMagentoNewsletterTemplate from "./screens/Magento/Marketing/NewsletterTemplates/AddMagentoNewsletterTemplate.tsx";
+import AddMagentoStor from "./screens/Magento/Store/AddMagentoStor.tsx";
+import MagentoManageStoresList from "./screens/Magento/Store/MagentoStoreList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -255,7 +260,7 @@ export const router = createBrowserRouter([
           { path: "/MagentoCustomerList", element: <MagentoCustomerList /> },
           { path: "/AddMagentoCustomer/:id", element: <AddMagentoCustomer /> },
           { path: "/customers/:id", element: <AddMagentoCustomer /> },
-          { path: "/MagentoStoreList", element: <MagentoStoreList /> },
+          { path: "/MagentoStoreList", element: <MagentoManageStoresList/> },
           { path: "/MagentoInventoryList", element: <MagentoInventoryList /> },
           { path: "/UpdateMagentoInventory/:sku/:itemId", element: <UpdateMagentoInventory /> },
           { path: "/MagentoAttributesLits", element: <MagentoAttributesLits /> },
@@ -296,6 +301,13 @@ export const router = createBrowserRouter([
           { path: "/MagentoReviewsList", element: <MagentoReviewsList /> },
           { path: "/AddMagentoReview", element: <AddMagentoReview /> },
           { path: "/AddMagentoReview/:id", element: <AddMagentoReview /> },
+          { path: "/MagentoEmailTemplatesList", element: <MagentoEmailTemplatesList /> },
+          { path: "/AddMagentoEmailTemplate", element: <AddMagentoEmailTemplate /> },
+          { path: "/MagentoNewsletterTemplatesList", element: <MagentoNewsletterTemplatesList /> },
+          { path: "/AddMagentoNewsletterTemplate", element: <AddMagentoNewsletterTemplate /> },
+          { path: "/AddMagentoNewsletterTemplate/:id", element: <AddMagentoNewsletterTemplate /> },
+          { path: "/AddMagentoStor/:id", element: <AddMagentoStor /> },
+          { path: "/AddMagentoStor", element: <AddMagentoStor /> },
         ]
       },
     ]

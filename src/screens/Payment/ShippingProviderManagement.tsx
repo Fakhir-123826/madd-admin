@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaPlus, FaEllipsisV } from "react-icons/fa";
-import ShipRocket from "../../../public/shiprocket.webp";
 
 interface Provider {
   id: number;
@@ -116,7 +115,7 @@ const ShippingProviderManagement = () => {
                 {/* Provider Name Cell */}
                 <td className="relative p-4 font-medium rounded-l-xl text-black">
                   <div className="flex items-center gap-2">
-                    <img src={ShipRocket} alt="ShipRocket" className="w-8 h-8 object-contain" />
+                    <img src="shiprocket.webp" alt="ShipRocket" className="w-8 h-8 object-contain" />
                     {provider.name}
                   </div>
                   <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />

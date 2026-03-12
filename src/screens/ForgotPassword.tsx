@@ -1,6 +1,5 @@
 
 
-import logo from "../../public/madd-admin.png"
 function ForgotPassword() {
     return (
         <div>
@@ -10,7 +9,7 @@ function ForgotPassword() {
                         Forgot Password
                     </h3>
                     <img
-                        src={logo}
+                        src="madd-admin.png"
                         alt="main logo"
                         className="h-16 object-contain pr-30"
                     />
