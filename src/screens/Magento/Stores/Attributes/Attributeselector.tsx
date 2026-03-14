@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Search } from "lucide-react";
-import { useGetAttributesQuery, type MagentoAttribute } from "../../../app/api/MagentoSlices/Attributes";
+import { useGetAttributesQuery, type MagentoAttribute } from "../../../../app/api/MagentoSlices/Attributes";
 
 interface AttributeSelectorProps {
     isOpen: boolean;

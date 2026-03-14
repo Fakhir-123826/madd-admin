@@ -94,10 +94,10 @@ import MogentoOrder from "./screens/Magento/Order/MagentoOrder.tsx";
 import ProtectedRoute from "./ProtectedRoute.tsx";
 import MagentoInventoryList from "./screens/Magento/Inventory/MagentoInventoryList.tsx";
 import UpdateMagentoInventory from "./screens/Magento/Inventory/UpdateMagentoInventory.tsx";
-import MagentoAttributesLits from "./screens/Magento/Attributes/MagentoAttributesLits.tsx";
-import AddMagentoAttribute from "./screens/Magento/Attributes/AddMagentoAttribute.tsx";
-import MagentoAttributeSetsList from "./screens/Magento/AttributeSet/MagentoAttributeSetsList.tsx";
-import AddMagentoAttributeSet from "./screens/Magento/AttributeSet/AddMagentoAttributeSet.tsx";
+import MagentoAttributesLits from "./screens/Magento/Stores/Attributes/MagentoAttributesLits.tsx";
+import AddMagentoAttribute from "./screens/Magento/Stores/Attributes/AddMagentoAttribute.tsx";
+import MagentoAttributeSetsList from "./screens/Magento/Stores/AttributeSet/MagentoAttributeSetsList.tsx";
+import AddMagentoAttributeSet from "./screens/Magento/Stores/AttributeSet/AddMagentoAttributeSet.tsx";
 import NotFound from "./component/NotFound.tsx";
 import MagentoPaymentServices from "./screens/Magento/PaymentService/MagentoPaymentServices.tsx";
 import MagentoInvoiceList from "./screens/Magento/Invoices/MagentoInvoiceList.tsx";
@@ -127,8 +127,17 @@ import MagentoEmailTemplatesList from "./screens/Magento/Marketing/EmailTemplate
 import AddMagentoEmailTemplate from "./screens/Magento/Marketing/EmailTemplates/AddMagentoEmailTemplate.tsx";
 import MagentoNewsletterTemplatesList from "./screens/Magento/Marketing/NewsletterTemplates/MagentoNewsletterTemplatesList.tsx";
 import AddMagentoNewsletterTemplate from "./screens/Magento/Marketing/NewsletterTemplates/AddMagentoNewsletterTemplate.tsx";
-import AddMagentoStor from "./screens/Magento/Store/AddMagentoStor.tsx";
-import MagentoManageStoresList from "./screens/Magento/Store/MagentoStoreList.tsx";
+import AddMagentoStor from "./screens/Magento/Stores/Store/AddMagentoStor.tsx";
+import MagentoManageStoresList from "./screens/Magento/Stores/Store/MagentoStoreList.tsx";
+import MagentoConfigurationList from "./screens/Magento/Content/MagentoConfigurationList.tsx";
+import MagentoTermsConditionsList from "./screens/Magento/Stores/TermsConditions/MagentoTermsConditionsList.tsx";
+import AddMagentoTermsCondition from "./screens/Magento/Stores/TermsConditions/AddMagentoTermsCondition.tsx";
+import AddMagentoOrderStatus from "./screens/Magento/Stores/OrderStatus/AddMagentoOrderStatus.tsx";
+import MagentoOrderStatusList from "./screens/Magento/Stores/OrderStatus/MagentoOrderStatusList.tsx";
+import MagentoSourcesList from "./screens/Magento/Stores/Source/MagentoSourcesList.tsx";
+import AddMagentoSource from "./screens/Magento/Stores/Source/AddMagentoSource.tsx";
+import MagentoTaxRulesList from "./screens/Magento/Stores/TaxRules/MagentoTaxRulesList.tsx";
+import AddMagentoTaxRule from "./screens/Magento/Stores/TaxRules/AddMagentoTaxRule.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -260,7 +269,7 @@ export const router = createBrowserRouter([
           { path: "/MagentoCustomerList", element: <MagentoCustomerList /> },
           { path: "/AddMagentoCustomer/:id", element: <AddMagentoCustomer /> },
           { path: "/customers/:id", element: <AddMagentoCustomer /> },
-          { path: "/MagentoStoreList", element: <MagentoManageStoresList/> },
+          { path: "/MagentoStoreList", element: <MagentoManageStoresList /> },
           { path: "/MagentoInventoryList", element: <MagentoInventoryList /> },
           { path: "/UpdateMagentoInventory/:sku/:itemId", element: <UpdateMagentoInventory /> },
           { path: "/MagentoAttributesLits", element: <MagentoAttributesLits /> },
@@ -308,6 +317,18 @@ export const router = createBrowserRouter([
           { path: "/AddMagentoNewsletterTemplate/:id", element: <AddMagentoNewsletterTemplate /> },
           { path: "/AddMagentoStor/:id", element: <AddMagentoStor /> },
           { path: "/AddMagentoStor", element: <AddMagentoStor /> },
+          { path: "/MagentoConfigurationList", element: <MagentoConfigurationList /> },
+          { path: "/MagentoTermsConditionsList", element: <MagentoTermsConditionsList /> },
+          { path: "/AddMagentoTermsCondition", element: <AddMagentoTermsCondition /> },
+          { path: "/AddMagentoTermsCondition/:id", element: <AddMagentoTermsCondition /> },
+          { path: "/MagentoOrderStatusList", element: <MagentoOrderStatusList /> },
+          { path: "/AddMagentoOrderStatus", element: <AddMagentoOrderStatus /> },
+          { path: "/AddMagentoOrderStatus/:id", element: <AddMagentoOrderStatus /> },
+          { path: "/MagentoSourcesList", element: <MagentoSourcesList /> },
+          { path: "/AddMagentoSource", element: <AddMagentoSource /> },
+          { path: "/MagentoTaxRulesList", element: <MagentoTaxRulesList /> },
+          { path: "/AddMagentoTaxRule", element: <AddMagentoTaxRule /> },
+
         ]
       },
     ]

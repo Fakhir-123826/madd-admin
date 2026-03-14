@@ -210,21 +210,21 @@ const menuItems: MenuItem[] = [
             children: [
               { label: "All Stores", path: "/MagentoStoreList" },
               { label: "Configuration", path: "/stores/configuration" },
-              { label: "Terms and Conditions", path: "/stores/terms-conditions" },
-              { label: "Order Status", path: "/stores/order-status" },
+              { label: "Terms and Conditions", path: "/MagentoTermsConditionsList" },
+              { label: "Order Status", path: "/MagentoOrderStatusList" },
             ]
           },
           {
             label: "Inventory",
             children: [
-              { label: "Sources", path: "/stores/sources" },
+              { label: "Sources", path: "/MagentoSourcesList" },
               { label: "Stocks", path: "/stores/stocks" },
             ]
           },
           {
             label: "Taxes",
             children: [
-              { label: "Tax Rules", path: "/stores/tax-rules" },
+              { label: "Tax Rules", path: "/MagentoTaxRulesList" },
               { label: "Tax Zones and Rates", path: "/stores/tax-zones" },
             ]
           },

@@ -143,7 +143,7 @@ import { useNavigate } from "react-router-dom";
 import {
   FaFilter, FaColumns, FaChevronLeft, FaChevronRight, FaChevronDown, FaPlus
 } from "react-icons/fa";
-import { useGetAllStoresQuery } from "../../../app/api/MagentoSlices/StoreSlice";
+import { useGetAllStoresQuery } from "../../../../app/api/MagentoSlices/StoreSlice";
 
 function MagentoManageStoresList() {
   const navigate = useNavigate();

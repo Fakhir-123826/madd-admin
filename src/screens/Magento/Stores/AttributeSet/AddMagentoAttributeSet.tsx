@@ -5,7 +5,7 @@ import {
     useUpdateAttributeSetMutation,
     useGetAttributeSetQuery,
     useGetAttributeSetsQuery,
-} from "../../../app/api/MagentoSlices/AttributeSetApi";
+} from "../../../../app/api/MagentoSlices/AttributeSetApi";
 
 function AddMagentoAttributeSet() {
     const navigate = useNavigate();

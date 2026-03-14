@@ -6,7 +6,7 @@ import {
     useUpdateAttributeMutation,
     useGetAttributeQuery,
     type AttributeOption
-} from "../../../app/api/MagentoSlices/Attributes";
+} from "../../../../app/api/MagentoSlices/Attributes";
 
 const INPUT_TYPES = [
     { value: "text", label: "Text Field" },

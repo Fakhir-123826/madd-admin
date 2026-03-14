@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Trash2 } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
-import Pagination from "../../../component/Pagination";
+import Pagination from "../../../../component/Pagination";
 import {
   useGetAttributeSetsQuery,
   useDeleteAttributeSetMutation,
   type AttributeSet,
-} from "../../../app/api/MagentoSlices/AttributeSetApi";
+} from "../../../../app/api/MagentoSlices/AttributeSetApi";
 
 function MagentoAttributeSetsList() {
   const navigate = useNavigate();

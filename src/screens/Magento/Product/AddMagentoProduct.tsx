@@ -11,7 +11,7 @@ import {
 import { useGetCategoriesQuery, type MagentoCategory } from "../../../app/api/MagentoSlices/CategorySlice";
 import AutoCompleteMultiSelect from "../../../component/Inputs Feilds/AutoCompleteMultiSelect";
 import type { MagentoAttribute } from "../../../app/api/MagentoSlices/Attributes";
-import AttributeSelector from "../Attributes/Attributeselector";
+import AttributeSelector from "../Stores/Attributes/Attributeselector";
 
 interface CustomAttribute {
   attribute_code: string;
