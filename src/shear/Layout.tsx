@@ -218,21 +218,21 @@ const menuItems: MenuItem[] = [
             label: "Inventory",
             children: [
               { label: "Sources", path: "/MagentoSourcesList" },
-              { label: "Stocks", path: "/stores/stocks" },
+              { label: "Stocks", path: "/MagentoStockList" },
             ]
           },
           {
             label: "Taxes",
             children: [
               { label: "Tax Rules", path: "/MagentoTaxRulesList" },
-              { label: "Tax Zones and Rates", path: "/stores/tax-zones" },
+              { label: "Tax Zones and Rates", path: "/MagentoStockList" },
             ]
           },
           {
             label: "Currency",
             children: [
-              { label: "Currency Rates", path: "/stores/currency-rates" },
-              { label: "Currency Symbols", path: "/stores/currency-symbols" },
+              { label: "Currency Rates", path: "/AddCurrencyRates" },
+              { label: "Currency Symbols", path: "/AddCurrencySymbols" },
             ]
           },
           {
@@ -240,7 +240,7 @@ const menuItems: MenuItem[] = [
             children: [
               { label: "Product", path: "/MagentoAttributesLits" },
               { label: "Attribute Set", path: "/MagentoAttributeSets" },
-              { label: "Rating", path: "/MagentoAttributeSets" },
+              { label: "Rating", path: "/MagentoProductRatingsList" },
             ]
           },
         ],

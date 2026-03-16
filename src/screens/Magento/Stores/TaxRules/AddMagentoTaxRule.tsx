@@ -2,13 +2,87 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaChevronDown } from "react-icons/fa";
 
+// Yeh AutoCompleteMultiSelect component copy kar liya tere dusre code se (thoda adjust kiya)
+const AutoCompleteMultiSelect = ({
+  label,
+  options,
+  selectedValues,
+  onChange,
+}: {
+  label: string;
+  options: { label: string; value: string }[];
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
+}) => {
+  const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const filteredOptions = options.filter(opt =>
+    opt.label.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const toggleValue = (value: string) => {
+    const newValues = selectedValues.includes(value)
+      ? selectedValues.filter(v => v !== value)
+      : [...selectedValues, value];
+    onChange(newValues);
+  };
+
+  return (
+    <div className="relative">
+      <label className="text-sm font-medium text-gray-700 block mb-1">
+        {label} <span className="text-red-500">*</span>
+      </label>
+      <div
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-700 flex items-center justify-between cursor-pointer focus-within:border-teal-500"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{selectedValues.length} selected</span>
+        <FaChevronDown className="text-gray-500" />
+      </div>
+
+      {isOpen && (
+        <div className="absolute w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10">
+          <div className="p-2 border-b border-gray-200">
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search..."
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-teal-400"
+              onClick={e => e.stopPropagation()} // input click pe dropdown band na ho
+            />
+          </div>
+          {filteredOptions.map(opt => (
+            <div
+              key={opt.value}
+              onClick={() => toggleValue(opt.value)}
+              className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-sm"
+            >
+              <input
+                type="checkbox"
+                checked={selectedValues.includes(opt.value)}
+                readOnly
+                className="w-4 h-4 accent-teal-500"
+              />
+              {opt.label}
+            </div>
+          ))}
+          {filteredOptions.length === 0 && (
+            <div className="px-4 py-2.5 text-sm text-gray-500">No results found</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AddMagentoTaxRule = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
 
   const [name, setName] = useState(isEdit ? "Rule1" : "");
-  const [taxRate, setTaxRate] = useState<string[]>([]); // multi-select simulation
   const [selectedRates, setSelectedRates] = useState<string[]>([]);
 
   const [touched, setTouched] = useState(false);
@@ -22,24 +96,18 @@ const AddMagentoTaxRule = () => {
 
   const handleSave = () => {
     setTouched(true);
-    if (!name.trim()) return;
+    if (!name.trim() || selectedRates.length === 0) return;
 
     setSuccess(`Tax Rule ${isEdit ? "updated" : "saved"} successfully!`);
     setTimeout(() => navigate("/MagentoTaxRulesList"), 1500);
   };
 
-  const toggleRate = (rate: string) => {
-    setSelectedRates(prev =>
-      prev.includes(rate) ? prev.filter(r => r !== rate) : [...prev, rate]
-    );
-  };
-
   const availableRates = [
-    "US-CA-Rate 1",
-    "US-NY-Rate 1",
-    "US-MI-Rate 1",
-    "MY group",
-    "MY group 2"
+    { label: "US-CA-Rate 1", value: "us-ca-rate-1" },
+    { label: "US-NY-Rate 1", value: "us-ny-rate-1" },
+    { label: "US-MI-Rate 1", value: "us-mi-rate-1" },
+    { label: "MY group", value: "my-group" },
+    { label: "MY group 2", value: "my-group-2" },
   ];
 
   return (
@@ -100,36 +168,18 @@ const AddMagentoTaxRule = () => {
           </div>
         </div>
 
-        {/* Tax Rate (multi-select simulation) */}
+        {/* Tax Rate – Real Multi-Select Dropdown */}
         <div className="grid md:grid-cols-4 gap-4 items-start">
           <label className="md:col-span-1 text-sm font-medium text-gray-700 text-right pt-2.5">
             Tax Rate <span className="text-red-500">*</span>
           </label>
           <div className="md:col-span-3 space-y-2">
-            <div className="relative">
-              <div className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-700 flex items-center justify-between cursor-pointer">
-                <span>{selectedRates.length} selected</span>
-                <FaChevronDown className="text-gray-500" />
-              </div>
-              {/* Dropdown simulation */}
-              <div className="absolute w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10">
-                {availableRates.map(rate => (
-                  <div
-                    key={rate}
-                    onClick={() => toggleRate(rate)}
-                    className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedRates.includes(rate)}
-                      readOnly
-                      className="w-4 h-4 accent-teal-500"
-                    />
-                    {rate}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <AutoCompleteMultiSelect
+              label=""
+              options={availableRates}
+              selectedValues={selectedRates}
+              onChange={setSelectedRates}
+            />
             <button className="text-xs text-blue-500 hover:text-blue-700">
               + Add New Tax Rate
             </button>

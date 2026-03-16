@@ -138,6 +138,14 @@ import MagentoSourcesList from "./screens/Magento/Stores/Source/MagentoSourcesLi
 import AddMagentoSource from "./screens/Magento/Stores/Source/AddMagentoSource.tsx";
 import MagentoTaxRulesList from "./screens/Magento/Stores/TaxRules/MagentoTaxRulesList.tsx";
 import AddMagentoTaxRule from "./screens/Magento/Stores/TaxRules/AddMagentoTaxRule.tsx";
+import MagentoProductRatingsList from "./screens/Magento/Stores/Rating/MagentoProductRatingsList.tsx";
+import AddMagentoRating from "./screens/Magento/Stores/Rating/AddMagentoProductRating.tsx";
+import MagentoStockList from "./screens/Magento/Stores/Stock/MagentoStockList.tsx";
+import AddMagentoStock from "./screens/Magento/Stores/Stock/AddMagentoStock.tsx";
+import MagentoTaxZonesList from "./screens/Magento/Stores/TaxZoneAndRates/MagentoTaxZonesList.tsx";
+import AddMagentoTaxZone from "./screens/Magento/Stores/TaxZoneAndRates/AddMagentoTaxZone.tsx";
+import AddCurrencySymbols from "./screens/Magento/Stores/CurrencySymbols/AddCurrencySymbols.tsx";
+import AddCurrencyRates from "./screens/Magento/Stores/CurrencyRates/AddCurrencyRates.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -328,6 +336,14 @@ export const router = createBrowserRouter([
           { path: "/AddMagentoSource", element: <AddMagentoSource /> },
           { path: "/MagentoTaxRulesList", element: <MagentoTaxRulesList /> },
           { path: "/AddMagentoTaxRule", element: <AddMagentoTaxRule /> },
+          { path: "/AddCurrencySymbols", element: <AddCurrencySymbols /> },
+          { path: "/AddCurrencyRates", element: <AddCurrencyRates /> },
+          { path: "/MagentoProductRatingsList", element: <MagentoProductRatingsList /> },
+          { path: "/MagentoTaxZonesList", element: <MagentoTaxZonesList /> },
+          { path: "/AddMagentoTaxZone", element: <AddMagentoTaxZone /> },
+          { path: "/AddMagentoRating", element: <AddMagentoRating /> },
+          { path: "/MagentoStockList", element: <MagentoStockList /> },
+          { path: "/AddMagentoStock", element: <AddMagentoStock /> },
 
         ]
       },
