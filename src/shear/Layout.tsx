@@ -57,9 +57,9 @@ const menuItems: MenuItem[] = [
           { label: "Invoice", path: "/MagentoInvoiceList" },
           { label: "Shipment", path: "/MagentoShipments" },
           { label: "Credit Memos", path: "/MagentoCreditMemos" },
-          { label: "Billing Agreements", path: "/storeList5" },
-          { label: "Transactions", path: "/storeList6" },
-          { label: "Braintree Virtual Terminal", path: "/storeList7" },
+          { label: "Billing Agreements", path: "/MagentoBillingAgreementsList" },
+          { label: "Transactions", path: "/MagentoTransactionList" },
+          { label: "Braintree Virtual Terminal", path: "/BraintreeVirtualTerminal" },
         ],
       },
       {
@@ -74,7 +74,7 @@ const menuItems: MenuItem[] = [
         children: [
           { label: "All Customers", path: "/MagentoCustomerList" },
           { label: "Now Online", path: "/OnlineCustomers" },
-          { label: "Login as Customer Log", path: "/storeList12" },
+          { label: "! Login as Customer Log", path: "/storeList12" },
           { label: "Customer Groups", path: "/MagentoCustomerGroupsList" },
         ],
       },
@@ -209,7 +209,7 @@ const menuItems: MenuItem[] = [
             label: "Settings",
             children: [
               { label: "All Stores", path: "/MagentoStoreList" },
-              { label: "Configuration", path: "/stores/configuration" },
+              { label: "! Configuration", path: "/stores/configuration" },
               { label: "Terms and Conditions", path: "/MagentoTermsConditionsList" },
               { label: "Order Status", path: "/MagentoOrderStatusList" },
             ]

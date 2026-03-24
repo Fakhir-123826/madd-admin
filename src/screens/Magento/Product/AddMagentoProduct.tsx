@@ -113,42 +113,91 @@ const AddMagentoProductFull = () => {
     });
   };
 
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+
+  //   const payload = {
+  //     sku: formData.sku,
+  //     name: formData.name,
+  //     attribute_set_id: formData.attribute_set_id,
+  //     price: formData.price,
+  //     status: formData.status ? 1 : 0,
+  //     visibility: formData.visibility,
+  //     type_id: formData.type_id,
+  //     extension_attributes: {
+  //       website_ids: [1],
+  //       stock_item: {
+  //         qty: formData.stock_qty,
+  //         is_in_stock: formData.is_in_stock,
+  //       },
+  //       category_links: selectedCategories.map(catId => ({
+  //         position: 0,
+  //         category_id: catId.toString(),
+  //       })),
+  //     },
+  //     custom_attributes: customAttributes.filter(attr => attr.attribute_code && attr.value),
+  //   };
+
+  //   try {
+  //     if (isEditMode) {
+  //       await updateProduct({ sku: sku!, product: payload }).unwrap();
+  //     } else {
+  //       await createProduct(payload).unwrap();
+  //     }
+  //     navigate("/MagentoProducts");
+  //   } catch (error) {
+  //     console.error("Error saving product:", error);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const payload = {
-      sku: formData.sku,
-      name: formData.name,
-      attribute_set_id: formData.attribute_set_id,
-      price: formData.price,
-      status: formData.status ? 1 : 0,
-      visibility: formData.visibility,
-      type_id: formData.type_id,
-      extension_attributes: {
-        website_ids: [1],
-        stock_item: {
-          qty: formData.stock_qty,
-          is_in_stock: formData.is_in_stock,
+      product: {  // ← Yahan se shuru kar – pura object product key ke andar daal do
+        sku: formData.sku.trim(),
+        name: formData.name.trim(),
+        attribute_set_id: Number(formData.attribute_set_id),
+        price: Number(formData.price),
+        status: formData.status ? 1 : 0,
+        visibility: Number(formData.visibility),
+        type_id: formData.type_id,
+        extension_attributes: {
+          website_ids: [1],
+          stock_item: {
+            qty: Number(formData.stock_qty),
+            is_in_stock: formData.is_in_stock,
+          },
+          category_links: selectedCategories.map(catId => ({
+            position: 0,
+            category_id: String(catId),
+          })),
         },
-        category_links: selectedCategories.map(catId => ({
-          position: 0,
-          category_id: catId.toString(),
-        })),
-      },
-      custom_attributes: customAttributes.filter(attr => attr.attribute_code && attr.value),
+        custom_attributes: customAttributes
+          .filter(attr => attr.attribute_code && attr.value !== "")
+          .map(attr => ({
+            attribute_code: attr.attribute_code.trim(),
+            value: attr.type === "number" ? Number(attr.value) : String(attr.value),
+          })),
+      }
     };
+
+    console.log("Sending payload:", payload); // Check kar lena console mein
 
     try {
       if (isEditMode) {
-        await updateProduct({ sku: sku!, product: payload }).unwrap();
+        await updateProduct({ sku: sku!, product: payload.product }).unwrap(); // update mein bhi product key
       } else {
-        await createProduct(payload).unwrap();
+        await createProduct(payload).unwrap(); // create mein pura { product: {...} }
       }
+      alert("Product saved successfully!");
       navigate("/MagentoProducts");
-    } catch (error) {
-      console.error("Error saving product:", error);
+    } catch (error: any) {
+      console.error("Save failed:", error);
+      alert("Error: " + (error.data?.message || "Check console for details"));
     }
   };
+
 
   const categoryOptions = categories.map(cat => ({
     label: `${"— ".repeat(cat.level || 0)}${cat.name}`,
@@ -162,7 +211,7 @@ const AddMagentoProductFull = () => {
         {isEditMode ? "Update Product" : "Create Product"}
 
       </h2>
-      <AddButton label="Add Attribute" onClick={() => {setShowAttributeSelector(true)}}/>
+      <AddButton label="Add Attribute" onClick={() => { setShowAttributeSelector(true) }} />
       <form onSubmit={handleSubmit} className="space-y-8">
 
         {/* ===== Basic Info Card ===== */}

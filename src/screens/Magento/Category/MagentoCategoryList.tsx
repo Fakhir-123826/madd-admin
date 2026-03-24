@@ -19,17 +19,21 @@ function MagentoCategoryList() {
 
   const queryArgs = useMemo(
     () => ({ page: currentPage, pageSize: itemsPerPage }),
-    [currentPage, itemsPerPage]
+    [currentPage]
   );
 
-  const { data, error, isLoading, isFetching } = useGetCategoriesQuery(
-    queryArgs as any,
-    { refetchOnMountOrArgChange: true }
-  );
+  const { data, error, isLoading, isFetching } = useGetCategoriesQuery(queryArgs, {
+    refetchOnMountOrArgChange: true,
+  });
 
-  // Recursive flatten function
+  // Debugging: response check karne ke liye (remove in production)
+  // console.log("Categories API Response:", data);
+
+  // Recursive flatten function (tree ko flat list mein convert)
   const flattenCategories = (cat: MagentoCategory, level = 0): MagentoCategory[] => {
-    let result = [{ ...cat, level }];
+    const current = { ...cat, level };
+    let result: MagentoCategory[] = [current];
+
     if (cat.children_data && cat.children_data.length > 0) {
       cat.children_data.forEach((child) => {
         result = result.concat(flattenCategories(child, level + 1));
@@ -38,25 +42,52 @@ function MagentoCategoryList() {
     return result;
   };
 
-  // Prepare flat categories array
-  let categories: MagentoCategory[] = [];
-  if (data) {
-    if (Array.isArray(data)) {
-      data.forEach((cat) => categories.push(...flattenCategories(cat)));
-    } else {
-      categories.push(...flattenCategories(data));
-    }
-  }
+  // Flat categories prepare karo
+  const flatCategories: MagentoCategory[] = useMemo(() => {
+    if (!data?.data) return [];
 
-  const totalPages = Math.ceil(categories.length / itemsPerPage);
+    const responseData = data.data;
+    let all: MagentoCategory[] = [];
+
+    if (Array.isArray(responseData)) {
+      // Backend ne direct flat array diya
+      responseData.forEach((cat) => {
+        all.push(...flattenCategories(cat));
+      });
+    } else if (responseData?.items && Array.isArray(responseData.items)) {
+      // Magento-style search response (sabse common case)
+      responseData.items.forEach((cat: MagentoCategory) => {
+        all.push(...flattenCategories(cat));
+      });
+    } else if (responseData?.id && responseData.children_data) {
+      // Full tree (root category)
+      all = flattenCategories(responseData);
+    } else {
+      console.warn("Unexpected categories response shape:", responseData);
+    }
+
+    return all;
+  }, [data]);
+
+  // Agar backend total_count de raha hai to usko use karo (better pagination)
+  const totalCountFromBackend =
+    data?.data?.total_count ||
+    data?.data?.search_criteria?.total_count ||
+    flatCategories.length;
+
+  const totalPages = Math.ceil(totalCountFromBackend / itemsPerPage) || 1;
 
   const tdBase =
     "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
 
-  if (isLoading)
+  if (isLoading) {
     return <div className="p-6">Loading categories...</div>;
-  if (error)
-    return <div className="p-6 text-red-500">Error loading categories</div>;
+  }
+
+  if (error) {
+    console.error("Categories fetch error:", error);
+    return <div className="p-6 text-red-500">Error loading categories. Check console.</div>;
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -75,7 +106,6 @@ function MagentoCategoryList() {
             Add Category
           </button>
         </div>
-
       </div>
 
       <FilterBar />
@@ -102,14 +132,14 @@ function MagentoCategoryList() {
                   Loading categories...
                 </td>
               </tr>
-            ) : categories.length === 0 ? (
+            ) : flatCategories.length === 0 ? (
               <tr>
                 <td colSpan={7} className="text-center py-6">
                   No categories found
                 </td>
               </tr>
             ) : (
-              categories
+              flatCategories
                 .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                 .map((category) => (
                   <tr
@@ -121,21 +151,23 @@ function MagentoCategoryList() {
                     </td>
 
                     <td className={tdBase}>
-                      {`${"— ".repeat(category.level)}${category.name}`}
+                      {"— ".repeat(category.level || 0)}
+                      {category.name || "Unnamed"}
                     </td>
 
-                    <td className={tdBase}>{category.parent_id}</td>
+                    <td className={tdBase}>{category.parent_id || "-"}</td>
 
-                    <td className={tdBase}>{category.level}</td>
+                    <td className={tdBase}>{category.level || 0}</td>
 
-                    <td className={tdBase}>{category.position}</td>
+                    <td className={tdBase}>{category.position || 0}</td>
 
                     <td className={tdBase}>
                       <span
-                        className={`px-3 py-1 rounded-md text-xs font-medium ${category.is_active
+                        className={`px-3 py-1 rounded-md text-xs font-medium ${
+                          category.is_active
                             ? "bg-green-100 text-green-600"
                             : "bg-red-100 text-red-600"
-                          }`}
+                        }`}
                       >
                         {category.is_active ? "Active" : "Inactive"}
                       </span>

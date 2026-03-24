@@ -83,14 +83,14 @@ import SubDomain from "./screens/Domain/SubDomain.tsx";
 import AddDnsRecord from "./component/Domain/AddDnsRecord.tsx";
 import AddSubdomain from "./component/Domain/AddSubDomain.tsx";
 import AddSslCertificate from "./component/Domain/AddSslCertificate.tsx";
-import MagentoOrderList from "./screens/Magento/Order/MagentoOrderList.tsx";
+import MagentoOrderList from "./screens/Magento/Sales/Order/MagentoOrderList.tsx";
 import MagentoProductList from "./screens/Magento/Product/MagentoProductList.tsx";
 import AddMagentoProduct from "./screens/Magento/Product/AddMagentoProduct.tsx";
 import AddMagentoCategory from "./screens/Magento/Category/AddMagentoCategory.tsx";
 import MagentoCategoryList from "./screens/Magento/Category/MagentoCategoryList.tsx";
 import MagentoCustomerList from "./screens/Magento/Customers/MagentoCustomerList.tsx";
 import AddMagentoCustomer from "./screens/Magento/Customers/AddMagentoCustomer.tsx";
-import MogentoOrder from "./screens/Magento/Order/MagentoOrder.tsx";
+import MogentoOrder from "./screens/Magento/Sales/Order/MagentoOrder.tsx";
 import ProtectedRoute from "./ProtectedRoute.tsx";
 import MagentoInventoryList from "./screens/Magento/Inventory/MagentoInventoryList.tsx";
 import UpdateMagentoInventory from "./screens/Magento/Inventory/UpdateMagentoInventory.tsx";
@@ -99,13 +99,13 @@ import AddMagentoAttribute from "./screens/Magento/Stores/Attributes/AddMagentoA
 import MagentoAttributeSetsList from "./screens/Magento/Stores/AttributeSet/MagentoAttributeSetsList.tsx";
 import AddMagentoAttributeSet from "./screens/Magento/Stores/AttributeSet/AddMagentoAttributeSet.tsx";
 import NotFound from "./component/NotFound.tsx";
-import MagentoPaymentServices from "./screens/Magento/PaymentService/MagentoPaymentServices.tsx";
-import MagentoInvoiceList from "./screens/Magento/Invoices/MagentoInvoiceList.tsx";
-import MagentoInvoiceDetail from "./screens/Magento/Invoices/MagentoInvoiceDetail.tsx";
-import MagentoShipmentList from "./screens/Magento/Shipment/Magentoshipmentlist.tsx";
-import MagentoShipmentDetail from "./screens/Magento/Shipment/Magentoshipmentdetail.tsx";
-import MagentoCreditMemoList from "./screens/Magento/CreditMemo/Magentocreditmemolist.tsx";
-import MagentoCreditMemoDetail from "./screens/Magento/CreditMemo/Magentocreditmemodetail.tsx";
+import MagentoPaymentServices from "./screens/Magento/Sales/PaymentService/MagentoPaymentServices.tsx";
+import MagentoInvoiceList from "./screens/Magento/Sales/Invoices/MagentoInvoiceList.tsx";
+import MagentoInvoiceDetail from "./screens/Magento/Sales/Invoices/MagentoInvoiceDetail.tsx";
+import MagentoShipmentList from "./screens/Magento/Sales/Shipment/Magentoshipmentlist.tsx";
+import MagentoShipmentDetail from "./screens/Magento/Sales/Shipment/Magentoshipmentdetail.tsx";
+import MagentoCreditMemoList from "./screens/Magento/Sales/CreditMemo/Magentocreditmemolist.tsx";
+import MagentoCreditMemoDetail from "./screens/Magento/Sales/CreditMemo/Magentocreditmemodetail.tsx";
 import MagentoOnlineCustomers from "./screens/Magento/NowOnline/MagentoOnlineCustomers.tsx";
 import AddMagentoCustomerGroup from "./screens/Magento/CustomerGroups/AddMagentoCustomerGroup.tsx";
 import MagentoCustomerGroupsList from "./screens/Magento/CustomerGroups/MagentoCustomerGroupsList.tsx";
@@ -146,6 +146,9 @@ import MagentoTaxZonesList from "./screens/Magento/Stores/TaxZoneAndRates/Magent
 import AddMagentoTaxZone from "./screens/Magento/Stores/TaxZoneAndRates/AddMagentoTaxZone.tsx";
 import AddCurrencySymbols from "./screens/Magento/Stores/CurrencySymbols/AddCurrencySymbols.tsx";
 import AddCurrencyRates from "./screens/Magento/Stores/CurrencyRates/AddCurrencyRates.tsx";
+import MagentoBillingAgreementsList from "./screens/Magento/Sales/BillingAgreements/MagentoBillingAgreementsList.tsx";
+import MagentoTransactionList from "./screens/Magento/Sales/Transactions/MagentoTransactionList.tsx";
+import BraintreeVirtualTerminal from "./screens/Magento/Sales/BraintreeVirtualTerminal/BraintreeVirtualTerminal.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -344,6 +347,9 @@ export const router = createBrowserRouter([
           { path: "/AddMagentoRating", element: <AddMagentoRating /> },
           { path: "/MagentoStockList", element: <MagentoStockList /> },
           { path: "/AddMagentoStock", element: <AddMagentoStock /> },
+          { path: "/MagentoBillingAgreementsList", element: <MagentoBillingAgreementsList /> },
+          { path: "/MagentoTransactionList", element: <MagentoTransactionList /> },
+          { path: "/BraintreeVirtualTerminal", element: <BraintreeVirtualTerminal /> },
 
         ]
       },

@@ -8,7 +8,7 @@ export interface MagentoCategory {
   is_active?: boolean;
   position?: number;
   level?: number;
-    children_data?: MagentoCategory[];
+  children_data?: MagentoCategory[];
 }
 
 
@@ -21,8 +21,16 @@ export const magentoCategoryApi = createApi({
 
   endpoints: (builder) => ({
     // ✅ Get All Categories
-    getCategories: builder.query<MagentoCategory[], void>({
-      query: () => "categories",
+    // In CategorySlice.ts
+    getCategories: builder.query<MagentoCategory[], { page: number; pageSize: number }>({
+      query: ({ page, pageSize }) => ({
+        url: "categories/search",
+        params: {
+          page_size: pageSize,
+          current_page: page,
+          // optional: field: "is_active", value: "1", condition_type: "eq"
+        },
+      }),
       providesTags: ["Categories"],
     }),
 

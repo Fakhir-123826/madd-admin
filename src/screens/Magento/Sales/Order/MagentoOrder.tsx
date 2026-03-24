@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useGetOrderByIdQuery } from "../../../app/api/MagentoSlices/OrderSlice";
+import { useGetOrderByIdQuery } from "../../../../app/api/MagentoSlices/OrderSlice";
 
 const badgeStyle = (type: string) => {
   switch (type.toLowerCase()) {
