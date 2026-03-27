@@ -149,6 +149,28 @@ import AddCurrencyRates from "./screens/Magento/Stores/CurrencyRates/AddCurrency
 import MagentoBillingAgreementsList from "./screens/Magento/Sales/BillingAgreements/MagentoBillingAgreementsList.tsx";
 import MagentoTransactionList from "./screens/Magento/Sales/Transactions/MagentoTransactionList.tsx";
 import BraintreeVirtualTerminal from "./screens/Magento/Sales/BraintreeVirtualTerminal/BraintreeVirtualTerminal.tsx";
+import MagentoProductsInCartsList from "./screens/Magento/Reports/ProductsInCart/MagentoProductsInCartsList.tsx";
+import MagentoSearchTermsListForReports from "./screens/Magento/Reports/SearchTerms/MagentoSearchTermsListForReports.tsx";
+import MagentoAbandonedCartsList from "./screens/Magento/Reports/AbandonedCarts/MagentoAbandonedCartsList.tsx";
+import MagentoNewsletterProblemsReportList from "./screens/Magento/Reports/NewsletterProblemReports/MagentoNewsletterProblemsReportList.tsx";
+import MagentoCustomerReviewsReportList from "./screens/Magento/Reports/ByCustomers/MagentoCustomerReviewsReportList.tsx";
+import MagentoProductReviewsReportList from "./screens/Magento/Reports/ByProducts/MagentoProductReviewsReportList.tsx";
+import MagentoOrderUpdatedReportList from "./screens/Magento/Reports/Orders/MagentoOrderUpdatedReportList.tsx";
+import MagentoTaxReportList from "./screens/Magento/Reports/Tax/MagentoTaxReportList.tsx";
+import MagentoInvoiceReportList from "./screens/Magento/Reports/Invoiced/MagentoInvoiceReportList.tsx";
+import MagentoShippingReportList from "./screens/Magento/Reports/Shipping/MagentoShippingReportList.tsx";
+import MagentoRefundsReportList from "./screens/Magento/Reports/Refunds/MagentoRefundsReportList.tsx";
+import MagentoCouponsReportList from "./screens/Magento/Reports/Coupons/MagentoCouponsReportList.tsx";
+import MagentoPayPalSettlementReportList from "./screens/Magento/Reports/PayPalSettlement/MagentoPayPalSettlementReportList.tsx";
+import MagentoBraintreeSettlementReportList from "./screens/Magento/Reports/BraintreeSettlement/MagentoBraintreeSettlementReportList.tsx";
+import MagentoOrderTotalReportList from "./screens/Magento/Reports/OrderTotal/MagentoOrderTotalReportList.tsx";
+import MagentoOrderCountReportList from "./screens/Magento/Reports/OrderCount/MagentoOrderCountReportList.tsx";
+import MagentoNewAccountsReportList from "./screens/Magento/Reports/New/MagentoNewAccountsReportList.tsx";
+import MagentoProductViewsReportList from "./screens/Magento/Reports/Views/MagentoProductViewsReportList.tsx";
+import MagentoBestsellersReportList from "./screens/Magento/Reports/Bestsellers/MagentoBestsellersReportList.tsx";
+import MagentoLowStockReportList from "./screens/Magento/Reports/LowStock/MagentoLowStockReportList.tsx";
+import MagentoOrderedProductsReportList from "./screens/Magento/Reports/Ordered/MagentoOrderedProductsReportList.tsx";
+import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/MagentoDownloadsReportList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -350,7 +372,29 @@ export const router = createBrowserRouter([
           { path: "/MagentoBillingAgreementsList", element: <MagentoBillingAgreementsList /> },
           { path: "/MagentoTransactionList", element: <MagentoTransactionList /> },
           { path: "/BraintreeVirtualTerminal", element: <BraintreeVirtualTerminal /> },
-
+          //Reports
+          { path: "/MagentoProductsInCartsList", element: <MagentoProductsInCartsList /> },
+          { path: "/MagentoSearchTermsListForReports", element: <MagentoSearchTermsListForReports /> },
+          { path: "/MagentoAbandonedCartsList", element: <MagentoAbandonedCartsList /> },
+          { path: "/MagentoNewsletterProblemsReportList", element: <MagentoNewsletterProblemsReportList /> },
+          { path: "/MagentoCustomerReviewsReportList", element: <MagentoCustomerReviewsReportList /> },
+          { path: "/MagentoProductReviewsReportList", element: <MagentoProductReviewsReportList /> },
+          { path: "/MagentoOrderUpdatedReportList", element: <MagentoOrderUpdatedReportList /> },
+          { path: "/MagentoTaxReportList", element: <MagentoTaxReportList /> },
+          { path: "/MagentoInvoiceReportList", element: <MagentoInvoiceReportList /> },
+          { path: "/MagentoShippingReportList", element: <MagentoShippingReportList /> },
+          { path: "/MagentoRefundsReportList", element: <MagentoRefundsReportList /> },
+          { path: "/MagentoCouponsReportList", element: <MagentoCouponsReportList /> },
+          { path: "/MagentoPayPalSettlementReportList", element: <MagentoPayPalSettlementReportList /> },
+          { path: "/MagentoBraintreeSettlementReportList", element: <MagentoBraintreeSettlementReportList /> },
+          { path: "/MagentoOrderTotalReportList", element: <MagentoOrderTotalReportList /> },
+          { path: "/MagentoOrderCountReportList", element: <MagentoOrderCountReportList /> },
+          { path: "/MagentoNewAccountsReportList", element: <MagentoNewAccountsReportList /> },
+          { path: "/MagentoProductViewsReportList", element: <MagentoProductViewsReportList /> },
+          { path: "/MagentoBestsellersReportList", element: <MagentoBestsellersReportList /> },
+          { path: "/MagentoLowStockReportList", element: <MagentoLowStockReportList /> },
+          { path: "/MagentoOrderedProductsReportList", element: <MagentoOrderedProductsReportList /> },
+          { path: "/MagentoDownloadsReportList", element: <MagentoDownloadsReportList /> },
         ]
       },
     ]
