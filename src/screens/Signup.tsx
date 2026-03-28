@@ -140,12 +140,15 @@ import { FaLock, FaUser, FaArrowRight } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { useRegisterAdminMutation } from "../app/api/AuthSlices/AuthSlices";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Signup = () => {
     const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [success, setSuccess] = useState(false);
     const navigate = useNavigate();
@@ -306,33 +309,66 @@ const Signup = () => {
                         </div>
                     </div>
 
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-semibold text-gray-600">Refreal Code</label>
+                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                            <FaUser className="text-gray-400 text-sm flex-shrink-0" />
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Optional"
+                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                            />
+                        </div>
+                    </div>
+
+
                     {/* Password */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-sm font-semibold text-gray-600">Password</label>
+
                         <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
                             <FaLock className="text-gray-400 text-sm flex-shrink-0" />
+
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Enter your password"
                                 className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
                             />
+
+                            <span
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="cursor-pointer text-gray-500"
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
                         </div>
                     </div>
 
                     {/* Confirm Password */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-sm font-semibold text-gray-600">Confirm Password</label>
+
                         <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
                             <FaLock className="text-gray-400 text-sm flex-shrink-0" />
+
                             <input
-                                type="password"
+                                type={showConfirmPassword ? "text" : "password"}
                                 value={passwordConfirmation}
                                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                                 placeholder="Re-enter your password"
                                 className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
                             />
+
+                            <span
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="cursor-pointer text-gray-500"
+                            >
+                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
                         </div>
                     </div>
 

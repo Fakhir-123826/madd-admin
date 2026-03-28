@@ -189,7 +189,7 @@ const menuItems: MenuItem[] = [
             label: "Elements",
             icon: FaStore,
             children: [
-              { label: "Pages", path: "/SubscriptionList10" },
+              { label: "Pages", path: "/pageBuilder" },
               { label: "Blogs", path: "/SubscriptionList10" },
               { label: "Widgets", path: "/SubscriptionList10" },
               { label: "Templates", path: "/SubscriptionList10" },

@@ -109,13 +109,15 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginAdminMutation } from "../app/api/AuthSlices/AuthSlices";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 const Login = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loginAdmin, { isLoading, error }] = useLoginAdminMutation();
-const navigate = useNavigate()
+    const navigate = useNavigate()
     const handleLogin = async () => {
         try {
             const result = await loginAdmin({ email, password }).unwrap();
@@ -214,21 +216,31 @@ const navigate = useNavigate()
                     {/* Password */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-sm font-semibold text-gray-600">Password</label>
+
                         <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
                             <FaLock className="text-gray-400 text-sm flex-shrink-0" />
+
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Enter your password"
                                 className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
                             />
+
+                            {/* Eye Icon */}
+                            <span
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="cursor-pointer text-gray-500"
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
                         </div>
                     </div>
 
                     {/* Forgot Password */}
                     <div className="text-right -mt-3">
-                        <Link to="" className="text-sm font-medium text-blue-500 hover:text-blue-600 hover:underline transition-colors">
+                        <Link to="/ForgotPassword" className="text-sm font-medium text-blue-500 hover:text-blue-600 hover:underline transition-colors">
                             Forgot Password?
                         </Link>
                     </div>

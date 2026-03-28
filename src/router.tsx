@@ -171,6 +171,7 @@ import MagentoBestsellersReportList from "./screens/Magento/Reports/Bestsellers/
 import MagentoLowStockReportList from "./screens/Magento/Reports/LowStock/MagentoLowStockReportList.tsx";
 import MagentoOrderedProductsReportList from "./screens/Magento/Reports/Ordered/MagentoOrderedProductsReportList.tsx";
 import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/MagentoDownloadsReportList.tsx";
+import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -399,11 +400,12 @@ export const router = createBrowserRouter([
       },
     ]
   },
+  {path:"/pageBuilder" , element: <PageBuilderScreen/>},
 
   { path: "*", element: <NotFound /> },
   { path: "/login", element: <Login /> },
   { path: "/otp", element: <EnterOTP /> },
-  { path: "/pass", element: <ForgotPassword /> },
+  { path: "/ForgotPassword", element: <ForgotPassword /> },
   { path: "/ddd", element: <Dashboard /> },
   { path: "/signup", element: <Signup /> },
 ])
