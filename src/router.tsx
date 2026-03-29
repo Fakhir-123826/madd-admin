@@ -172,6 +172,7 @@ import MagentoLowStockReportList from "./screens/Magento/Reports/LowStock/Magent
 import MagentoOrderedProductsReportList from "./screens/Magento/Reports/Ordered/MagentoOrderedProductsReportList.tsx";
 import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/MagentoDownloadsReportList.tsx";
 import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
+import MagentoNotificationsList from "./screens/System/Notification/MagentoNotificationsList.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -289,7 +290,7 @@ export const router = createBrowserRouter([
 
       //Magento 
       {
-        element: <ProtectedRoute />,
+        // element: <ProtectedRoute />,
         children: [
           { path: "/MagentoOrders", element: <MagentoOrderList /> },
           { path: "/MogentoOrder/:id", element: <MogentoOrder /> },
@@ -396,6 +397,7 @@ export const router = createBrowserRouter([
           { path: "/MagentoLowStockReportList", element: <MagentoLowStockReportList /> },
           { path: "/MagentoOrderedProductsReportList", element: <MagentoOrderedProductsReportList /> },
           { path: "/MagentoDownloadsReportList", element: <MagentoDownloadsReportList /> },
+          { path: "/MagentoNotificationsList", element: <MagentoNotificationsList /> },
         ]
       },
     ]

@@ -24,6 +24,8 @@ import {
   FaMagento,
   FaChevronDown,
   FaChevronRight,
+  FaBell,
+  FaSearch,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
@@ -259,11 +261,11 @@ const menuItems: MenuItem[] = [
           {
             label: "Products",
             children: [
-              { 
-                label: "Views", 
-                path: "/MagentoProductViewsReportList" ,
+              {
+                label: "Views",
+                path: "/MagentoProductViewsReportList",
                 // matchPaths: ["/MagentoSearchSynonymsList", "/AddMagentoSearchSynonym", "/AddMagentoSearchSynonym/:id"]
-              
+
               },
               { label: "Bestsellers", path: "/MagentoBestsellersReportList" },
               { label: "Low Stock", path: "/MagentoLowStockReportList" },
@@ -355,6 +357,45 @@ const menuItems: MenuItem[] = [
                 matchPaths: ["/MagentoProductRatingsList", "/AddMagentoRating"]
               },
             ],
+          },
+        ],
+      },
+      {
+        label: "System",
+        icon: FaStore,
+        children: [
+          {
+            label: "Other Settings",
+            icon: FaStore,
+            children: [
+              {
+                label: "Notification",
+                path: "/MagentoNotificationsList",
+                // matchPaths: ["/MagentoCatalogPriceRuleList", "/AddCatalogPriceRule", "/AddCatalogPriceRule/:id"]
+              },
+              {
+                label: "Cart Price Rules",
+                path: "/MagentoCartPriceRulesList",
+                // matchPaths: ["/MagentoCartPriceRulesList", "/AddCartPriceRule", "/AddCartPriceRule/:id"]
+              },
+            ],
+          },
+          {
+            label: "Categories",
+          icon: FaStore,
+            children: [
+              {
+                label: "Catalog Price Rule",
+                path: "/MagentoCatalogPriceRuleList",
+                // matchPaths: ["/MagentoCatalogPriceRuleList", "/AddCatalogPriceRule", "/AddCatalogPriceRule/:id"]
+              },
+              {
+                label: "Cart Price Rules",
+                path: "/MagentoCartPriceRulesList",
+                // matchPaths: ["/MagentoCartPriceRulesList", "/AddCartPriceRule", "/AddCartPriceRule/:id"]
+              },
+            ],
+
           },
         ],
       },
@@ -532,27 +573,27 @@ const RecursiveMenuItem = ({
 
   const isExact = item.path === currentPath;
 
-const isActive =
-  isExact ||
-  (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) ||
-  isDescendantActive(item, currentPath);
+  const isActive =
+    isExact ||
+    (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) ||
+    isDescendantActive(item, currentPath);
 
 
-  
-// const isActive =
-//   (item.path && currentPath.startsWith(item.path)) ||
-//   (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) ||
-//   isDescendantActive(item, currentPath);
+
+  // const isActive =
+  //   (item.path && currentPath.startsWith(item.path)) ||
+  //   (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) ||
+  //   isDescendantActive(item, currentPath);
 
   // Indent based on depth
   // const paddingLeft = depth === 0 ? "px-6" : `pl-${4 + depth * 4} pr-4`;
   const paddingLeft = depth === 0
-  ? "px-6"
-  : depth === 1
-    ? "pl-8 pr-4"
-    : depth === 2
-      ? "pl-12 pr-4"
-      : "pl-16 pr-4";
+    ? "px-6"
+    : depth === 1
+      ? "pl-8 pr-4"
+      : depth === 2
+        ? "pl-12 pr-4"
+        : "pl-16 pr-4";
 
   const content = (
     <div
@@ -632,7 +673,10 @@ const Layout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
   // Admin info localStorage se
   const adminRaw = localStorage.getItem("admin");
   const admin = adminRaw ? JSON.parse(adminRaw) : null;
@@ -666,6 +710,22 @@ const Layout = () => {
     setOpenMenus(autoOpen);
   }, [location.pathname]);
 
+  // Add this useEffect inside your Layout component
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && showSearch) {
+        setShowSearch(false);
+        setSearchQuery("");        // optional: clear search when closing
+      }
+    };
+
+    window.addEventListener("keydown", handleEsc);
+
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [showSearch]);
+
   const toggleMenu = (key: string) => {
     setOpenMenus(prev =>
       prev.includes(key)
@@ -689,19 +749,19 @@ const Layout = () => {
   //   return findActive(menuItems);
   // };
 
-const getActiveLabel = (): string => {
-  const findActive = (items: MenuItem[]): string | null => {
-    for (const item of items) {
-      const isExact = item.path === location.pathname;
-      const isMatchPath = item.matchPaths?.some(p => location.pathname.startsWith(p));
-      const hasActiveChild = item.children?.some(child => findActive([child]));
+  const getActiveLabel = (): string => {
+    const findActive = (items: MenuItem[]): string | null => {
+      for (const item of items) {
+        const isExact = item.path === location.pathname;
+        const isMatchPath = item.matchPaths?.some(p => location.pathname.startsWith(p));
+        const hasActiveChild = item.children?.some(child => findActive([child]));
 
-      if (isExact || isMatchPath || hasActiveChild) return item.label;
-    }
-    return null;
+        if (isExact || isMatchPath || hasActiveChild) return item.label;
+      }
+      return null;
+    };
+    return findActive(menuItems) || "Dashboard";
   };
-  return findActive(menuItems) || "Dashboard";
-};
 
   // Active parent label for top bar
   const getActiveParentLabel = (): string => {
@@ -763,9 +823,54 @@ const getActiveLabel = (): string => {
             <span className="font-medium">{getActiveParentLabel()}</span>
           </div>
           <div className="flex items-center gap-4">
-            <button className="px-4 py-1 rounded-lg bg-green-500 text-white text-sm">
+            {/* <button className="px-4 py-1 rounded-lg bg-green-500 text-white text-sm">
               Yearly
-            </button>
+            </button> */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSearch(!showSearch)}
+                className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                title="Search"
+              >
+                <FaSearch className="text-xl text-gray-600" />
+              </button>
+
+              {/* Search Input - Slides in */}
+              {showSearch && (
+                <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-50">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search orders, products, customers..."
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:border-teal-500 text-sm"
+                      autoFocus
+                    />
+                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 px-2">
+                    Press ESC to close
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Notification Bell */}
+            <div className="relative cursor-pointer group">
+              <button className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative">
+                <FaBell className="text-xl text-gray-600" />
+                {/* Notification Dot */}
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+              </button>
+              {/* Optional Tooltip */}
+              <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded right-0 -bottom-8 whitespace-nowrap">
+                Notifications
+              </div>
+            </div>
+
+
+
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
