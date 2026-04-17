@@ -1,21 +1,17 @@
 import { useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import { useGetProductsQuery, type MagentoProduct } from "../../../app/api/MagentoSlices/ProductSlice";
-import { useGetStockQuery } from "../../../app/api/MagentoSlices/InventoryApi";
 import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import StoreViewDropdown from "../../../component/StoreViewDropdown";
 import type { StoreViewSelection } from "../../../model/MagentoProduct/StoreViewSelection";
 
-// ============ SINGLE ROW — ek SKU ka stock fetch karta hai ============
+// ============ SINGLE ROW ============
 function InventoryRow({ product, tdBase }: { product: MagentoProduct; tdBase: string }) {
-    const { data: stockRes, isLoading } = useGetStockQuery(product.sku);
-    const stock = stockRes?.data;
     const navigate = useNavigate();
 
     const qtyColor = () => {
-        if (isLoading) return "text-gray-400";
-        const qty = stock?.qty ?? 0;
+        const qty = product?.quantity ?? 0;
         if (qty === 0) return "text-red-500 font-bold";
         if (qty < 10) return "text-orange-500 font-semibold";
         return "text-green-600 font-semibold";
@@ -23,28 +19,18 @@ function InventoryRow({ product, tdBase }: { product: MagentoProduct; tdBase: st
 
     return (
         <tr className="bg-white shadow-sm hover:shadow-md transition-shadow">
-            <td className={`${tdBase} font-medium text-black`}>#{product.id}</td>
-            <td className={tdBase}>{product.sku}</td>
+            <td className={`${tdBase} font-medium text-black`}>#{product.id?.slice(0, 8)}</td>
+            <td className={tdBase}>{product.magento_sku || product.sku}</td>
             <td className={tdBase}>{product.name}</td>
-            <td className={tdBase}>{product.type_id}</td>
+            <td className={tdBase}>{product.type_id || "simple"}</td>
             <td className={`${tdBase} font-semibold`}>
-                ${Number(product.price ?? 0).toFixed(2)}
+                {product.formatted_price || `$${product.price}`}
             </td>
-
-            {/* QTY */}
             <td className={`${tdBase} ${qtyColor()}`}>
-                {isLoading ? (
-                    <span className="text-gray-400 text-xs">Loading...</span>
-                ) : (
-                    stock?.qty ?? "—"
-                )}
+                {product?.quantity ?? "—"}
             </td>
-
-            {/* In Stock */}
             <td className={tdBase}>
-                {isLoading ? (
-                    <span className="text-gray-400 text-xs">...</span>
-                ) : stock?.is_in_stock ? (
+                {product?.is_in_stock ? (
                     <span className="px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-600">
                         In Stock
                     </span>
@@ -54,26 +40,17 @@ function InventoryRow({ product, tdBase }: { product: MagentoProduct; tdBase: st
                     </span>
                 )}
             </td>
-
-            {/* Min Qty */}
-            <td className={tdBase}>{isLoading ? "..." : stock?.min_qty ?? "—"}</td>
-
-            {/* Max Sale Qty */}
-            <td className={tdBase}>{isLoading ? "..." : stock?.max_sale_qty ?? "—"}</td>
-
-            {/* Manage Stock */}
+            <td className={tdBase}>{product?.min_qty ?? "—"}</td>
+            <td className={tdBase}>{product?.max_sale_qty ?? "—"}</td>
             <td className={tdBase}>
-                {isLoading ? "..." : stock?.manage_stock ? (
-                    <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs">Yes</span>
-                ) : (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-md text-xs">No</span>
-                )}
+                <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs">
+                    {product?.manage_stock ? "Yes" : "N/A"}
+                </span>
             </td>
             <td className="relative p-4">
                 <button
-                    onClick={() => navigate(`/UpdateMagentoInventory/${product.sku}/${stock?.item_id}`)}
-                    disabled={isLoading || !stock?.item_id}
-                    className="text-gray-400 hover:text-teal-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    onClick={() => navigate(`/UpdateMagentoInventory/${product.magento_sku || product.sku}/${product.id}`)}
+                    className="text-gray-400 hover:text-teal-500 transition-colors"
                     title="Edit Stock"
                 >
                     <Eye size={18} />
@@ -91,14 +68,23 @@ function MagentoInventoryList() {
     const itemsPerPage = 10;
     const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
 
-    const { data, isLoading, error } = useGetProductsQuery({
-        filters: skuSearch ? { sku: skuSearch } : {},
-        page: currentPage,
-        pageSize: itemsPerPage,
-    });
+    const { data, isLoading, error } = useGetProductsQuery();
 
-    const products: MagentoProduct[] = data?.items || [];
-    const totalPages = Math.ceil((data?.total_count || 0) / itemsPerPage);
+    const allProducts: MagentoProduct[] = data?.data || [];
+    
+    // Filter products by SKU search
+    const filteredProducts = skuSearch 
+        ? allProducts.filter(product => 
+            (product.magento_sku || product.sku)?.toLowerCase().includes(skuSearch.toLowerCase())
+          )
+        : allProducts;
+    
+    // Pagination
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const currentProducts = filteredProducts.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     const tdBase =
         "relative p-4 text-gray-600 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-gradient-to-r after:from-teal-400 after:to-green-400";
@@ -152,26 +138,29 @@ function MagentoInventoryList() {
                     <tbody>
                         {isLoading ? (
                             <tr>
-                                <td colSpan={10} className="text-center py-6 text-gray-400">
-                                    Loading products...
+                                <td colSpan={11} className="text-center py-10">
+                                    <div className="flex items-center justify-center gap-3">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500"></div>
+                                        <span className="text-gray-500">Loading products...</span>
+                                    </div>
                                 </td>
                             </tr>
                         ) : error ? (
                             <tr>
-                                <td colSpan={10} className="text-center py-6 text-red-500">
-                                    Error loading inventory
+                                <td colSpan={11} className="text-center py-10 text-red-500">
+                                    Error loading inventory. Please try again.
                                 </td>
                             </tr>
-                        ) : products.length === 0 ? (
+                        ) : currentProducts.length === 0 ? (
                             <tr>
-                                <td colSpan={10} className="text-center py-10 text-gray-500">
+                                <td colSpan={11} className="text-center py-10 text-gray-500">
                                     No products found
                                 </td>
                             </tr>
                         ) : (
-                            products.map((product) => (
+                            currentProducts.map((product) => (
                                 <InventoryRow
-                                    key={product.sku}
+                                    key={product.magento_sku || product.sku || product.id}
                                     product={product}
                                     tdBase={tdBase}
                                 />
@@ -182,20 +171,38 @@ function MagentoInventoryList() {
             </div>
 
             {/* PAGINATION */}
-            <div className="flex justify-center gap-2 py-6">
-                {[...Array(totalPages)].map((_, i) => (
+            {totalPages > 1 && !isLoading && (
+                <div className="flex justify-center gap-2 py-6">
                     <button
-                        key={i}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`px-3 py-1 rounded ${currentPage === i + 1
-                            ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-                            : "bg-gray-100"
-                            }`}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 rounded bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors"
                     >
-                        {i + 1}
+                        Previous
                     </button>
-                ))}
-            </div>
+                    
+                    {[...Array(totalPages)].map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setCurrentPage(i + 1)}
+                            className={`px-3 py-1 rounded transition-all ${currentPage === i + 1
+                                ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
+                                : "bg-gray-100 hover:bg-gray-200"
+                                }`}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                    
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1 rounded bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

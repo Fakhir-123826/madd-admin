@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
@@ -9,18 +9,20 @@ import {
 } from "react-icons/fa";
 import StoreViewDropdown from "../../../../component/StoreViewDropdown";
 import type { StoreViewSelection } from "../../../../model/MagentoProduct/StoreViewSelection";
+// import { useGetOrdersQuery } from "../orderApi"; // Adjust path as needed
+// import type { MagentoOrder, OrderFilters } from "./orderApi"; // Adjust path as needed
 
 function MagentoOrderList() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showColumns, setShowColumns] = useState(false);
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [perPage, setPerPage] = useState(20);
   const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
   const [exportType, setExportType] = useState<"csv" | "excel">("csv");
   const [showExport, setShowExport] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Column Visibility State
   const [visibleColumns, setVisibleColumns] = useState({
@@ -50,841 +52,54 @@ function MagentoOrderList() {
   });
 
   // Filter States
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<OrderFilters>({
     purchaseDateFrom: "",
     purchaseDateTo: "",
     grandTotalBaseFrom: "",
     grandTotalBaseTo: "",
     grandTotalPurchasedFrom: "",
     grandTotalPurchasedTo: "",
-    subtotalFrom: "",
-    subtotalTo: "",
-    shippingHandlingFrom: "",
-    shippingHandlingTo: "",
-    totalRefundedFrom: "",
-    totalRefundedTo: "",
     billToName: "",
     shipToName: "",
-    customerName: "",
     status: "",
     customerEmail: "",
-    customerGroup: "",
-    paymentMethod: "",
-    pickupLocationCode: "",
-    braintreeSource: "",
-    billingAddress: "",
-    shippingAddress: "",
-    shippingInformation: "",
     disputeState: "",
     purchasePoint: "",
     id: "",
   });
 
-  // Dummy Data
-  const dummyData = {
-    items: [
-      {
-        id: "000000002",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-24",
-        bill_to_name: "Veronica Costello",
-        ship_to_name: "Veronica Costello",
-        grand_total_base: 39.64,
-        grand_total_purchased: 39.64,
-        status: "Closed",
-        billing_address: "6140 Honey Bluff, Michigan",
-        shipping_address: "6140 Honey Bluff, Michigan",
-        shipping_information: "Flat Rate - Fixed",
-        customer_email: "roni_costello@example.com",
-        customer_group: "General",
-        subtotal: 32.00,
-        shipping_and_handling: 5.00,
-        customer_name: "Veronica Costello",
-        payment_method: "Check / Money order",
-        total_refunded: 39.64,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000001",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-24",
-        bill_to_name: "Veronica Costello",
-        ship_to_name: "Veronica Costello",
-        grand_total_base: 36.39,
-        grand_total_purchased: 36.39,
-        status: "Processing",
-        billing_address: "6140 Honey Bluff, Michigan",
-        shipping_address: "6140 Honey Bluff, Michigan",
-        shipping_information: "Flat Rate - Fixed",
-        customer_email: "roni_costello@example.com",
-        customer_group: "General",
-        subtotal: 29.00,
-        shipping_and_handling: 5.00,
-        customer_name: "Veronica Costello",
-        payment_method: "Check / Money order",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000002",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-24",
-        bill_to_name: "Veronica Costello",
-        ship_to_name: "Veronica Costello",
-        grand_total_base: 39.64,
-        grand_total_purchased: 39.64,
-        status: "Closed",
-        billing_address: "6140 Honey Bluff, Michigan",
-        shipping_address: "6140 Honey Bluff, Michigan",
-        shipping_information: "Flat Rate - Fixed",
-        customer_email: "roni_costello@example.com",
-        customer_group: "General",
-        subtotal: 32.00,
-        shipping_and_handling: 5.00,
-        customer_name: "Veronica Costello",
-        payment_method: "Check / Money order",
-        total_refunded: 39.64,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000001",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-24",
-        bill_to_name: "Veronica Costello",
-        ship_to_name: "Veronica Costello",
-        grand_total_base: 36.39,
-        grand_total_purchased: 36.39,
-        status: "Processing",
-        billing_address: "6140 Honey Bluff, Michigan",
-        shipping_address: "6140 Honey Bluff, Michigan",
-        shipping_information: "Flat Rate - Fixed",
-        customer_email: "roni_costello@example.com",
-        customer_group: "General",
-        subtotal: 29.00,
-        shipping_and_handling: 5.00,
-        customer_name: "Veronica Costello",
-        payment_method: "Check / Money order",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-      {
-        id: "000000003",
-        purchase_point: "Main Website Store",
-        purchase_date: "2026-02-25",
-        bill_to_name: "John Smith",
-        ship_to_name: "John Smith",
-        grand_total_base: 125.50,
-        grand_total_purchased: 125.50,
-        status: "Closed",
-        billing_address: "123 Main St, New York",
-        shipping_address: "123 Main St, New York",
-        shipping_information: "Free Shipping",
-        customer_email: "john.smith@example.com",
-        customer_group: "VIP",
-        subtotal: 110.00,
-        shipping_and_handling: 15.50,
-        customer_name: "John Smith",
-        payment_method: "Credit Card",
-        total_refunded: 0.00,
-        allocated_sources: "Default Source",
-        pickup_location_code: "",
-        braintree_transaction_source: "Default Source",
-        dispute_state: "",
-      },
-    ],
-    total_count: 23,
-  };
+  // Fetch orders from API
+  const { data: ordersData, isLoading, error, refetch } = useGetOrdersQuery({
+    filters: filters,
+    page: currentPage,
+    pageSize: perPage,
+  });
 
-  const orders = dummyData.items || [];
+  const orders = ordersData?.items || [];
+  const totalCount = ordersData?.total_count || 0;
+  const totalPages = Math.ceil(totalCount / perPage);
 
-  // Real-time Filtering
+  // Real-time Search Filtering (client-side on fetched data)
   const filteredOrders = useMemo(() => {
-    return orders.filter((order: any) => {
-      const matchSearch =
-        order.id.toLowerCase().includes(search.toLowerCase()) ||
-        order.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-        order.customer_email.toLowerCase().includes(search.toLowerCase());
-
-      const matchPurchaseDateFrom = !filters.purchaseDateFrom || order.purchase_date >= filters.purchaseDateFrom;
-      const matchPurchaseDateTo = !filters.purchaseDateTo || order.purchase_date <= filters.purchaseDateTo;
-
-      const matchGrandTotalBaseFrom = !filters.grandTotalBaseFrom || order.grand_total_base >= parseFloat(filters.grandTotalBaseFrom || "0");
-      const matchGrandTotalBaseTo = !filters.grandTotalBaseTo || order.grand_total_base <= parseFloat(filters.grandTotalBaseTo || "999999");
-
-      const matchStatus = !filters.status || order.status === filters.status;
-      const matchCustomerGroup = !filters.customerGroup || order.customer_group === filters.customerGroup;
-
-      return matchSearch &&
-        matchPurchaseDateFrom &&
-        matchPurchaseDateTo &&
-        matchGrandTotalBaseFrom &&
-        matchGrandTotalBaseTo &&
-        matchStatus &&
-        matchCustomerGroup;
+    if (!search.trim()) return orders;
+    
+    return orders.filter((order: MagentoOrder) => {
+      const searchLower = search.toLowerCase();
+      return (
+        order.increment_id?.toLowerCase().includes(searchLower) ||
+        order.customer_firstname?.toLowerCase().includes(searchLower) ||
+        order.customer_lastname?.toLowerCase().includes(searchLower) ||
+        order.customer_email?.toLowerCase().includes(searchLower)
+      );
     });
-  }, [orders, search, filters]);
+  }, [orders, search]);
 
-  const toggleSelect = (id: number) => {
+  // Reset to page 1 when filters or perPage changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, perPage]);
+
+  const toggleSelect = (id: string) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     );
@@ -892,36 +107,36 @@ function MagentoOrderList() {
 
   const toggleAll = () => {
     setSelected(
-      selected.length === filteredOrders.length ? [] : filteredOrders.map((i: any) => i.id)
+      selected.length === filteredOrders.length ? [] : filteredOrders.map((order) => order.increment_id)
     );
   };
 
   const thClass = "px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider whitespace-nowrap";
   const tdClass = "px-6 py-4 text-sm text-gray-600 whitespace-nowrap";
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key: keyof OrderFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const resetFilters = () => {
     setFilters({
-      purchaseDateFrom: "", purchaseDateTo: "",
-      grandTotalBaseFrom: "", grandTotalBaseTo: "",
-      grandTotalPurchasedFrom: "", grandTotalPurchasedTo: "",
-      subtotalFrom: "", subtotalTo: "",
-      shippingHandlingFrom: "", shippingHandlingTo: "",
-      totalRefundedFrom: "", totalRefundedTo: "",
-      billToName: "", shipToName: "", customerName: "",
-      status: "", customerEmail: "", customerGroup: "",
-      paymentMethod: "", pickupLocationCode: "",
-      braintreeSource: "", billingAddress: "",
-      shippingAddress: "", shippingInformation: "",
-      disputeState: "", purchasePoint: "", id: "",
+      purchaseDateFrom: "",
+      purchaseDateTo: "",
+      grandTotalBaseFrom: "",
+      grandTotalBaseTo: "",
+      grandTotalPurchasedFrom: "",
+      grandTotalPurchasedTo: "",
+      billToName: "",
+      shipToName: "",
+      status: "",
+      customerEmail: "",
+      disputeState: "",
+      purchasePoint: "",
+      id: "",
     });
     setShowFilters(false);
   };
 
-  // Toggle Column Visibility
   const toggleColumn = (key: string) => {
     setVisibleColumns((prev) => ({
       ...prev,
@@ -942,27 +157,27 @@ function MagentoOrderList() {
       ];
 
       const csvRows = dataToExport.map(order => [
-        order.id,
-        order.purchase_point,
-        order.purchase_date,
-        `"${order.bill_to_name}"`,
-        `"${order.ship_to_name}"`,
-        order.grand_total_base,
-        order.grand_total_purchased,
+        order.increment_id,
+        order.order_currency_code,
+        order.created_at,
+        `"${order.customer_firstname} ${order.customer_lastname}"`,
+        `"${order.customer_firstname} ${order.customer_lastname}"`,
+        order.grand_total,
+        order.grand_total,
         order.status,
-        `"${order.billing_address}"`,
-        `"${order.shipping_address}"`,
-        `"${order.shipping_information}"`,
+        `"${order.billing_address?.street?.join(", ") || ""}, ${order.billing_address?.city || ""}, ${order.billing_address?.region || ""}"`,
+        `"${order.extension_attributes?.shipping_assignments?.[0]?.shipping?.address?.street?.join(", ") || ""}, ${order.extension_attributes?.shipping_assignments?.[0]?.shipping?.address?.city || ""}"`,
+        `"${order.extension_attributes?.shipping_assignments?.[0]?.shipping?.method || ""}"`,
         order.customer_email,
-        order.customer_group,
+        "General",
         order.subtotal,
-        order.shipping_and_handling,
-        `"${order.customer_name}"`,
-        `"${order.payment_method}"`,
-        order.total_refunded,
-        order.allocated_sources,
-        order.braintree_transaction_source,
-        order.dispute_state || ""
+        order.shipping_amount,
+        `"${order.customer_firstname} ${order.customer_lastname}"`,
+        `"${order.payment?.method || ""}"`,
+        order.grand_total - (order.total_refunded || 0),
+        order.extension_attributes?.shipping_assignments?.[0]?.shipping?.method || "",
+        order.payment?.method || "",
+        order.state || ""
       ].join(","));
 
       const csvContent = [headers.join(","), ...csvRows].join("\n");
@@ -972,8 +187,7 @@ function MagentoOrderList() {
       link.href = URL.createObjectURL(blob);
       link.download = `orders_${new Date().toISOString().slice(0, 10)}.csv`;
       link.click();
-    }
-    else if (exportType === "excel") {
+    } else if (exportType === "excel") {
       let xml = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet">
@@ -982,7 +196,7 @@ function MagentoOrderList() {
 
       // Headers
       xml += `<Row>`;
-      ["ID", "Purchase Point", "Purchase Date", "Bill-to Name", "Ship-to Name", "Grand Total (Base)", "Status", "Customer Email", "Customer Group", "Total Refunded"].forEach(header => {
+      ["ID", "Purchase Date", "Customer Name", "Status", "Grand Total", "Customer Email", "Payment Method"].forEach(header => {
         xml += `<Cell><Data ss:Type="String">${header}</Data></Cell>`;
       });
       xml += `</Row>`;
@@ -990,16 +204,13 @@ function MagentoOrderList() {
       // Data Rows
       dataToExport.forEach(order => {
         xml += `<Row>`;
-        xml += `<Cell><Data ss:Type="String">${order.id}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="String">${order.purchase_point}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="String">${order.purchase_date}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="String">${order.bill_to_name}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="String">${order.ship_to_name}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="Number">${order.grand_total_base}</Data></Cell>`;
+        xml += `<Cell><Data ss:Type="String">${order.increment_id}</Data></Cell>`;
+        xml += `<Cell><Data ss:Type="String">${order.created_at}</Data></Cell>`;
+        xml += `<Cell><Data ss:Type="String">${order.customer_firstname} ${order.customer_lastname}</Data></Cell>`;
         xml += `<Cell><Data ss:Type="String">${order.status}</Data></Cell>`;
+        xml += `<Cell><Data ss:Type="Number">${order.grand_total}</Data></Cell>`;
         xml += `<Cell><Data ss:Type="String">${order.customer_email}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="String">${order.customer_group}</Data></Cell>`;
-        xml += `<Cell><Data ss:Type="Number">${order.total_refunded}</Data></Cell>`;
+        xml += `<Cell><Data ss:Type="String">${order.payment?.method || ""}</Data></Cell>`;
         xml += `</Row>`;
       });
 
@@ -1015,18 +226,31 @@ function MagentoOrderList() {
     setShowExport(false);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Add these new states for real pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 m-6">
+        <p className="text-red-600">Error loading orders. Please try again.</p>
+        <button 
+          onClick={() => refetch()} 
+          className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
-  // Calculate total pages
-  const totalPages = Math.ceil(filteredOrders.length / perPage);
-
-  // Paginated data (this is what you show in the table)
-  const paginatedOrders = useMemo(() => {
-    const start = (currentPage - 1) * perPage;
-    return filteredOrders.slice(start, start + perPage);
-  }, [filteredOrders, currentPage, perPage]);
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
 
@@ -1081,8 +305,6 @@ function MagentoOrderList() {
         </div>
       </div>
 
-
-      {/* ==================== EXPORT POPUP ==================== */}
       {/* EXPORT POPUP */}
       {showExport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -1127,7 +349,7 @@ function MagentoOrderList() {
         </div>
       )}
 
-      {/* ==================== COLUMNS POPUP ==================== */}
+      {/* COLUMNS POPUP */}
       {showColumns && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl w-[420px] p-6 max-h-[80vh] overflow-auto">
@@ -1136,7 +358,7 @@ function MagentoOrderList() {
               <button onClick={() => setShowColumns(false)} className="text-2xl text-gray-500 hover:text-black">✕</button>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">23 out of 23 visible</p>
+            <p className="text-sm text-gray-500 mb-4">{Object.values(visibleColumns).filter(v => v).length} out of {Object.keys(visibleColumns).length} visible</p>
 
             <div className="grid grid-cols-2 gap-3">
               {Object.keys(visibleColumns).map((key) => (
@@ -1224,33 +446,6 @@ function MagentoOrderList() {
               </div>
             </div>
 
-            {/* Subtotal */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Subtotal</label>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="text" placeholder="from" value={filters.subtotalFrom} onChange={(e) => handleFilterChange("subtotalFrom", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-                <input type="text" placeholder="to" value={filters.subtotalTo} onChange={(e) => handleFilterChange("subtotalTo", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-              </div>
-            </div>
-
-            {/* Shipping and Handling */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Shipping and Handling</label>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="text" placeholder="from" value={filters.shippingHandlingFrom} onChange={(e) => handleFilterChange("shippingHandlingFrom", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-                <input type="text" placeholder="to" value={filters.shippingHandlingTo} onChange={(e) => handleFilterChange("shippingHandlingTo", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-              </div>
-            </div>
-
-            {/* Total Refunded */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Total Refunded</label>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="text" placeholder="from" value={filters.totalRefundedFrom} onChange={(e) => handleFilterChange("totalRefundedFrom", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-                <input type="text" placeholder="to" value={filters.totalRefundedTo} onChange={(e) => handleFilterChange("totalRefundedTo", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-              </div>
-            </div>
-
             {/* Bill-to Name */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-2">Bill-to Name</label>
@@ -1263,19 +458,15 @@ function MagentoOrderList() {
               <input type="text" value={filters.shipToName} onChange={(e) => handleFilterChange("shipToName", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
             </div>
 
-            {/* Customer Name */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Customer Name</label>
-              <input type="text" value={filters.customerName} onChange={(e) => handleFilterChange("customerName", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
             {/* Status */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-2">Status</label>
               <select value={filters.status} onChange={(e) => handleFilterChange("status", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full">
                 <option value="">All Status</option>
-                <option value="Closed">Closed</option>
-                <option value="Processing">Processing</option>
+                <option value="closed">Closed</option>
+                <option value="processing">Processing</option>
+                <option value="pending">Pending</option>
+                <option value="complete">Complete</option>
               </select>
             </div>
 
@@ -1283,54 +474,6 @@ function MagentoOrderList() {
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-2">Customer Email</label>
               <input type="text" value={filters.customerEmail} onChange={(e) => handleFilterChange("customerEmail", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Customer Group */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Customer Group</label>
-              <select value={filters.customerGroup} onChange={(e) => handleFilterChange("customerGroup", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full">
-                <option value="">All Groups</option>
-                <option value="General">General</option>
-              </select>
-            </div>
-
-            {/* Payment Method */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Payment Method</label>
-              <select value={filters.paymentMethod} onChange={(e) => handleFilterChange("paymentMethod", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full">
-                <option value="">All Methods</option>
-                <option value="Check / Money order">Check / Money order</option>
-              </select>
-            </div>
-
-            {/* Pickup Location Code */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Pickup Location Code</label>
-              <input type="text" value={filters.pickupLocationCode} onChange={(e) => handleFilterChange("pickupLocationCode", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Braintree Transaction Source */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Braintree Transaction Source</label>
-              <input type="text" value={filters.braintreeSource} onChange={(e) => handleFilterChange("braintreeSource", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Billing Address */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Billing Address</label>
-              <input type="text" value={filters.billingAddress} onChange={(e) => handleFilterChange("billingAddress", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Shipping Address */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Shipping Address</label>
-              <input type="text" value={filters.shippingAddress} onChange={(e) => handleFilterChange("shippingAddress", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Shipping Information */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Shipping Information</label>
-              <input type="text" value={filters.shippingInformation} onChange={(e) => handleFilterChange("shippingInformation", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
             </div>
 
             {/* Dispute State */}
@@ -1375,11 +518,8 @@ function MagentoOrderList() {
       )}
 
       {/* Action Bar */}
-      {/* Action Bar - Clean & Professional */}
-      {/* Action Bar with Real Pagination */}
       <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
         <div className="flex items-center gap-4">
-          {/* Actions Dropdown */}
           <div className="relative group">
             <select
               className="px-4 py-2.5 border border-gray-300 rounded-2xl text-sm bg-white appearance-none pr-8 cursor-pointer focus:outline-none focus:border-teal-500 hover:border-gray-400 transition-all"
@@ -1387,7 +527,6 @@ function MagentoOrderList() {
                 const value = e.target.value;
                 if (value && value !== "Actions") {
                   alert(`Action: ${value} applied to ${selected.length || filteredOrders.length} selected records`);
-                  // TODO: Connect real bulk actions here
                   e.target.value = "Actions";
                 }
               }}
@@ -1406,13 +545,11 @@ function MagentoOrderList() {
           </div>
 
           <span className="text-sm text-gray-600 font-medium">
-            {filteredOrders.length} records found
+            {totalCount} records found
           </span>
         </div>
 
-        {/* Real Pagination */}
         <div className="flex items-center gap-6">
-          {/* Per Page */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <select
               value={perPage}
@@ -1428,7 +565,6 @@ function MagentoOrderList() {
             <span>per page</span>
           </div>
 
-          {/* Pagination Controls */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -1492,38 +628,51 @@ function MagentoOrderList() {
                 </td>
               </tr>
             ) : (
-              paginatedOrders.map((order: any, idx: number) => (
-                <tr key={order.id} className={`border-b border-gray-100 hover:bg-teal-50/60 transition-all ${idx % 2 === 1 ? "bg-gray-50" : "bg-white"}`}>
+              filteredOrders.map((order: MagentoOrder, idx: number) => (
+                <tr key={order.entity_id} className={`border-b border-gray-100 hover:bg-teal-50/60 transition-all ${idx % 2 === 1 ? "bg-gray-50" : "bg-white"}`}>
                   <td className="px-6 py-4">
-                    <input type="checkbox" checked={selected.includes(order.id)} onChange={() => toggleSelect(order.id)} className="accent-teal-500" />
+                    <input type="checkbox" checked={selected.includes(order.increment_id)} onChange={() => toggleSelect(order.increment_id)} className="accent-teal-500" />
                   </td>
-                  {visibleColumns.id && <td className={`${tdClass} font-medium`}>{order.id}</td>}
-                  {visibleColumns.purchasePoint && <td className={tdClass}>{order.purchase_point}</td>}
-                  {visibleColumns.purchaseDate && <td className={tdClass}>{order.purchase_date}</td>}
-                  {visibleColumns.billToName && <td className={tdClass}>{order.bill_to_name}</td>}
-                  {visibleColumns.shipToName && <td className={tdClass}>{order.ship_to_name}</td>}
-                  {visibleColumns.grandTotalBase && <td className={tdClass}>${order.grand_total_base}</td>}
-                  {visibleColumns.grandTotalPurchased && <td className={tdClass}>${order.grand_total_purchased}</td>}
+                  {visibleColumns.id && <td className={`${tdClass} font-medium`}>{order.increment_id}</td>}
+                  {visibleColumns.purchasePoint && <td className={tdClass}>{order.order_currency_code}</td>}
+                  {visibleColumns.purchaseDate && <td className={tdClass}>{new Date(order.created_at).toLocaleDateString()}</td>}
+                  {visibleColumns.billToName && <td className={tdClass}>{order.customer_firstname} {order.customer_lastname}</td>}
+                  {visibleColumns.shipToName && <td className={tdClass}>{order.customer_firstname} {order.customer_lastname}</td>}
+                  {visibleColumns.grandTotalBase && <td className={tdClass}>${order.grand_total}</td>}
+                  {visibleColumns.grandTotalPurchased && <td className={tdClass}>${order.grand_total}</td>}
                   {visibleColumns.status && <td className={tdClass}>
-                    <span className={`px-3 py-1 text-xs rounded-full ${order.status === 'Closed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                    <span className={`px-3 py-1 text-xs rounded-full ${order.status === 'closed' ? 'bg-green-100 text-green-700' : order.status === 'processing' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
                       {order.status}
                     </span>
                   </td>}
-                  {visibleColumns.billingAddress && <td className={tdClass}>{order.billing_address}</td>}
-                  {visibleColumns.shippingAddress && <td className={tdClass}>{order.shipping_address}</td>}
-                  {visibleColumns.shippingInformation && <td className={tdClass}>{order.shipping_information}</td>}
+                  {visibleColumns.billingAddress && <td className={tdClass}>
+                    {order.billing_address?.street?.join(", ")} {order.billing_address?.city}
+                  </td>}
+                  {visibleColumns.shippingAddress && <td className={tdClass}>
+                    {order.extension_attributes?.shipping_assignments?.[0]?.shipping?.address?.street?.join(", ")} {order.extension_attributes?.shipping_assignments?.[0]?.shipping?.address?.city}
+                  </td>}
+                  {visibleColumns.shippingInformation && <td className={tdClass}>
+                    {order.extension_attributes?.shipping_assignments?.[0]?.shipping?.method || "-"}
+                  </td>}
                   {visibleColumns.customerEmail && <td className={tdClass}>{order.customer_email}</td>}
-                  {visibleColumns.customerGroup && <td className={tdClass}>{order.customer_group}</td>}
+                  {visibleColumns.customerGroup && <td className={tdClass}>General</td>}
                   {visibleColumns.subtotal && <td className={tdClass}>${order.subtotal}</td>}
-                  {visibleColumns.shippingAndHandling && <td className={tdClass}>${order.shipping_and_handling}</td>}
-                  {visibleColumns.customerName && <td className={tdClass}>{order.customer_name}</td>}
-                  {visibleColumns.paymentMethod && <td className={tdClass}>{order.payment_method}</td>}
-                  {visibleColumns.totalRefunded && <td className={tdClass}>${order.total_refunded}</td>}
-                  {visibleColumns.action && <td className="px-6 py-4 text-teal-600 hover:text-teal-700 cursor-pointer font-medium">View</td>}
-                  {visibleColumns.allocatedSources && <td className={tdClass}>{order.allocated_sources}</td>}
-                  {visibleColumns.pickupLocationCode && <td className={tdClass}>{order.pickup_location_code || "-"}</td>}
-                  {visibleColumns.braintreeSource && <td className={tdClass}>{order.braintree_transaction_source}</td>}
-                  {visibleColumns.disputeState && <td className={tdClass}>{order.dispute_state || "-"}</td>}
+                  {visibleColumns.shippingAndHandling && <td className={tdClass}>${order.shipping_amount}</td>}
+                  {visibleColumns.customerName && <td className={tdClass}>{order.customer_firstname} {order.customer_lastname}</td>}
+                  {visibleColumns.paymentMethod && <td className={tdClass}>{order.payment?.method || "-"}</td>}
+                  {visibleColumns.totalRefunded && <td className={tdClass}>$0</td>}
+                  {visibleColumns.action && (
+                    <td 
+                      onClick={() => navigate(`/orders/${order.entity_id}`)} 
+                      className="px-6 py-4 text-teal-600 hover:text-teal-700 cursor-pointer font-medium"
+                    >
+                      View
+                    </td>
+                  )}
+                  {visibleColumns.allocatedSources && <td className={tdClass}>Default Source</td>}
+                  {visibleColumns.pickupLocationCode && <td className={tdClass}>-</td>}
+                  {visibleColumns.braintreeSource && <td className={tdClass}>{order.payment?.method || "-"}</td>}
+                  {visibleColumns.disputeState && <td className={tdClass}>{order.state || "-"}</td>}
                 </tr>
               ))
             )}

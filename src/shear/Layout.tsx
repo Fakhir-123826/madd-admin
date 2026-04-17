@@ -28,7 +28,9 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useLogoutMutation } from "../app/api/AuthSlices/AuthSlices";
 
+import { router } from "../router";
 // ============ TYPES ============
 interface MenuItem {
   label: string;
@@ -382,7 +384,7 @@ const menuItems: MenuItem[] = [
           },
           {
             label: "Categories",
-          icon: FaStore,
+            icon: FaStore,
             children: [
               {
                 label: "Catalog Price Rule",
@@ -620,7 +622,7 @@ const RecursiveMenuItem = ({
 
         {/* Label */}
         {!collapsed && (
-          <span className="text-sm font-medium truncate max-w-[160px]">{item.label}</span>
+          <span className="text-sm font-medium truncate max-w-40">{item.label}</span>
         )}
       </div>
 
@@ -670,11 +672,20 @@ const RecursiveMenuItem = ({
 const Layout = () => {
 
   const location = useLocation();
+  // const navigate = useNavigate();        
   const [collapsed, setCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const handleLogout = async () => {
+    await logoutApi({});
+    navigate("/login");
+  };
+
   const navigate = useNavigate();
 
   // Admin info localStorage se
@@ -684,12 +695,7 @@ const Layout = () => {
     ? `${admin.firstname?.[0] ?? ""}${admin.lastname?.[0] ?? ""}`.toUpperCase()
     : "A";
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin");
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("token");
-    navigate("/login"); // ya jo bhi login route ho
-  };
+
   // Auto open parent menus based on current path
   useEffect(() => {
     const autoOpen: string[] = [];

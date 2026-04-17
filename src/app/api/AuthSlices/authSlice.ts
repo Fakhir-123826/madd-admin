@@ -3,27 +3,36 @@ import { createSlice } from "@reduxjs/toolkit";
 const authSlice = createSlice({
     name: "auth",
     initialState: {
-        token: localStorage.getItem("admin_token") || null,
-        admin: localStorage.getItem("admin")
-            ? JSON.parse(localStorage.getItem("admin")!)
+        token: localStorage.getItem("token") || null,
+        refreshToken: localStorage.getItem("refresh_token") || null,
+        user: localStorage.getItem("user")
+            ? JSON.parse(localStorage.getItem("user")!)
             : null,
-        isAuthenticated: !!localStorage.getItem("admin_token"),
+        isAuthenticated: !!localStorage.getItem("token"),
     },
     reducers: {
         setCredentials: (state, action) => {
-            state.token = action.payload.token;
-            state.admin = action.payload.admin;
+            const { token, refresh_token, user } = action.payload;
+            state.token = token;
+            state.refreshToken = refresh_token;
+            state.user = user;
             state.isAuthenticated = true;
-            // ✅ ye missing tha!
-            localStorage.setItem("admin_token", action.payload.token);
-            localStorage.setItem("admin", JSON.stringify(action.payload.admin));
+
+            // ✅ localStorage saved 
+            localStorage.setItem("token", token);
+            localStorage.setItem("refresh_token", refresh_token);
+            localStorage.setItem("user", JSON.stringify(user));
         },
         logout: (state) => {
             state.token = null;
-            state.admin = null;
+            state.refreshToken = null;
+            state.user = null;
             state.isAuthenticated = false;
-            localStorage.removeItem("admin_token");
-            localStorage.removeItem("admin");
+
+            // ✅ localStorage clear karo
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("user");
         },
     },
 });

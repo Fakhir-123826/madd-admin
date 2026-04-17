@@ -99,39 +99,88 @@
 //         </div>
 //     )
 // }
-
-// export default Login
-
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaLock, FaUser, FaArrowRight } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
-import { useLoginAdminMutation } from "../app/api/AuthSlices/AuthSlices";
+import { useLoginAdminMutation, useMeQuery } from "../app/api/AuthSlices/AuthSlices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { ROUTES } from "../router";
 
 const Login = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [loginAdmin, { isLoading, error }] = useLoginAdminMutation();
-    const navigate = useNavigate()
+    const [loginAdmin, { isLoading: loginLoading, error: loginError }] = useLoginAdminMutation();
+    const navigate = useNavigate();
+
+    // Check if user is already logged in (route is now protected by auth middleware)
+    const { data: meData, isLoading: meLoading, error: meError, refetch: refetchMe } = useMeQuery();
+
+    useEffect(() => {
+        // If we have user data (authenticated), redirect to dashboard
+        if (meData?.data?.user || meData?.user) {
+            navigate(ROUTES.DASHBOARD);
+        }
+        
+        // Handle 401 unauthorized - clear token and stay on login page
+        if (meError?.status === 401) {
+            localStorage.removeItem("token");
+        }
+    }, [meData, meError, navigate]);
+
     const handleLogin = async () => {
         try {
             const result = await loginAdmin({ email, password }).unwrap();
+            
             console.log("Login Success:", result);
-            localStorage.setItem("token", result.token);
-            navigate("/MagentoOrders");
+            
+            // After successful login, refetch user data to update the me query cache
+            await refetchMe();
+            
+            const user = result?.data?.user;
+            
+            // CASE 1: NOT VERIFIED
+            if (!user?.is_email_verified) {
+                navigate(ROUTES.VERIFY_EMAIL, {
+                    state: { email }
+                });
+                return;
+            }
+            
+            // CASE 2: VERIFIED → LOGIN SUCCESS
+            navigate(ROUTES.DASHBOARD);
+            
         } catch (err) {
-            console.error("Login Error:", err);
+            console.log("Login Error:", err);
+            
+            const status = err?.status || err?.error?.status;
+            const data = err?.data || err?.error?.data;
+            
+            if (status === 403 && data?.requires_verification) {
+                navigate(ROUTES.VERIFY_EMAIL, {
+                    state: { email }
+                });
+                return;
+            }
         }
     };
 
+    // Show loading state while checking authentication
+    if (meLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex overflow-hidden" style={{ fontFamily: "'Segoe UI', sans-serif" }}>
-
             {/* LEFT - Diagonal Gradient Background */}
             <div className="relative hidden lg:flex lg:w-1/2 items-center justify-center overflow-hidden">
                 {/* Base gradient */}
@@ -181,7 +230,6 @@ const Login = () => {
 
             {/* RIGHT - Form Panel */}
             <div className="w-full lg:w-1/2 flex flex-col bg-white">
-
                 {/* Top bar with logo */}
                 <div className="flex items-center justify-between px-10 py-6 border-b border-gray-100">
                     <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Log in</h2>
@@ -190,11 +238,10 @@ const Login = () => {
 
                 {/* Form */}
                 <div className="flex-1 flex flex-col justify-center px-10 lg:px-16 py-10 gap-6 w-full">
-
-                    {/* Error */}
-                    {error && (
+                    {/* Error Display */}
+                    {loginError && (
                         <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">
-                            Invalid email or password. Please try again.
+                            {(loginError as any)?.data?.message || "Invalid email or password. Please try again."}
                         </div>
                     )}
 
@@ -209,6 +256,7 @@ const Login = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="esteban_schiller@gmail.com"
                                 className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
                             />
                         </div>
                     </div>
@@ -216,22 +264,19 @@ const Login = () => {
                     {/* Password */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-sm font-semibold text-gray-600">Password</label>
-
                         <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
                             <FaLock className="text-gray-400 text-sm flex-shrink-0" />
-
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Enter your password"
                                 className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
                             />
-
-                            {/* Eye Icon */}
                             <span
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="cursor-pointer text-gray-500"
+                                className="cursor-pointer text-gray-500 hover:text-gray-700"
                             >
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
@@ -248,11 +293,11 @@ const Login = () => {
                     {/* Login Button */}
                     <button
                         onClick={handleLogin}
-                        disabled={isLoading}
+                        disabled={loginLoading}
                         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white text-sm shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
                         style={{ background: "linear-gradient(135deg, #3ab5e6, #1a8fc0)" }}
                     >
-                        {isLoading ? "Logging in..." : (
+                        {loginLoading ? "Logging in..." : (
                             <>
                                 Login
                                 <FaArrowRight className="text-xs" />
@@ -288,11 +333,13 @@ const Login = () => {
                     {/* Signup link */}
                     <p className="text-center text-sm text-gray-500">
                         Don't have an account?{" "}
-                        <Link to="/Signup" className="text-blue-500 font-semibold hover:underline">
+                        <Link
+                            to={ROUTES.REGISTER}
+                            className="text-blue-500 font-semibold hover:underline"
+                        >
                             Sign up
                         </Link>
                     </p>
-
                 </div>
             </div>
         </div>

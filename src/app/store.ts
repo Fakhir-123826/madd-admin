@@ -16,7 +16,7 @@ import { attributeSetApi } from "./api/MagentoSlices/AttributeSetApi";
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
-    auth: authReducer,                                        // ✅ sahi
+    auth: authReducer,                                       
     [authApi.reducerPath]: authApi.reducer,
     [subscriptionApi.reducerPath]: subscriptionApi.reducer,
     [magentoApi.reducerPath]: magentoApi.reducer,
