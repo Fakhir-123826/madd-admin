@@ -19,6 +19,11 @@ import { userApi } from "./api/UserSlices/UserApi";
 
 import { storeListApi } from "./api/StoreSlices/StoreApi";
 
+//Settlements
+import { settlementApi } from "./api/SettlementSlices/SettlementApi";
+
+import { dashboardApi } from './api/DashboardSlices/DashboardApi';
+
 
 export const store = configureStore({
   reducer: {
@@ -41,6 +46,12 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
 
     [storeListApi.reducerPath]: storeListApi.reducer,
+
+    [settlementApi.reducerPath]: settlementApi.reducer ,
+    
+    [dashboardApi.reducerPath]: dashboardApi.reducer ,
+
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -58,6 +69,8 @@ export const store = configureStore({
       vendorApi.middleware,  
       userApi.middleware,      
       storeListApi.middleware,
+      settlementApi.middleware,
+      dashboardApi.middleware
     ),
 });
 

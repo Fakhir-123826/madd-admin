@@ -71,7 +71,7 @@ const StoreList = () => {
 
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">Stores Management</h2>
+                <h2 className="text-lg font-semibold">Stores Management 123</h2>
                 <div className="flex items-center gap-4 text-sm text-gray-400">
                     <span>Total: <span className="font-semibold text-gray-600">{data?.meta?.total ?? 0}</span></span>
                     <span>Active: <span className="font-semibold text-green-600">{data?.meta?.active ?? 0}</span></span>

@@ -175,6 +175,10 @@ import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/Mage
 import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
 import MagentoNotificationsList from "./screens/System/Notification/MagentoNotificationsList.tsx";
 
+
+import SettlementList from "./screens/Settlements/Settlementlist.tsx";
+import SettlementDetail from "./screens/Settlements/SettlementDetail.tsx";
+import GenerateSettlement from "./screens/Settlements/GenerateSettlement.tsx";
 // router.tsx
 
 // ==================== ROUTE CONSTANTS ====================
@@ -451,6 +455,14 @@ export const ROUTES = {
 
   VENDOR: "/Verdor",
 
+
+MAGENTO_SETTLEMENTS_LIST: "/settlements",
+MAGENTO_SETTLEMENT_DETAIL: (id: string | number = ":id") => `/settlements/${id}`,
+MAGENTO_SETTLEMENT_GENERATE: "/settlements/generate",
+
+
+
+
 } as const;
 
 // ==================== ROUTE CONFIGURATION ====================
@@ -694,6 +706,12 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_DOWNLOADS_REPORT, element: <MagentoDownloadsReportList /> },
   { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
   { path: ROUTES.VENDOR, element: <VendorList/> },
+
+
+{ path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
+{ path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
+{ path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
+
 
 ];
 
