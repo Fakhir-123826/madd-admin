@@ -13,10 +13,17 @@ import { inventoryApi } from "./api/MagentoSlices/InventoryApi";
 import { attributeApi } from "./api/MagentoSlices/Attributes";
 import { attributeSetApi } from "./api/MagentoSlices/AttributeSetApi";
 
+import { vendorApi } from "./api/VendorSlices/VendorApi";
+import vendorReducer from "./api/VendorSlices/VendorSlice";
+import { userApi } from "./api/UserSlices/UserApi";
+
+import { storeListApi } from "./api/StoreSlices/StoreApi";
+
+
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
-    auth: authReducer,                                       
+    auth: authReducer,
     [authApi.reducerPath]: authApi.reducer,
     [subscriptionApi.reducerPath]: subscriptionApi.reducer,
     [magentoApi.reducerPath]: magentoApi.reducer,
@@ -28,6 +35,12 @@ export const store = configureStore({
     [inventoryApi.reducerPath]: inventoryApi.reducer,
     [attributeApi.reducerPath]: attributeApi.reducer,
     [attributeSetApi.reducerPath]: attributeSetApi.reducer,
+
+    vendor: vendorReducer,
+    [vendorApi.reducerPath]: vendorApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
+
+    [storeListApi.reducerPath]: storeListApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -38,10 +51,13 @@ export const store = configureStore({
       magentoCustomerApi.middleware,
       productApi.middleware,
       orderApi.middleware,
-      storeApi.middleware ,
-      inventoryApi.middleware ,
+      storeApi.middleware,
+      inventoryApi.middleware,
       attributeApi.middleware,
-      attributeSetApi.middleware
+      attributeSetApi.middleware,
+      vendorApi.middleware,  
+      userApi.middleware,      
+      storeListApi.middleware,
     ),
 });
 

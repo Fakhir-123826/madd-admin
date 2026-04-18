@@ -174,6 +174,7 @@ import MagentoOrderedProductsReportList from "./screens/Magento/Reports/Ordered/
 import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/MagentoDownloadsReportList.tsx";
 import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
 import MagentoNotificationsList from "./screens/System/Notification/MagentoNotificationsList.tsx";
+
 // router.tsx
 
 // ==================== ROUTE CONSTANTS ====================
@@ -447,6 +448,9 @@ export const ROUTES = {
   MAGENTO_ORDERED_PRODUCTS_REPORT: "/MagentoOrderedProductsReportList",
   MAGENTO_DOWNLOADS_REPORT: "/MagentoDownloadsReportList",
   MAGENTO_NOTIFICATIONS_LIST: "/MagentoNotificationsList",
+
+  VENDOR: "/Verdor",
+
 } as const;
 
 // ==================== ROUTE CONFIGURATION ====================
@@ -689,6 +693,8 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_ORDERED_PRODUCTS_REPORT, element: <MagentoOrderedProductsReportList /> },
   { path: ROUTES.MAGENTO_DOWNLOADS_REPORT, element: <MagentoDownloadsReportList /> },
   { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
+  { path: ROUTES.VENDOR, element: <VendorList/> },
+
 ];
 
 // ==================== CREATE ROUTER ====================
