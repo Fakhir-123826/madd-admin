@@ -207,6 +207,7 @@ export const ROUTES = {
   VENDOR_LIST: "/Vendor",
   VENDOR_DETAIL: "/Verder1",
   CREATE_VENDOR: "/CreateVerder",
+  EDIT_VENDOR: "/EditVendor/:id",
   CREATE_VENDOR_ONBOARD: "/CreateVerderOnboard",
   VENDOR_ONBOARD: "/VerderOnboard",
   VENDOR_DASHBOARD: "/VendorDashBoard",
@@ -471,7 +472,14 @@ const protectedRoutes = [
   // Vendor Section
   { path: ROUTES.VENDOR_LIST, element: <VendorList /> },
   { path: ROUTES.VENDOR_DETAIL, element: <Vendor /> },
-  { path: ROUTES.CREATE_VENDOR, element: <CreateVendor /> },
+  {
+    path: ROUTES.CREATE_VENDOR,
+    element: <CreateVendor />
+  },
+  {
+    path: ROUTES.EDIT_VENDOR,
+    element: <CreateVendor />
+  },
   { path: ROUTES.CREATE_VENDOR_ONBOARD, element: <CreateVendoronBoard /> },
   { path: ROUTES.VENDOR_ONBOARD, element: <VendorOnboard /> },
   { path: ROUTES.VENDOR_DASHBOARD, element: <VendorDashBoard /> },
@@ -693,7 +701,7 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_ORDERED_PRODUCTS_REPORT, element: <MagentoOrderedProductsReportList /> },
   { path: ROUTES.MAGENTO_DOWNLOADS_REPORT, element: <MagentoDownloadsReportList /> },
   { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
-  { path: ROUTES.VENDOR, element: <VendorList/> },
+  { path: ROUTES.VENDOR, element: <VendorList /> },
 
 ];
 

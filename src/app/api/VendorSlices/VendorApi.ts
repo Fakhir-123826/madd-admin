@@ -2,16 +2,34 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
+export interface SuspendVendorPayload {
+    reason: string;
+}
+
+export interface UpdateVendorPlanPayload {
+    plan_id: number;
+    duration_months?: number;
+}
+
+export interface RejectKycPayload {
+    reason: string;
+}
+
 export const vendorApi = createApi({
     reducerPath: "vendorApi",
 
     baseQuery: fetchBaseQuery({
         baseUrl: baseURL,
+
         prepareHeaders: (headers) => {
             const token = localStorage.getItem("token");
+
             if (token) {
                 headers.set("authorization", `Bearer ${token}`);
             }
+
+            headers.set("Content-Type", "application/json");
+
             return headers;
         },
     }),
@@ -20,8 +38,12 @@ export const vendorApi = createApi({
 
     endpoints: (builder) => ({
 
-        // ================= GET ALL VENDORS =================
-        getVendors: builder.query({
+        /*
+        =========================================
+        GET ALL VENDORS
+        =========================================
+        */
+        getVendors: builder.query<any, void>({
             query: () => ({
                 url: "admin/vendors",
                 method: "GET",
@@ -29,9 +51,123 @@ export const vendorApi = createApi({
             providesTags: ["Vendors"],
         }),
 
+        /*
+        =========================================
+        GET SINGLE VENDOR
+        =========================================
+        */
+        getSingleVendor: builder.query<any, string>({
+            query: (id) => ({
+                url: `admin/vendors/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Vendors"],
+        }),
+
+        /*
+        =========================================
+        APPROVE VENDOR
+        =========================================
+        */
+        approveVendor: builder.mutation<any, string>({
+            query: (id) => ({
+                url: `admin/vendors/${id}/approve`,
+                method: "POST",
+                body: {},
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        /*
+        =========================================
+        SUSPEND VENDOR
+        =========================================
+        */
+        suspendVendor: builder.mutation<
+            any,
+            { id: string; data: SuspendVendorPayload }
+        >({
+            query: ({ id, data }) => ({
+                url: `admin/vendors/${id}/suspend`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        /*
+        =========================================
+        ACTIVATE VENDOR
+        =========================================
+        */
+        activateVendor: builder.mutation<any, string>({
+            query: (id) => ({
+                url: `admin/vendors/${id}/activate`,
+                method: "POST",
+                body: {},
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        /*
+        =========================================
+        UPDATE VENDOR PLAN
+        =========================================
+        */
+        updateVendorPlan: builder.mutation<
+            any,
+            { id: string; data: UpdateVendorPlanPayload }
+        >({
+            query: ({ id, data }) => ({
+                url: `admin/vendors/${id}/plan`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        /*
+        =========================================
+        VERIFY KYC
+        =========================================
+        */
+        verifyVendorKyc: builder.mutation<any, string>({
+            query: (id) => ({
+                url: `admin/vendors/${id}/kyc-verify`,
+                method: "POST",
+                body: {},
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        /*
+        =========================================
+        REJECT KYC
+        =========================================
+        */
+        rejectVendorKyc: builder.mutation<
+            any,
+            { id: string; data: RejectKycPayload }
+        >({
+            query: ({ id, data }) => ({
+                url: `admin/vendors/${id}/kyc-reject`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
     }),
 });
 
 export const {
     useGetVendorsQuery,
+    useGetSingleVendorQuery,
+    useApproveVendorMutation,
+    useSuspendVendorMutation,
+    useActivateVendorMutation,
+    useUpdateVendorPlanMutation,
+    useVerifyVendorKycMutation,
+    useRejectVendorKycMutation,
 } = vendorApi;
+
+export default vendorApi;
