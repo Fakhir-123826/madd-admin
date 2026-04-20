@@ -19,6 +19,8 @@ import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
 import OrderList from './screens/OrdersManagement/OrderList.tsx'
+import OrderStatistics from './screens/OrdersManagement/OrderStatistics.tsx'
+
 import CategoryList from './screens/Catalog/Category/CategoryList.tsx'
 import CreateCategory from './screens/Catalog/Category/CreateCategory.tsx'
 import InventoryManagementList from './screens/Catalog/InventoryManagement/InventoryManagementList.tsx'
@@ -175,6 +177,10 @@ import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/Mage
 import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
 import MagentoNotificationsList from "./screens/System/Notification/MagentoNotificationsList.tsx";
 
+
+import SettlementList from "./screens/Settlements/Settlementlist.tsx";
+import SettlementDetail from "./screens/Settlements/SettlementDetail.tsx";
+import GenerateSettlement from "./screens/Settlements/GenerateSettlement.tsx";
 // router.tsx
 
 // ==================== ROUTE CONSTANTS ====================
@@ -200,6 +206,8 @@ export const ROUTES = {
 
   // Order Section
   ORDER_LIST: "/orderlist",
+  ORDER_STATISTICS: "/OrderStatistics",
+
   ADD_ORDER: "/addorder",
   ORDER_DETAILS: (id: string | number = ":id") => `/order/${id}`,
 
@@ -452,6 +460,14 @@ export const ROUTES = {
 
   VENDOR: "/Verdor",
 
+
+MAGENTO_SETTLEMENTS_LIST: "/settlements",
+MAGENTO_SETTLEMENT_DETAIL: (id: string | number = ":id") => `/settlements/${id}`,
+MAGENTO_SETTLEMENT_GENERATE: "/settlements/generate",
+
+
+
+
 } as const;
 
 // ==================== ROUTE CONFIGURATION ====================
@@ -466,6 +482,8 @@ const protectedRoutes = [
 
   // Order Section
   { path: ROUTES.ORDER_LIST, element: <OrderList /> },
+  { path: ROUTES.ORDER_STATISTICS, element: <OrderStatistics /> },
+
   { path: ROUTES.ADD_ORDER, element: <AddOrder /> },
   { path: ROUTES.ORDER_DETAILS(), element: <OrderDetails /> },
 
@@ -702,6 +720,12 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_DOWNLOADS_REPORT, element: <MagentoDownloadsReportList /> },
   { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
   { path: ROUTES.VENDOR, element: <VendorList /> },
+
+
+{ path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
+{ path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
+{ path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
+
 
 ];
 
