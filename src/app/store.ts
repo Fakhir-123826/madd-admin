@@ -6,7 +6,6 @@ import { magentoApi } from "./api/MagentoSlices/magentoApi";
 import { magentoCategoryApi } from "./api/MagentoSlices/CategorySlice"; // ✅ import the category API
 import { magentoCustomerApi } from "./api/MagentoSlices/CustomerSlice";
 import { productApi } from "./api/MagentoSlices/ProductSlice"
-import { orderApi } from "./api/MagentoSlices/OrderSlice";
 import authReducer from "./api/AuthSlices/authSlice";
 import { storeApi } from "./api/MagentoSlices/StoreSlice";
 import { inventoryApi } from "./api/MagentoSlices/InventoryApi";
@@ -25,6 +24,8 @@ import { settlementApi } from "./api/SettlementSlices/SettlementApi";
 import { dashboardApi } from './api/DashboardSlices/DashboardApi';
 
 
+import { orderApi } from "./api/OrderSlices/OrderApi";
+
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -35,7 +36,6 @@ export const store = configureStore({
     [magentoCategoryApi.reducerPath]: magentoCategoryApi.reducer,
     [magentoCustomerApi.reducerPath]: magentoCustomerApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
-    [orderApi.reducerPath]: orderApi.reducer,
     [storeApi.reducerPath]: storeApi.reducer,
     [inventoryApi.reducerPath]: inventoryApi.reducer,
     [attributeApi.reducerPath]: attributeApi.reducer,
@@ -50,6 +50,7 @@ export const store = configureStore({
     [settlementApi.reducerPath]: settlementApi.reducer ,
     
     [dashboardApi.reducerPath]: dashboardApi.reducer ,
+    [orderApi.reducerPath]: orderApi.reducer
 
 
   },
@@ -61,7 +62,6 @@ export const store = configureStore({
       magentoCategoryApi.middleware,
       magentoCustomerApi.middleware,
       productApi.middleware,
-      orderApi.middleware,
       storeApi.middleware,
       inventoryApi.middleware,
       attributeApi.middleware,
@@ -70,7 +70,9 @@ export const store = configureStore({
       userApi.middleware,      
       storeListApi.middleware,
       settlementApi.middleware,
-      dashboardApi.middleware
+      dashboardApi.middleware,
+      orderApi.middleware
+
     ),
 });
 

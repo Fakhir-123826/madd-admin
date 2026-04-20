@@ -29,6 +29,8 @@ import {
 } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../app/api/AuthSlices/AuthSlices";
+import { ROUTES } from "../router.tsx";
+
 
 import { router } from "../router";
 // ============ TYPES ============
@@ -403,9 +405,23 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-
-  // Non-Magento menus (as they were)
-  { label: "Order Management", icon: FaShoppingCart, path: "/orderlist" },
+  {
+    label: "Order Management",
+    icon: FaShoppingCart,
+    path: "/orderlist",
+    children: [
+      {
+        label: "All Orders",
+        path: "/orderlist",
+        matchPaths: ["/orderlist", "/orders/:uuid"]
+      },
+      {
+        label: "Order Statistics",
+        path: "/OrderStatistics",
+        matchPaths: ["/OrderStatistics"]
+      },
+    ]
+  },
   {
     label: "Stores",
     icon: FaStore,

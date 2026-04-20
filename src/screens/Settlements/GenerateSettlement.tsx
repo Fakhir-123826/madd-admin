@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaSave, FaSpinner, FaCalendarAlt, FaUser, FaCheckCircle } from "react-icons/fa";
-import { useGenerateSettlementMutation } from "../../app/api/SettlementSlices/SettlementApi";
+import { 
+    useGenerateSettlementMutation   // ✅ Already exists
+} from "../../app/api/SettlementSlices/SettlementApi";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 

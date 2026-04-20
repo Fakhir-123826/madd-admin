@@ -19,6 +19,8 @@ import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
 import OrderList from './screens/OrdersManagement/OrderList.tsx'
+import OrderStatistics from './screens/OrdersManagement/OrderStatistics.tsx'
+
 import CategoryList from './screens/Catalog/Category/CategoryList.tsx'
 import CreateCategory from './screens/Catalog/Category/CreateCategory.tsx'
 import InventoryManagementList from './screens/Catalog/InventoryManagement/InventoryManagementList.tsx'
@@ -204,6 +206,8 @@ export const ROUTES = {
 
   // Order Section
   ORDER_LIST: "/orderlist",
+  ORDER_STATISTICS: "/OrderStatistics",
+
   ADD_ORDER: "/addorder",
   ORDER_DETAILS: (id: string | number = ":id") => `/order/${id}`,
 
@@ -477,6 +481,8 @@ const protectedRoutes = [
 
   // Order Section
   { path: ROUTES.ORDER_LIST, element: <OrderList /> },
+  { path: ROUTES.ORDER_STATISTICS, element: <OrderStatistics /> },
+
   { path: ROUTES.ADD_ORDER, element: <AddOrder /> },
   { path: ROUTES.ORDER_DETAILS(), element: <OrderDetails /> },
 
