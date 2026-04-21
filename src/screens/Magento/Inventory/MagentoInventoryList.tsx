@@ -1,10 +1,154 @@
 import { useState } from "react";
 import { FaFilter } from "react-icons/fa";
-import { useGetProductsQuery, type MagentoProduct } from "../../../app/api/MagentoSlices/ProductSlice";
 import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import StoreViewDropdown from "../../../component/StoreViewDropdown";
 import type { StoreViewSelection } from "../../../model/MagentoProduct/StoreViewSelection";
+import type { MagentoProduct } from "../../../app/api/MagentoSlices/ProductSlice";
+
+// ============ FAKE DATA ============
+const FAKE_PRODUCTS: MagentoProduct[] = [
+    {
+        id: "prod_001",
+        sku: "WB1001",
+        magento_sku: "WB1001-BLACK",
+        name: "Classic Wireless Headphones",
+        type_id: "configurable",
+        price: 89.99,
+        formatted_price: "$89.99",
+        quantity: 245,
+        is_in_stock: true,
+        min_qty: 5,
+        max_sale_qty: 50,
+        manage_stock: true
+    },
+    {
+        id: "prod_002",
+        sku: "KB2002",
+        magento_sku: "KB2002-RGB",
+        name: "Mechanical Gaming Keyboard",
+        type_id: "simple",
+        price: 149.99,
+        formatted_price: "$149.99",
+        quantity: 0,
+        is_in_stock: false,
+        min_qty: 10,
+        max_sale_qty: 25,
+        manage_stock: true
+    },
+    {
+        id: "prod_003",
+        sku: "MS3003",
+        magento_sku: "MS3003-WIRELESS",
+        name: "Ergonomic Wireless Mouse",
+        type_id: "simple",
+        price: 49.99,
+        formatted_price: "$49.99",
+        quantity: 3,
+        is_in_stock: true,
+        min_qty: 15,
+        max_sale_qty: 100,
+        manage_stock: true
+    },
+    {
+        id: "prod_004",
+        sku: "MN4004",
+        magento_sku: "MN4004-4K",
+        name: "27-inch 4K Monitor",
+        type_id: "configurable",
+        price: 399.99,
+        formatted_price: "$399.99",
+        quantity: 8,
+        is_in_stock: true,
+        min_qty: 2,
+        max_sale_qty: 10,
+        manage_stock: true
+    },
+    {
+        id: "prod_005",
+        sku: "SS5005",
+        magento_sku: "SS5005-1TB",
+        name: "External SSD 1TB",
+        type_id: "simple",
+        price: 129.99,
+        formatted_price: "$129.99",
+        quantity: 0,
+        is_in_stock: false,
+        min_qty: 20,
+        max_sale_qty: 200,
+        manage_stock: true
+    },
+    {
+        id: "prod_006",
+        sku: "WC6006",
+        magento_sku: "WC6006-HD",
+        name: "HD Webcam with Microphone",
+        type_id: "simple",
+        price: 79.99,
+        formatted_price: "$79.99",
+        quantity: 156,
+        is_in_stock: true,
+        min_qty: 8,
+        max_sale_qty: 75,
+        manage_stock: true
+    },
+    {
+        id: "prod_007",
+        sku: "US7007",
+        magento_sku: "US7007-USBHUB",
+        name: "USB-C 7-in-1 Hub",
+        type_id: "simple",
+        price: 59.99,
+        formatted_price: "$59.99",
+        quantity: 2,
+        is_in_stock: true,
+        min_qty: 12,
+        max_sale_qty: 150,
+        manage_stock: true
+    },
+    {
+        id: "prod_008",
+        sku: "LP8008",
+        magento_sku: "LP8008-RGB",
+        name: "Gaming Mouse Pad",
+        type_id: "simple",
+        price: 29.99,
+        formatted_price: "$29.99",
+        quantity: 0,
+        is_in_stock: false,
+        min_qty: 30,
+        max_sale_qty: 500,
+        manage_stock: false
+    },
+    {
+        id: "prod_009",
+        sku: "SP9009",
+        magento_sku: "SP9009-BLUETOOTH",
+        name: "Bluetooth Soundbar",
+        type_id: "configurable",
+        price: 199.99,
+        formatted_price: "$199.99",
+        quantity: 42,
+        is_in_stock: true,
+        min_qty: 3,
+        max_sale_qty: 30,
+        manage_stock: true
+    },
+    {
+        id: "prod_010",
+        sku: "CH1010",
+        magento_sku: "CH1010-STAND",
+        name: "Adjustable Laptop Stand",
+        type_id: "simple",
+        price: 34.99,
+        formatted_price: "$34.99",
+        quantity: 7,
+        is_in_stock: true,
+        min_qty: 6,
+        max_sale_qty: 120,
+        manage_stock: true
+    }
+];
 
 // ============ SINGLE ROW ============
 function InventoryRow({ product, tdBase }: { product: MagentoProduct; tdBase: string }) {
@@ -68,9 +212,8 @@ function MagentoInventoryList() {
     const itemsPerPage = 10;
     const [storeSelection, setStoreSelection] = useState<StoreViewSelection>({ type: "all" });
 
-    const { data, isLoading, error } = useGetProductsQuery();
-
-    const allProducts: MagentoProduct[] = data?.data || [];
+    // Using only fake data
+    const allProducts: MagentoProduct[] = FAKE_PRODUCTS;
     
     // Filter products by SKU search
     const filteredProducts = skuSearch 
@@ -136,22 +279,7 @@ function MagentoInventoryList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={11} className="text-center py-10">
-                                    <div className="flex items-center justify-center gap-3">
-                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500"></div>
-                                        <span className="text-gray-500">Loading products...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        ) : error ? (
-                            <tr>
-                                <td colSpan={11} className="text-center py-10 text-red-500">
-                                    Error loading inventory. Please try again.
-                                </td>
-                            </tr>
-                        ) : currentProducts.length === 0 ? (
+                        {currentProducts.length === 0 ? (
                             <tr>
                                 <td colSpan={11} className="text-center py-10 text-gray-500">
                                     No products found
@@ -171,7 +299,7 @@ function MagentoInventoryList() {
             </div>
 
             {/* PAGINATION */}
-            {totalPages > 1 && !isLoading && (
+            {totalPages > 1 && (
                 <div className="flex justify-center gap-2 py-6">
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}

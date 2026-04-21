@@ -10,8 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@puckeditor/core": "^0.21.1",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.6",
+    "grapesjs": "^0.19.5",
+    "grapesjs-blocks-basic": "^0.1.8",
+    "grapesjs-plugin-forms": "^0.2.3",
+    "grapesjs-preset-webpage": "latest",
+    "grapesjs-react": "^4.0.3",
     "lucide-react": "^0.563.0",
     "rc-tree": "^5.13.1",
     "react": "^19.2.0",
@@ -21,20 +27,13 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.13.0",
     "recharts": "^3.7.0",
-    "tinymce": "^8.3.2",
-
-    "@puckeditor/core": "^0.21.1",
-    "grapesjs": "^0.19.5",
-    "grapesjs-react": "^4.0.3",
-    "grapesjs-preset-webpage": "latest",
-    "grapesjs-plugin-forms": "^0.2.3",
-    "grapesjs-blocks-basic": "^0.1.8"
+    "tinymce": "^8.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
