@@ -15,6 +15,23 @@ export interface RejectKycPayload {
     reason: string;
 }
 
+export interface CreateVendorPayload {
+    user_id: number,
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+    phone?: string;
+    country_code: string;
+    company_name: string;
+    company_slug?: string;
+
+    description?: string;
+    plan_id?: number;
+    status?: string;
+}
+
+
 export const vendorApi = createApi({
     reducerPath: "vendorApi",
 
@@ -140,6 +157,15 @@ export const vendorApi = createApi({
             invalidatesTags: ["Vendors"],
         }),
 
+
+        createVendor: builder.mutation<any, CreateVendorPayload>({
+            query: (data) => ({
+                url: "admin/vendors",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
         /*
         =========================================
         REJECT KYC
@@ -162,6 +188,7 @@ export const vendorApi = createApi({
 export const {
     useGetVendorsQuery,
     useGetSingleVendorQuery,
+    useCreateVendorMutation,
     useApproveVendorMutation,
     useSuspendVendorMutation,
     useActivateVendorMutation,

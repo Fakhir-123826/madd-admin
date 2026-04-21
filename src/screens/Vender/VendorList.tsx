@@ -6,6 +6,8 @@ import {
     useSuspendVendorMutation,
     useActivateVendorMutation,
 } from "../../app/api/VendorSlices/VendorApi";
+import FilterBar from "../../component/orderManagement/FilterBar";
+import { Link } from "react-router-dom";
 
 // ============ STATUS STYLE ============
 const statusStyle = (status: string) => {
@@ -149,14 +151,17 @@ const VendorList = () => {
             {/* HEADER WITH CREATE BUTTON */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Vendor Management</h2>
-                <button
-                    onClick={() => {/* Add navigation */ }}
-                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-teal-400 to-green-400 text-white hover:opacity-90 transition-opacity"
-                >
-                    Create Vendor
-                </button>
+                <Link to="/CreateVerder">
+                    <button
+                        onClick={() => {/* Add navigation */ }}
+                        className="px-5 py-2 rounded-lg bg-gradient-to-r from-teal-400 to-green-400 text-white hover:opacity-90 transition-opacity"
+                    >
+                        Create Vendor
+                    </button>
+                </Link>
             </div>
 
+            <FilterBar />
             {/* TABLE - Keep the same as before */}
             <div className="rounded-t-3xl overflow-x-auto">
                 <table className="w-full text-sm border-separate border-spacing-y-3">
