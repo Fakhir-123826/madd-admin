@@ -31,8 +31,8 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../app/api/AuthSlices/AuthSlices";
 import { ROUTES } from "../router.tsx";
 
-
 import { router } from "../router";
+
 // ============ TYPES ============
 interface MenuItem {
   label: string;
@@ -42,505 +42,7 @@ interface MenuItem {
   matchPaths?: string[];
 }
 
-// ============ MENU ITEMS ============
-// ================= MENU ITEMS (Fully Updated with matchPaths) =================
-const menuItems: MenuItem[] = [
-  { label: "Dashboard", icon: FaHome, path: "/" },
-
-  {
-    label: "Magento",
-    icon: FaMagento,
-    path: "/magento",
-    children: [
-      // Inventory
-      { label: "All Magento Inventory", path: "/MagentoInventoryList" },
-
-      // Sales
-      {
-        label: "Sales",
-        icon: FaStore,
-        children: [
-          { label: "Orders", path: "/MagentoOrders" },
-          { label: "Payment Service", path: "/MagentoPaymentService" },
-          { label: "Invoice", path: "/MagentoInvoiceList" },
-          { label: "Shipment", path: "/MagentoShipments" },
-          { label: "Credit Memos", path: "/MagentoCreditMemos" },
-          { label: "Billing Agreements", path: "/MagentoBillingAgreementsList" },
-          { label: "Transactions", path: "/MagentoTransactionList" },
-          { label: "Braintree Virtual Terminal", path: "/BraintreeVirtualTerminal" },
-        ],
-      },
-
-      // Catalog
-      {
-        label: "Catalog",
-        icon: FaStore,
-        children: [
-          {
-            label: "Products",
-            path: "/MagentoProducts",
-            matchPaths: ["/MagentoProducts", "/AddMagentoProduct", "/AddMagentoProduct/:sku"]
-          },
-          {
-            label: "Categories",
-            path: "/MagentoCategoryList",
-            matchPaths: ["/MagentoCategoryList", "/AddMagentoCategory", "/AddMagentoCategory/:id"]
-          },
-        ],
-      },
-
-      // Customers
-      {
-        label: "Customers",
-        icon: FaStore,
-        children: [
-          {
-            label: "All Customers",
-            path: "/MagentoCustomerList",
-            matchPaths: ["/MagentoCustomerList", "/AddMagentoCustomer", "/AddMagentoCustomer/:id", "/customers/:id"]
-          },
-          { label: "Now Online", path: "/OnlineCustomers" },
-          { label: "! Login as Customer Log", path: "/storeList12" },
-          {
-            label: "Customer Groups",
-            path: "/MagentoCustomerGroupsList",
-            matchPaths: ["/MagentoCustomerGroupsList", "/AddMagentoCustomerGroup", "/AddMagentoCustomerGroup/:id"]
-          },
-        ],
-      },
-
-      // Marketing
-      {
-        label: "Marketing",
-        icon: FaStore,
-        children: [
-          {
-            label: "Promotions",
-            icon: FaStore,
-            children: [
-              {
-                label: "Catalog Price Rule",
-                path: "/MagentoCatalogPriceRuleList",
-                matchPaths: ["/MagentoCatalogPriceRuleList", "/AddCatalogPriceRule", "/AddCatalogPriceRule/:id"]
-              },
-              {
-                label: "Cart Price Rules",
-                path: "/MagentoCartPriceRulesList",
-                matchPaths: ["/MagentoCartPriceRulesList", "/AddCartPriceRule", "/AddCartPriceRule/:id"]
-              },
-            ],
-          },
-          {
-            label: "SEO & Search",
-            icon: FaStore,
-            children: [
-              {
-                label: "URL Rewrites",
-                path: "/MagentoUrlRewritesList",
-                matchPaths: ["/MagentoUrlRewritesList", "/AddMagentoUrlRewrite", "/AddMagentoUrlRewrite/:id"]
-              },
-              {
-                label: "Search Terms",
-                path: "/MagentoSearchTermsList",
-                matchPaths: ["/MagentoSearchTermsList", "/AddMagentoSearchTerm", "/AddMagentoSearchTerm/:id"]
-              },
-              {
-                label: "Search Synonyms",
-                path: "/MagentoSearchSynonymsList",
-                matchPaths: ["/MagentoSearchSynonymsList", "/AddMagentoSearchSynonym", "/AddMagentoSearchSynonym/:id"]
-              },
-              {
-                label: "Site Map",
-                path: "/MagentoSitemapList",
-                matchPaths: ["/MagentoSitemapList", "/AddMagentoSitemap", "/AddMagentoSitemap/:id"]
-              },
-            ],
-          },
-          {
-            label: "Communications",
-            icon: FaStore,
-            children: [
-              {
-                label: "Email Templates",
-                path: "/MagentoEmailTemplatesList",
-                matchPaths: ["/MagentoEmailTemplatesList", "/AddMagentoEmailTemplate", "/AddMagentoEmailTemplate/:id"]
-              },
-              {
-                label: "Newsletter Templates",
-                path: "/MagentoNewsletterTemplatesList",
-                matchPaths: ["/MagentoNewsletterTemplatesList", "/AddMagentoNewsletterTemplate", "/AddMagentoNewsletterTemplate/:id"]
-              },
-            ],
-          },
-          {
-            label: "User Content",
-            icon: FaStore,
-            children: [
-              {
-                label: "All Reviews",
-                path: "/MagentoReviewsList",
-                matchPaths: ["/MagentoReviewsList", "/AddMagentoReview", "/AddMagentoReview/:id"]
-              },
-            ],
-          },
-        ],
-      },
-
-      // Content (Yeh missing tha)
-      {
-        label: "Content",
-        icon: FaStore,
-        children: [
-          {
-            label: "Elements",
-            icon: FaStore,
-            children: [
-              { label: "Pages", path: "/pageBuilder" },
-              { label: "Blogs", path: "/SubscriptionList10" },
-              { label: "Widgets", path: "/SubscriptionList10" },
-              { label: "Templates", path: "/SubscriptionList10" },
-            ],
-          },
-          {
-            label: "Media",
-            icon: FaStore,
-            children: [
-              { label: "Media Gallery", path: "/SubscriptionList10" },
-            ],
-          },
-          {
-            label: "Design",
-            icon: FaStore,
-            children: [
-              { label: "Configuration", path: "/SubscriptionList10" },
-              { label: "Themes", path: "/SubscriptionList10" },
-              { label: "Schedule", path: "/SubscriptionList10" },
-            ],
-          },
-        ],
-      },
-
-      // Reports (Yeh bhi missing tha)
-      {
-        label: "Reports",
-        icon: FaChartBar,
-        children: [
-          {
-            label: "Marketing",
-            children: [
-              { label: "Products in Cart", path: "/MagentoProductsInCartsList" },
-              { label: "Search Terms", path: "/MagentoSearchTermsListForReports" },
-              { label: "Abandoned Carts", path: "/MagentoAbandonedCartsList" },
-              { label: "Newsletter Problem Reports", path: "/MagentoNewsletterProblemsReportList" },
-            ],
-          },
-          {
-            label: "Reviews",
-            children: [
-              { label: "By Customers", path: "/MagentoCustomerReviewsReportList" },
-              { label: "By Products", path: "/MagentoProductReviewsReportList" },
-            ],
-          },
-          {
-            label: "Sales",
-            children: [
-              { label: "Orders", path: "/MagentoOrderUpdatedReportList" },
-              { label: "Tax", path: "/MagentoTaxReportList" },
-              { label: "Invoiced", path: "/MagentoInvoiceReportList" },
-              { label: "Shipping", path: "/MagentoShippingReportList" },
-              { label: "Refunds", path: "/MagentoRefundsReportList" },
-              { label: "Coupons", path: "/MagentoCouponsReportList" },
-              { label: "PayPal Settlement", path: "/MagentoPayPalSettlementReportList" },
-              { label: "Braintree Settlement", path: "/MagentoBraintreeSettlementReportList" },
-            ],
-          },
-          {
-            label: "Customers",
-            children: [
-              { label: "Order Total", path: "/MagentoOrderTotalReportList" },
-              { label: "Order Count", path: "/MagentoOrderCountReportList" },
-              { label: "New", path: "/MagentoNewAccountsReportList" },
-            ],
-          },
-          {
-            label: "Products",
-            children: [
-              {
-                label: "Views",
-                path: "/MagentoProductViewsReportList",
-                // matchPaths: ["/MagentoSearchSynonymsList", "/AddMagentoSearchSynonym", "/AddMagentoSearchSynonym/:id"]
-
-              },
-              { label: "Bestsellers", path: "/MagentoBestsellersReportList" },
-              { label: "Low Stock", path: "/MagentoLowStockReportList" },
-              { label: "Ordered", path: "/MagentoOrderedProductsReportList" },
-              { label: "Downloads", path: "/MagentoDownloadsReportList" },
-            ],
-          },
-          {
-            label: "Business Intelligence",
-            children: [
-              { label: "Advanced Reporting", path: "/reports/advanced-reporting" },
-              { label: "BI Essentials", path: "/reports/bi-essentials" },
-            ],
-          },
-        ],
-      },
-
-      // Stores
-      {
-        label: "Stores",
-        icon: FaStore,
-        children: [
-          {
-            label: "Settings",
-            children: [
-              {
-                label: "All Stores",
-                path: "/MagentoStoreList",
-                matchPaths: ["/MagentoStoreList", "/AddMagentoStor", "/AddMagentoStor/:id"]
-              },
-              { label: "! Configuration", path: "/stores/configuration" },
-              {
-                label: "Terms and Conditions",
-                path: "/MagentoTermsConditionsList",
-                matchPaths: ["/MagentoTermsConditionsList", "/AddMagentoTermsCondition", "/AddMagentoTermsCondition/:id"]
-              },
-              {
-                label: "Order Status",
-                path: "/MagentoOrderStatusList",
-                matchPaths: ["/MagentoOrderStatusList", "/AddMagentoOrderStatus", "/AddMagentoOrderStatus/:id"]
-              },
-            ],
-          },
-          {
-            label: "Inventory",
-            children: [
-              { label: "Sources", path: "/MagentoSourcesList" },
-              {
-                label: "Stocks",
-                path: "/MagentoStockList",
-                matchPaths: ["/MagentoStockList", "/AddMagentoStock"]
-              },
-            ],
-          },
-          {
-            label: "Taxes",
-            children: [
-              {
-                label: "Tax Rules",
-                path: "/MagentoTaxRulesList",
-                matchPaths: ["/MagentoTaxRulesList", "/AddMagentoTaxRule"]
-              },
-              { label: "Tax Zones and Rates", path: "/MagentoTaxZonesList" },
-            ],
-          },
-          {
-            label: "Currency",
-            children: [
-              { label: "Currency Rates", path: "/AddCurrencyRates" },
-              { label: "Currency Symbols", path: "/AddCurrencySymbols" },
-            ],
-          },
-          {
-            label: "Attributes",
-            children: [
-              {
-                label: "Product",
-                path: "/MagentoAttributesLits",
-                matchPaths: ["/MagentoAttributesLits", "/AddMagentoAttribute", "/AddMagentoAttribute/:attribute_code"]
-              },
-              {
-                label: "Attribute Set",
-                path: "/MagentoAttributeSets",
-                matchPaths: ["/MagentoAttributeSets", "/AddMagentoAttributeSet"]
-              },
-              {
-                label: "Rating",
-                path: "/MagentoProductRatingsList",
-                matchPaths: ["/MagentoProductRatingsList", "/AddMagentoRating"]
-              },
-            ],
-          },
-        ],
-      },
-      {
-        label: "System",
-        icon: FaStore,
-        children: [
-          {
-            label: "Other Settings",
-            icon: FaStore,
-            children: [
-              {
-                label: "Notification",
-                path: "/MagentoNotificationsList",
-                // matchPaths: ["/MagentoCatalogPriceRuleList", "/AddCatalogPriceRule", "/AddCatalogPriceRule/:id"]
-              },
-              {
-                label: "Cart Price Rules",
-                path: "/MagentoCartPriceRulesList",
-                // matchPaths: ["/MagentoCartPriceRulesList", "/AddCartPriceRule", "/AddCartPriceRule/:id"]
-              },
-            ],
-          },
-          {
-            label: "Categories",
-            icon: FaStore,
-            children: [
-              {
-                label: "Catalog Price Rule",
-                path: "/MagentoCatalogPriceRuleList",
-                // matchPaths: ["/MagentoCatalogPriceRuleList", "/AddCatalogPriceRule", "/AddCatalogPriceRule/:id"]
-              },
-              {
-                label: "Cart Price Rules",
-                path: "/MagentoCartPriceRulesList",
-                // matchPaths: ["/MagentoCartPriceRulesList", "/AddCartPriceRule", "/AddCartPriceRule/:id"]
-              },
-            ],
-
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Order Management",
-    icon: FaShoppingCart,
-    path: "/orderlist",
-    children: [
-      {
-        label: "All Orders",
-        path: "/orderlist",
-        matchPaths: ["/orderlist", "/orders/:uuid"]
-      },
-      {
-        label: "Order Statistics",
-        path: "/OrderStatistics",
-        matchPaths: ["/OrderStatistics"]
-      },
-    ]
-  },
-  {
-    label: "Stores",
-    icon: FaStore,
-    path: "/store",
-    children: [
-      { label: "All Subscription", path: "/SubscriptionList" },
-      { label: "Stores list", path: "/storeList" },
-    ],
-  },
-  {
-    label: "Catalog",
-    icon: FaBox,
-    path: "/catalog",
-    children: [
-      { label: "All Inventiries", path: "/InventoryManagementList" },
-      { label: "All Product Bases", path: "/ProductBaseList" },
-      { label: "All Legality Control", path: "/LegalityControlList" },
-      { label: "All Product Sharing", path: "/ProductSharingList" },
-      { label: "All Category", path: "/CategoryList" },
-    ],
-  },
-  {
-    label: "Users",
-    icon: FaUsers,
-    path: "/users",
-    children: [
-      { label: "Users List", path: "/userlist" },
-      { label: "Roles", path: "/usersroles" },
-      { label: "Group", path: "/usersgroup" },
-    ],
-  },
-  {
-    label: "Vendors",
-    icon: FaHandshake,
-    path: "/vendors",
-    children: [
-      { label: "All Vendors", path: "/Verdor" },
-      { label: "Add Vendor Onboard", path: "/CreateVerderOnboard" },
-      { label: "Vendor Requests", path: "/vendor/requests" },
-    ],
-  },
-  { label: "Settlements", icon: FaExchangeAlt, path: "/settlements" },
-  { label: "CMS", icon: FaFileAlt, path: "/cms" },
-  { label: "OMS", icon: FaCogs, path: "/oms" },
-  { label: "Integrations", icon: FaGlobe, path: "/integrations" },
-  {
-    label: "Local Companies",
-    icon: FaBuilding,
-    path: "/local-companies",
-    children: [
-      { label: "Country Management", path: "/country-management" },
-      { label: "Currency Managment", path: "/currency-management" },
-      { label: "Languages Managment", path: "/language-management" },
-    ],
-  },
-  { label: "Marketplace", icon: FaShoppingBag, path: "/marketplace" },
-  {
-    label: "MLM System",
-    icon: FaProjectDiagram,
-    path: "/mlm",
-    children: [
-      { label: "Mlm Dashboard", path: "/mlmdashboard" },
-      { label: "User Tree", path: "/usertree" },
-      { label: "Reports", path: "/reports" },
-    ],
-  },
-  {
-    label: "Settings",
-    icon: FaCog,
-    path: "/settings",
-    children: [
-      { label: "Translation", path: "/translation" },
-      { label: "Updates", path: "/updates" },
-      { label: "Backups", path: "/backups" },
-      { label: "Audit Logs", path: "/auditlogs" },
-    ],
-  },
-  { label: "Domain", icon: FaGlobe, path: "/domains" },
-  {
-    label: "Return Platform",
-    icon: FaUndoAlt,
-    path: "/return-platform",
-    children: [
-      { label: "Coupon Management", path: "/CouponManagementList" },
-      { label: "Email Marketing", path: "/EmailMarketingList" },
-      { label: "SEOSettingList", path: "/SEOSettingList" },
-    ],
-  },
-  { label: "Marketing", icon: FaBullhorn, path: "/marketing" },
-  { label: "Payments", icon: FaCreditCard, path: "/payment-providers" },
-  { label: "Shipping", icon: FaTruck, path: "/shipping-mangement" },
-  {
-    label: "Taxes",
-    icon: FaMoneyBill,
-    path: "/taxes-management",
-    children: [
-      { label: "Taxes", path: "/taxes" },
-      { label: "Invoice", path: "/invoicemanagement" },
-    ],
-  },
-  { label: "Reports", icon: FaChartBar, path: "/reports-main" },
-];
-
 // ============ HELPER — check if any child/grandchild path is active ============
-// const isDescendantActive = (item: MenuItem, currentPath: string): boolean => {
-//   // exact path or startsWith
-//   if (item.path && (item.path === currentPath || currentPath.startsWith(item.path))) return true;
-
-//   // check custom matchPaths
-//   if (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) return true;
-
-//   // check children recursively
-//   if (item.children) {
-//     return item.children.some(child => isDescendantActive(child, currentPath));
-//   }
-
-//   return false;
-// };
-
 const isDescendantActive = (item: MenuItem, currentPath: string): boolean => {
   if (item.path) {
     if (item.path === "/") {
@@ -557,7 +59,6 @@ const isDescendantActive = (item: MenuItem, currentPath: string): boolean => {
 
   return false;
 };
-
 
 // ============ RECURSIVE MENU ITEM ============
 interface RecursiveMenuItemProps {
@@ -584,11 +85,6 @@ const RecursiveMenuItem = ({
   const menuKey = `${depth}-${item.label}`;
   const isOpen = openMenus.includes(menuKey);
 
-  // Is this item or any descendant active?
-  // const isActive = item.path
-  //   ? item.path === currentPath
-  //   : isDescendantActive(item, currentPath);
-
   const isExact = item.path === currentPath;
 
   const isActive =
@@ -596,15 +92,7 @@ const RecursiveMenuItem = ({
     (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) ||
     isDescendantActive(item, currentPath);
 
-
-
-  // const isActive =
-  //   (item.path && currentPath.startsWith(item.path)) ||
-  //   (item.matchPaths && item.matchPaths.some(p => currentPath.startsWith(p))) ||
-  //   isDescendantActive(item, currentPath);
-
   // Indent based on depth
-  // const paddingLeft = depth === 0 ? "px-6" : `pl-${4 + depth * 4} pr-4`;
   const paddingLeft = depth === 0
     ? "px-6"
     : depth === 1
@@ -634,8 +122,6 @@ const RecursiveMenuItem = ({
         {Icon && depth === 0 && !collapsed && <Icon className="text-lg flex-shrink-0" />}
         {Icon && depth === 0 && collapsed && <Icon className="text-lg" />}
 
-
-
         {/* Label */}
         {!collapsed && (
           <span className="text-sm font-medium truncate max-w-40">{item.label}</span>
@@ -654,7 +140,7 @@ const RecursiveMenuItem = ({
   return (
     <div className="relative">
       {/* Active left bar — sirf depth 0 pe */}
-      {isActive && (
+      {isActive && depth === 0 && (
         <span className="absolute -left-4 top-2 bottom-2 w-1 rounded-full bg-blue-500" />
       )}
       {/* Item — link ya div */}
@@ -686,15 +172,13 @@ const RecursiveMenuItem = ({
 
 // ============ LAYOUT ============
 const Layout = () => {
-
   const location = useLocation();
-  // const navigate = useNavigate();        
   const [collapsed, setCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [filteredMenuItems, setFilteredMenuItems] = useState<MenuItem[]>([]);
 
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const handleLogout = async () => {
@@ -704,13 +188,505 @@ const Layout = () => {
 
   const navigate = useNavigate();
 
-  // Admin info localStorage se
-  const adminRaw = localStorage.getItem("admin");
-  const admin = adminRaw ? JSON.parse(adminRaw) : null;
-  const initials = admin
-    ? `${admin.firstname?.[0] ?? ""}${admin.lastname?.[0] ?? ""}`.toUpperCase()
-    : "A";
+  // Get user from localStorage
+  const userRaw = localStorage.getItem("user");
+  const user = userRaw ? JSON.parse(userRaw) : null;
+  
+  // Check if user has admin or super_admin role
+  const hasAdminAccess = user?.roles?.some(
+    (role: string) => role === "super_admin" || role === "admin"
+  ) || false;
 
+  // ================= FULL MENU ITEMS (Moved inside component to use user role) =================
+  const getFullMenuItems = (): MenuItem[] => [
+    { label: "Dashboard", icon: FaHome, path: "/" },
+
+    {
+      label: "Magento",
+      icon: FaMagento,
+      path: "/magento",
+      children: [
+        // Inventory
+        { label: "All Magento Inventory", path: "/MagentoInventoryList" },
+
+        // Sales
+        {
+          label: "Sales",
+          icon: FaStore,
+          children: [
+            { label: "Orders", path: "/MagentoOrders" },
+            { label: "Payment Service", path: "/MagentoPaymentService" },
+            { label: "Invoice", path: "/MagentoInvoiceList" },
+            { label: "Shipment", path: "/MagentoShipments" },
+            { label: "Credit Memos", path: "/MagentoCreditMemos" },
+            { label: "Billing Agreements", path: "/MagentoBillingAgreementsList" },
+            { label: "Transactions", path: "/MagentoTransactionList" },
+            { label: "Braintree Virtual Terminal", path: "/BraintreeVirtualTerminal" },
+          ],
+        },
+
+        // Catalog
+        {
+          label: "Catalog",
+          icon: FaStore,
+          children: [
+            {
+              label: "Products",
+              path: "/MagentoProducts",
+              matchPaths: ["/MagentoProducts", "/AddMagentoProduct", "/AddMagentoProduct/:sku"]
+            },
+            {
+              label: "Categories",
+              path: "/MagentoCategoryList",
+              matchPaths: ["/MagentoCategoryList", "/AddMagentoCategory", "/AddMagentoCategory/:id"]
+            },
+          ],
+        },
+
+        // Customers
+        {
+          label: "Customers",
+          icon: FaStore,
+          children: [
+            {
+              label: "All Customers",
+              path: "/MagentoCustomerList",
+              matchPaths: ["/MagentoCustomerList", "/AddMagentoCustomer", "/AddMagentoCustomer/:id", "/customers/:id"]
+            },
+            { label: "Now Online", path: "/OnlineCustomers" },
+            // { label: "! Login as Customer Log", path: "/storeList12" },
+            {
+              label: "Customer Groups",
+              path: "/MagentoCustomerGroupsList",
+              matchPaths: ["/MagentoCustomerGroupsList", "/AddMagentoCustomerGroup", "/AddMagentoCustomerGroup/:id"]
+            },
+          ],
+        },
+
+        // Marketing
+        {
+          label: "Marketing",
+          icon: FaStore,
+          children: [
+            {
+              label: "Promotions",
+              icon: FaStore,
+              children: [
+                {
+                  label: "Catalog Price Rule",
+                  path: "/MagentoCatalogPriceRuleList",
+                  matchPaths: ["/MagentoCatalogPriceRuleList", "/AddCatalogPriceRule", "/AddCatalogPriceRule/:id"]
+                },
+                {
+                  label: "Cart Price Rules",
+                  path: "/MagentoCartPriceRulesList",
+                  matchPaths: ["/MagentoCartPriceRulesList", "/AddCartPriceRule", "/AddCartPriceRule/:id"]
+                },
+              ],
+            },
+            {
+              label: "SEO & Search",
+              icon: FaStore,
+              children: [
+                {
+                  label: "URL Rewrites",
+                  path: "/MagentoUrlRewritesList",
+                  matchPaths: ["/MagentoUrlRewritesList", "/AddMagentoUrlRewrite", "/AddMagentoUrlRewrite/:id"]
+                },
+                {
+                  label: "Search Terms",
+                  path: "/MagentoSearchTermsList",
+                  matchPaths: ["/MagentoSearchTermsList", "/AddMagentoSearchTerm", "/AddMagentoSearchTerm/:id"]
+                },
+                {
+                  label: "Search Synonyms",
+                  path: "/MagentoSearchSynonymsList",
+                  matchPaths: ["/MagentoSearchSynonymsList", "/AddMagentoSearchSynonym", "/AddMagentoSearchSynonym/:id"]
+                },
+                {
+                  label: "Site Map",
+                  path: "/MagentoSitemapList",
+                  matchPaths: ["/MagentoSitemapList", "/AddMagentoSitemap", "/AddMagentoSitemap/:id"]
+                },
+              ],
+            },
+            {
+              label: "Communications",
+              icon: FaStore,
+              children: [
+                {
+                  label: "Email Templates",
+                  path: "/MagentoEmailTemplatesList",
+                  matchPaths: ["/MagentoEmailTemplatesList", "/AddMagentoEmailTemplate", "/AddMagentoEmailTemplate/:id"]
+                },
+                {
+                  label: "Newsletter Templates",
+                  path: "/MagentoNewsletterTemplatesList",
+                  matchPaths: ["/MagentoNewsletterTemplatesList", "/AddMagentoNewsletterTemplate", "/AddMagentoNewsletterTemplate/:id"]
+                },
+              ],
+            },
+            {
+              label: "User Content",
+              icon: FaStore,
+              children: [
+                {
+                  label: "All Reviews",
+                  path: "/MagentoReviewsList",
+                  matchPaths: ["/MagentoReviewsList", "/AddMagentoReview", "/AddMagentoReview/:id"]
+                },
+              ],
+            },
+          ],
+        },
+
+        // Content
+        {
+          label: "Content",
+          icon: FaStore,
+          children: [
+            {
+              label: "Elements",
+              icon: FaStore,
+              children: [
+                { label: "Pages", path: "/pageBuilder" },
+                { label: "Blogs", path: "/SubscriptionList10" },
+                { label: "Widgets", path: "/SubscriptionList10" },
+                { label: "Templates", path: "/SubscriptionList10" },
+              ],
+            },
+            {
+              label: "Media",
+              icon: FaStore,
+              children: [
+                { label: "Media Gallery", path: "/SubscriptionList10" },
+              ],
+            },
+            {
+              label: "Design",
+              icon: FaStore,
+              children: [
+                { label: "Configuration", path: "/SubscriptionList10" },
+                { label: "Themes", path: "/SubscriptionList10" },
+                { label: "Schedule", path: "/SubscriptionList10" },
+              ],
+            },
+          ],
+        },
+
+        // Reports
+        {
+          label: "Reports",
+          icon: FaChartBar,
+          children: [
+            {
+              label: "Marketing",
+              children: [
+                { label: "Products in Cart", path: "/MagentoProductsInCartsList" },
+                { label: "Search Terms", path: "/MagentoSearchTermsListForReports" },
+                { label: "Abandoned Carts", path: "/MagentoAbandonedCartsList" },
+                { label: "Newsletter Problem Reports", path: "/MagentoNewsletterProblemsReportList" },
+              ],
+            },
+            {
+              label: "Reviews",
+              children: [
+                { label: "By Customers", path: "/MagentoCustomerReviewsReportList" },
+                { label: "By Products", path: "/MagentoProductReviewsReportList" },
+              ],
+            },
+            {
+              label: "Sales",
+              children: [
+                { label: "Orders", path: "/MagentoOrderUpdatedReportList" },
+                { label: "Tax", path: "/MagentoTaxReportList" },
+                { label: "Invoiced", path: "/MagentoInvoiceReportList" },
+                { label: "Shipping", path: "/MagentoShippingReportList" },
+                { label: "Refunds", path: "/MagentoRefundsReportList" },
+                { label: "Coupons", path: "/MagentoCouponsReportList" },
+                { label: "PayPal Settlement", path: "/MagentoPayPalSettlementReportList" },
+                { label: "Braintree Settlement", path: "/MagentoBraintreeSettlementReportList" },
+              ],
+            },
+            {
+              label: "Customers",
+              children: [
+                { label: "Order Total", path: "/MagentoOrderTotalReportList" },
+                { label: "Order Count", path: "/MagentoOrderCountReportList" },
+                { label: "New", path: "/MagentoNewAccountsReportList" },
+              ],
+            },
+            {
+              label: "Products",
+              children: [
+                {
+                  label: "Views",
+                  path: "/MagentoProductViewsReportList",
+                },
+                { label: "Bestsellers", path: "/MagentoBestsellersReportList" },
+                { label: "Low Stock", path: "/MagentoLowStockReportList" },
+                { label: "Ordered", path: "/MagentoOrderedProductsReportList" },
+                { label: "Downloads", path: "/MagentoDownloadsReportList" },
+              ],
+            },
+            {
+              label: "Business Intelligence",
+              children: [
+                { label: "Advanced Reporting", path: "/reports/advanced-reporting" },
+                { label: "BI Essentials", path: "/reports/bi-essentials" },
+              ],
+            },
+          ],
+        },
+
+        // Stores
+        {
+          label: "Stores",
+          icon: FaStore,
+          children: [
+            {
+              label: "Settings",
+              children: [
+                {
+                  label: "All Stores",
+                  path: "/MagentoStoreList",
+                  matchPaths: ["/MagentoStoreList", "/AddMagentoStor", "/AddMagentoStor/:id"]
+                },
+                // { label: "! Configuration", path: "/stores/configuration" },
+                {
+                  label: "Terms and Conditions",
+                  path: "/MagentoTermsConditionsList",
+                  matchPaths: ["/MagentoTermsConditionsList", "/AddMagentoTermsCondition", "/AddMagentoTermsCondition/:id"]
+                },
+                {
+                  label: "Order Status",
+                  path: "/MagentoOrderStatusList",
+                  matchPaths: ["/MagentoOrderStatusList", "/AddMagentoOrderStatus", "/AddMagentoOrderStatus/:id"]
+                },
+              ],
+            },
+            {
+              label: "Inventory",
+              children: [
+                { label: "Sources", path: "/MagentoSourcesList" },
+                {
+                  label: "Stocks",
+                  path: "/MagentoStockList",
+                  matchPaths: ["/MagentoStockList", "/AddMagentoStock"]
+                },
+              ],
+            },
+            {
+              label: "Taxes",
+              children: [
+                {
+                  label: "Tax Rules",
+                  path: "/MagentoTaxRulesList",
+                  matchPaths: ["/MagentoTaxRulesList", "/AddMagentoTaxRule"]
+                },
+                { label: "Tax Zones and Rates", path: "/MagentoTaxZonesList" },
+              ],
+            },
+            {
+              label: "Currency",
+              children: [
+                { label: "Currency Rates", path: "/AddCurrencyRates" },
+                { label: "Currency Symbols", path: "/AddCurrencySymbols" },
+              ],
+            },
+            {
+              label: "Attributes",
+              children: [
+                {
+                  label: "Product",
+                  path: "/MagentoAttributesLits",
+                  matchPaths: ["/MagentoAttributesLits", "/AddMagentoAttribute", "/AddMagentoAttribute/:attribute_code"]
+                },
+                {
+                  label: "Attribute Set",
+                  path: "/MagentoAttributeSets",
+                  matchPaths: ["/MagentoAttributeSets", "/AddMagentoAttributeSet"]
+                },
+                {
+                  label: "Rating",
+                  path: "/MagentoProductRatingsList",
+                  matchPaths: ["/MagentoProductRatingsList", "/AddMagentoRating"]
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: "System",
+          icon: FaStore,
+          children: [
+            {
+              label: "Other Settings",
+              icon: FaStore,
+              children: [
+                {
+                  label: "Notification",
+                  path: "/MagentoNotificationsList",
+                },
+                {
+                  label: "Cart Price Rules",
+                  path: "/MagentoCartPriceRulesList",
+                },
+              ],
+            },
+            {
+              label: "Categories",
+              icon: FaStore,
+              children: [
+                {
+                  label: "Catalog Price Rule",
+                  path: "/MagentoCatalogPriceRuleList",
+                },
+                {
+                  label: "Cart Price Rules",
+                  path: "/MagentoCartPriceRulesList",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Order Management",
+      icon: FaShoppingCart,
+      path: "/orderlist",
+      children: [
+        {
+          label: "All Orders",
+          path: "/orderlist",
+          matchPaths: ["/orderlist", "/orders/:uuid"]
+        },
+        {
+          label: "Order Statistics",
+          path: "/OrderStatistics",
+          matchPaths: ["/OrderStatistics"]
+        },
+      ]
+    },
+    {
+      label: "Stores",
+      icon: FaStore,
+      path: "/store",
+      children: [
+        { label: "All Subscription", path: "/SubscriptionList" },
+        { label: "Stores list", path: "/storeList" },
+      ],
+    },
+    {
+      label: "Catalog",
+      icon: FaBox,
+      path: "/catalog",
+      children: [
+        { label: "All Inventiries", path: "/InventoryManagementList" },
+        { label: "All Product Bases", path: "/ProductBaseList" },
+        { label: "All Legality Control", path: "/LegalityControlList" },
+        { label: "All Product Sharing", path: "/ProductSharingList" },
+        { label: "All Category", path: "/CategoryList" },
+      ],
+    },
+    {
+      label: "Users",
+      icon: FaUsers,
+      path: "/users",
+      children: [
+        { label: "Users List", path: "/userlist" },
+        { label: "Roles", path: "/usersroles" },
+        { label: "Group", path: "/usersgroup" },
+      ],
+    },
+    {
+      label: "Vendors",
+      icon: FaHandshake,
+      path: "/vendors",
+      children: [
+        { label: "All Vendors", path: "/Verdor" },
+        { label: "Add Vendor Onboard", path: "/CreateVerderOnboard" },
+        { label: "Vendor Requests", path: "/vendor/requests" },
+      ],
+    },
+    { label: "Settlements", icon: FaExchangeAlt, path: "/settlements" },
+    { label: "CMS", icon: FaFileAlt, path: "/cms" },
+    { label: "OMS", icon: FaCogs, path: "/oms" },
+    { label: "Integrations", icon: FaGlobe, path: "/integrations" },
+    {
+      label: "Local Companies",
+      icon: FaBuilding,
+      path: "/local-companies",
+      children: [
+        { label: "Country Management", path: "/country-management" },
+        { label: "Currency Managment", path: "/currency-management" },
+        { label: "Languages Managment", path: "/language-management" },
+      ],
+    },
+    { label: "Marketplace", icon: FaShoppingBag, path: "/marketplace" },
+    {
+      label: "MLM System",
+      icon: FaProjectDiagram,
+      path: "/mlm",
+      children: [
+        { label: "Mlm Dashboard", path: "/mlmdashboard" },
+        { label: "User Tree", path: "/usertree" },
+        { label: "Reports", path: "/reports" },
+      ],
+    },
+    {
+      label: "Settings",
+      icon: FaCog,
+      path: "/settings",
+      children: [
+        { label: "Translation", path: "/translation" },
+        { label: "Updates", path: "/updates" },
+        { label: "Backups", path: "/backups" },
+        { label: "Audit Logs", path: "/auditlogs" },
+      ],
+    },
+    { label: "Domain", icon: FaGlobe, path: "/domains" },
+    {
+      label: "Return Platform",
+      icon: FaUndoAlt,
+      path: "/return-platform",
+      children: [
+        { label: "Coupon Management", path: "/CouponManagementList" },
+        { label: "Email Marketing", path: "/EmailMarketingList" },
+        { label: "SEOSettingList", path: "/SEOSettingList" },
+      ],
+    },
+    { label: "Marketing", icon: FaBullhorn, path: "/marketing" },
+    { label: "Payments", icon: FaCreditCard, path: "/payment-providers" },
+    { label: "Shipping", icon: FaTruck, path: "/shipping-mangement" },
+    {
+      label: "Taxes",
+      icon: FaMoneyBill,
+      path: "/taxes-management",
+      children: [
+        { label: "Taxes", path: "/taxes" },
+        { label: "Invoice", path: "/invoicemanagement" },
+      ],
+    },
+    { label: "Reports", icon: FaChartBar, path: "/reports-main" },
+  ];
+
+  // Filter menu items based on user role
+  useEffect(() => {
+    const fullMenu = getFullMenuItems();
+    
+    if (hasAdminAccess) {
+      // If user is admin or super_admin, show all menus
+      setFilteredMenuItems(fullMenu);
+    } else {
+      // If not admin, only show Dashboard and Magento
+      const allowedMenus = fullMenu.filter(item => 
+        item.label === "Dashboard" || item.label === "Magento"
+      );
+      setFilteredMenuItems(allowedMenus);
+    }
+  }, [hasAdminAccess]);
 
   // Auto open parent menus based on current path
   useEffect(() => {
@@ -728,16 +704,16 @@ const Layout = () => {
       });
     };
 
-    findOpenMenus(menuItems, 0);
+    findOpenMenus(filteredMenuItems, 0);
     setOpenMenus(autoOpen);
-  }, [location.pathname]);
+  }, [location.pathname, filteredMenuItems]);
 
   // Add this useEffect inside your Layout component
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape" && showSearch) {
         setShowSearch(false);
-        setSearchQuery("");        // optional: clear search when closing
+        setSearchQuery("");
       }
     };
 
@@ -756,21 +732,6 @@ const Layout = () => {
     );
   };
 
-  // Active label for top bar
-  // const getActiveLabel = (): string => {
-  //   const findActive = (items: MenuItem[]): string => {
-  //     for (const item of items) {
-  //       if (item.path === location.pathname) return item.label;
-  //       if (item.children) {
-  //         const found = findActive(item.children);
-  //         if (found) return found;
-  //       }
-  //     }
-  //     return "Dashboard";
-  //   };
-  //   return findActive(menuItems);
-  // };
-
   const getActiveLabel = (): string => {
     const findActive = (items: MenuItem[]): string | null => {
       for (const item of items) {
@@ -782,7 +743,7 @@ const Layout = () => {
       }
       return null;
     };
-    return findActive(menuItems) || "Dashboard";
+    return findActive(filteredMenuItems) || "Dashboard";
   };
 
   // Active parent label for top bar
@@ -798,26 +759,25 @@ const Layout = () => {
       return "";
     };
     const active = getActiveLabel();
-    return findParent(menuItems, active) || active;
+    return findParent(filteredMenuItems, active) || active;
   };
 
   return (
     <div className="min-h-screen flex bg-gray-100 overflow-x-hidden">
       {/* SIDEBAR */}
       <aside className={`${collapsed ? "w-20" : "w-64"} bg-white flex flex-col transition-all duration-300 overflow-hidden`}>
-
         {/* LOGO */}
         <div className="h-20 flex items-center justify-center">
           <img
             src="madd-admin.png"
+            alt="Logo"
             className={`transition-all duration-300 ${collapsed ? "w-8" : "w-40"}`}
           />
         </div>
 
         {/* NAV */}
-        {/* <nav className={`flex-1 px-4 space-y-1 text-sm overflow-y-auto ${!collapsed ? "mt-6" : ""}`}> */}
         <nav className="flex-1 px-4 space-y-1 text-sm overflow-y-auto overflow-x-hidden">
-          {menuItems.map((item) => (
+          {filteredMenuItems.map((item) => (
             <RecursiveMenuItem
               key={item.label}
               item={item}
@@ -845,9 +805,6 @@ const Layout = () => {
             <span className="font-medium">{getActiveParentLabel()}</span>
           </div>
           <div className="flex items-center gap-4">
-            {/* <button className="px-4 py-1 rounded-lg bg-green-500 text-white text-sm">
-              Yearly
-            </button> */}
             <div className="relative">
               <button
                 onClick={() => setShowSearch(!showSearch)}
@@ -885,13 +842,10 @@ const Layout = () => {
                 {/* Notification Dot */}
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
               </button>
-              {/* Optional Tooltip */}
               <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded right-0 -bottom-8 whitespace-nowrap">
                 Notifications
               </div>
             </div>
-
-
 
             <div className="relative">
               <button
@@ -899,10 +853,10 @@ const Layout = () => {
                 className="flex items-center gap-2 hover:bg-gray-50 px-3 py-1.5 rounded-xl transition-all"
               >
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                  {initials}
+                  {user ? `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() : "A"}
                 </div>
                 <span className="text-sm text-gray-700 font-medium">
-                  {admin ? `${admin.firstname} ${admin.lastname}` : "Admin"}
+                  {user ? `${user.first_name} ${user.last_name}` : "Admin"}
                 </span>
                 <span className="text-gray-400 text-xs">•••</span>
               </button>
@@ -916,12 +870,17 @@ const Layout = () => {
                   />
                   {/* Dropdown */}
                   <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-lg border border-gray-100 w-52 overflow-hidden">
-                    {/* Admin info */}
+                    {/* User info */}
                     <div className="px-4 py-3 border-b border-gray-50">
                       <p className="text-sm font-semibold text-gray-800">
-                        {admin ? `${admin.firstname} ${admin.lastname}` : "Admin"}
+                        {user ? `${user.first_name} ${user.last_name}` : "Admin"}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{admin?.email ?? ""}</p>
+                      <p className="text-xs text-gray-400 truncate">{user?.email ?? ""}</p>
+                      {user?.roles && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Role: {user.roles.join(", ")}
+                        </p>
+                      )}
                     </div>
                     {/* Logout */}
                     <button

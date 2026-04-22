@@ -128,8 +128,8 @@ const MagentoCustomerGroupsList = () => {
 
             {/* TABLE */}
             <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", minWidth: "600px", borderCollapse: "collapse" }}>
-                    <thead>
+               <table className="bg-gradient-to-r from-teal-400 to-green-400 text-white"  style={{ width: "100%", minWidth: "600px", borderCollapse: "collapse" }}>
+                    <thead className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
                         <tr style={{ background: "linear-gradient(to right, #38bdf8, #3b82f6)" }}>
                             {[
                                 { label: "ID", sortable: true },

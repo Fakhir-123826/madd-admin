@@ -9,9 +9,123 @@ import {
 } from "react-icons/fa";
 import StoreViewDropdown from "../../../../component/StoreViewDropdown";
 import type { StoreViewSelection } from "../../../../model/MagentoProduct/StoreViewSelection";
-// import { useGetOrdersQuery } from "../orderApi"; // Adjust path as needed
-// import type { MagentoOrder, OrderFilters } from "./orderApi"; // Adjust path as needed
 
+// ============ FAKE DATA GENERATION ============
+interface MagentoOrder {
+  entity_id: number;
+  increment_id: string;
+  order_currency_code: string;
+  created_at: string;
+  customer_firstname: string;
+  customer_lastname: string;
+  customer_email: string;
+  grand_total: number;
+  status: string;
+  state: string;
+  subtotal: number;
+  shipping_amount: number;
+  payment?: { method: string };
+  billing_address?: { street: string[]; city: string; region?: string };
+  extension_attributes?: {
+    shipping_assignments?: Array<{
+      shipping?: {
+        address?: { street: string[]; city: string };
+        method?: string;
+      };
+    }>;
+  };
+}
+
+const firstNames = ["John", "Emma", "Michael", "Sophia", "William", "Olivia", "James", "Ava", "Robert", "Isabella", "David", "Mia", "Richard", "Charlotte", "Joseph", "Amelia", "Thomas", "Harper", "Charles", "Evelyn"];
+const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Wilson", "Anderson", "Taylor", "Thomas", "Moore", "Jackson", "Martin", "Lee", "White", "Harris"];
+const statuses = ["pending", "processing", "complete", "closed", "canceled"];
+const paymentMethods = ["credit_card", "paypal", "bank_transfer", "cash_on_delivery", "braintree"];
+const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "Austin"];
+const streets = ["123 Main St", "456 Oak Ave", "789 Pine Rd", "321 Elm Blvd", "654 Maple Dr", "987 Cedar Ln", "147 Birch St", "258 Walnut Ave"];
+
+const generateRandomDate = (start: Date, end: Date) => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+};
+
+const formatDate = (date: Date) => {
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+};
+
+const generateFakeOrders = (count: number): MagentoOrder[] => {
+  const orders: MagentoOrder[] = [];
+  const startDate = new Date(2024, 0, 1);
+  const endDate = new Date();
+
+  for (let i = 1; i <= count; i++) {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const grandTotal = Math.floor(Math.random() * 50000) / 100 + 10;
+    const subtotal = grandTotal - (Math.random() * 20);
+    const shippingAmount = Math.floor(Math.random() * 1500) / 100;
+    const orderDate = generateRandomDate(startDate, endDate);
+    const city = cities[Math.floor(Math.random() * cities.length)];
+    const street = streets[Math.floor(Math.random() * streets.length)];
+    
+    orders.push({
+      entity_id: i,
+      increment_id: `#${100000 + i}`,
+      order_currency_code: "USD",
+      created_at: formatDate(orderDate),
+      customer_firstname: firstName,
+      customer_lastname: lastName,
+      customer_email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}@example.com`,
+      grand_total: grandTotal,
+      status: status,
+      state: status === "complete" ? "closed" : status === "processing" ? "processing" : "new",
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      shipping_amount: parseFloat(shippingAmount.toFixed(2)),
+      payment: {
+        method: paymentMethods[Math.floor(Math.random() * paymentMethods.length)]
+      },
+      billing_address: {
+        street: [street],
+        city: city,
+        region: ["CA", "TX", "NY", "FL", "IL"][Math.floor(Math.random() * 5)]
+      },
+      extension_attributes: {
+        shipping_assignments: [{
+          shipping: {
+            address: {
+              street: [street],
+              city: city
+            },
+            method: ["flatrate", "freeshipping", "table"][Math.floor(Math.random() * 3)]
+          }
+        }]
+      }
+    });
+  }
+  
+  // Sort by date descending (newest first)
+  return orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+};
+
+const FAKE_ORDERS = generateFakeOrders(50);
+
+// ============ ORDER FILTERS TYPE ============
+interface OrderFilters {
+  purchaseDateFrom: string;
+  purchaseDateTo: string;
+  grandTotalBaseFrom: string;
+  grandTotalBaseTo: string;
+  grandTotalPurchasedFrom: string;
+  grandTotalPurchasedTo: string;
+  billToName: string;
+  shipToName: string;
+  status: string;
+  customerEmail: string;
+  disputeState: string;
+  purchasePoint: string;
+  id: string;
+}
+
+// ============ MAIN COMPONENT ============
 function MagentoOrderList() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -68,36 +182,80 @@ function MagentoOrderList() {
     id: "",
   });
 
-  // Fetch orders from API
-  const { data: ordersData, isLoading, error, refetch } = useGetOrdersQuery({
-    filters: filters,
-    page: currentPage,
-    pageSize: perPage,
-  });
-
-  const orders = ordersData?.items || [];
-  const totalCount = ordersData?.total_count || 0;
+  // Using fake data instead of API
+  const orders = FAKE_ORDERS;
+  const totalCount = orders.length;
   const totalPages = Math.ceil(totalCount / perPage);
+  const isLoading = false;
+  const error = null;
 
-  // Real-time Search Filtering (client-side on fetched data)
+  // Apply filters to orders
   const filteredOrders = useMemo(() => {
-    if (!search.trim()) return orders;
-    
-    return orders.filter((order: MagentoOrder) => {
+    let result = [...orders];
+
+    // Search filter
+    if (search.trim()) {
       const searchLower = search.toLowerCase();
-      return (
+      result = result.filter((order) =>
         order.increment_id?.toLowerCase().includes(searchLower) ||
-        order.customer_firstname?.toLowerCase().includes(searchLower) ||
-        order.customer_lastname?.toLowerCase().includes(searchLower) ||
+        `${order.customer_firstname} ${order.customer_lastname}`.toLowerCase().includes(searchLower) ||
         order.customer_email?.toLowerCase().includes(searchLower)
       );
-    });
-  }, [orders, search]);
+    }
+
+    // Date range filter
+    if (filters.purchaseDateFrom) {
+      result = result.filter(order => new Date(order.created_at) >= new Date(filters.purchaseDateFrom));
+    }
+    if (filters.purchaseDateTo) {
+      result = result.filter(order => new Date(order.created_at) <= new Date(filters.purchaseDateTo));
+    }
+
+    // Grand total filters
+    if (filters.grandTotalBaseFrom) {
+      result = result.filter(order => order.grand_total >= parseFloat(filters.grandTotalBaseFrom));
+    }
+    if (filters.grandTotalBaseTo) {
+      result = result.filter(order => order.grand_total <= parseFloat(filters.grandTotalBaseTo));
+    }
+
+    // Bill-to Name filter
+    if (filters.billToName) {
+      const nameLower = filters.billToName.toLowerCase();
+      result = result.filter(order => 
+        `${order.customer_firstname} ${order.customer_lastname}`.toLowerCase().includes(nameLower)
+      );
+    }
+
+    // Status filter
+    if (filters.status) {
+      result = result.filter(order => order.status === filters.status);
+    }
+
+    // Customer email filter
+    if (filters.customerEmail) {
+      const emailLower = filters.customerEmail.toLowerCase();
+      result = result.filter(order => order.customer_email?.toLowerCase().includes(emailLower));
+    }
+
+    // ID filter
+    if (filters.id) {
+      result = result.filter(order => order.increment_id.includes(filters.id));
+    }
+
+    return result;
+  }, [orders, search, filters]);
 
   // Reset to page 1 when filters or perPage changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters, perPage]);
+  }, [filters, perPage, search]);
+
+  // Pagination
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage
+  );
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
@@ -107,7 +265,7 @@ function MagentoOrderList() {
 
   const toggleAll = () => {
     setSelected(
-      selected.length === filteredOrders.length ? [] : filteredOrders.map((order) => order.increment_id)
+      selected.length === paginatedOrders.length ? [] : paginatedOrders.map((order) => order.increment_id)
     );
   };
 
@@ -134,6 +292,7 @@ function MagentoOrderList() {
       purchasePoint: "",
       id: "",
     });
+    setSearch("");
     setShowFilters(false);
   };
 
@@ -145,7 +304,7 @@ function MagentoOrderList() {
   };
 
   const exportData = () => {
-    const dataToExport = filteredOrders.length > 0 ? filteredOrders : orders;
+    const dataToExport = filteredOrders;
 
     if (exportType === "csv") {
       const headers = [
@@ -165,7 +324,7 @@ function MagentoOrderList() {
         order.grand_total,
         order.grand_total,
         order.status,
-        `"${order.billing_address?.street?.join(", ") || ""}, ${order.billing_address?.city || ""}, ${order.billing_address?.region || ""}"`,
+        `"${order.billing_address?.street?.join(", ") || ""}, ${order.billing_address?.city || ""}"`,
         `"${order.extension_attributes?.shipping_assignments?.[0]?.shipping?.address?.street?.join(", ") || ""}, ${order.extension_attributes?.shipping_assignments?.[0]?.shipping?.address?.city || ""}"`,
         `"${order.extension_attributes?.shipping_assignments?.[0]?.shipping?.method || ""}"`,
         order.customer_email,
@@ -174,7 +333,7 @@ function MagentoOrderList() {
         order.shipping_amount,
         `"${order.customer_firstname} ${order.customer_lastname}"`,
         `"${order.payment?.method || ""}"`,
-        order.grand_total - (order.total_refunded || 0),
+        "0",
         order.extension_attributes?.shipping_assignments?.[0]?.shipping?.method || "",
         order.payment?.method || "",
         order.state || ""
@@ -226,30 +385,17 @@ function MagentoOrderList() {
     setShowExport(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading orders...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-xl p-6 m-6">
-        <p className="text-red-600">Error loading orders. Please try again.</p>
-        <button 
-          onClick={() => refetch()} 
-          className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
+  // Get status badge color
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      pending: "bg-yellow-100 text-yellow-700",
+      processing: "bg-blue-100 text-blue-700",
+      complete: "bg-green-100 text-green-700",
+      closed: "bg-gray-100 text-gray-700",
+      canceled: "bg-red-100 text-red-700"
+    };
+    return styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700";
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
@@ -257,7 +403,7 @@ function MagentoOrderList() {
       {/* HEADER */}
       <div className="px-6 py-5 border-b border-gray-100">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold text-gray-800">Orders</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Orders ({totalCount})</h2>
           <button
             onClick={() => navigate("/addorder")}
             className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all"
@@ -273,7 +419,7 @@ function MagentoOrderList() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by keyword"
+                placeholder="Search by ID, Name, or Email..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-teal-400 bg-gray-50 focus:bg-white"
               />
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</div>
@@ -418,18 +564,18 @@ function MagentoOrderList() {
 
             {/* Grand Total (Base) */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Grand Total (Base)</label>
+              <label className="block text-xs font-medium text-gray-600 mb-2">Grand Total</label>
               <div className="grid grid-cols-2 gap-3">
                 <input
-                  type="text"
-                  placeholder="from"
+                  type="number"
+                  placeholder="Min $"
                   value={filters.grandTotalBaseFrom}
                   onChange={(e) => handleFilterChange("grandTotalBaseFrom", e.target.value)}
                   className="border border-gray-300 rounded-xl px-4 py-3 text-sm"
                 />
                 <input
-                  type="text"
-                  placeholder="to"
+                  type="number"
+                  placeholder="Max $"
                   value={filters.grandTotalBaseTo}
                   onChange={(e) => handleFilterChange("grandTotalBaseTo", e.target.value)}
                   className="border border-gray-300 rounded-xl px-4 py-3 text-sm"
@@ -437,25 +583,10 @@ function MagentoOrderList() {
               </div>
             </div>
 
-            {/* Grand Total (Purchased) */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Grand Total (Purchased)</label>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="text" placeholder="from" value={filters.grandTotalPurchasedFrom} onChange={(e) => handleFilterChange("grandTotalPurchasedFrom", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-                <input type="text" placeholder="to" value={filters.grandTotalPurchasedTo} onChange={(e) => handleFilterChange("grandTotalPurchasedTo", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 text-sm" />
-              </div>
-            </div>
-
             {/* Bill-to Name */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Bill-to Name</label>
-              <input type="text" value={filters.billToName} onChange={(e) => handleFilterChange("billToName", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Ship-to Name */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Ship-to Name</label>
-              <input type="text" value={filters.shipToName} onChange={(e) => handleFilterChange("shipToName", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
+              <label className="block text-xs font-medium text-gray-600 mb-2">Customer Name</label>
+              <input type="text" value={filters.billToName} onChange={(e) => handleFilterChange("billToName", e.target.value)} placeholder="Search by name..." className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
             </div>
 
             {/* Status */}
@@ -463,38 +594,24 @@ function MagentoOrderList() {
               <label className="block text-xs font-medium text-gray-600 mb-2">Status</label>
               <select value={filters.status} onChange={(e) => handleFilterChange("status", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full">
                 <option value="">All Status</option>
-                <option value="closed">Closed</option>
-                <option value="processing">Processing</option>
                 <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
                 <option value="complete">Complete</option>
+                <option value="closed">Closed</option>
+                <option value="canceled">Canceled</option>
               </select>
             </div>
 
             {/* Customer Email */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-2">Customer Email</label>
-              <input type="text" value={filters.customerEmail} onChange={(e) => handleFilterChange("customerEmail", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Dispute State */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Dispute State</label>
-              <input type="text" value={filters.disputeState} onChange={(e) => handleFilterChange("disputeState", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
-            </div>
-
-            {/* Purchase Point */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">Purchase Point</label>
-              <select value={filters.purchasePoint} onChange={(e) => handleFilterChange("purchasePoint", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full">
-                <option value="">All Store Views</option>
-                <option value="Main Website Store">Main Website Store</option>
-              </select>
+              <input type="email" value={filters.customerEmail} onChange={(e) => handleFilterChange("customerEmail", e.target.value)} placeholder="Search by email..." className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
             </div>
 
             {/* ID */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-2">ID</label>
-              <input type="text" value={filters.id} onChange={(e) => handleFilterChange("id", e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
+              <label className="block text-xs font-medium text-gray-600 mb-2">Order ID</label>
+              <input type="text" value={filters.id} onChange={(e) => handleFilterChange("id", e.target.value)} placeholder="Search by ID..." className="border border-gray-300 rounded-xl px-4 py-3 w-full" />
             </div>
 
           </div>
@@ -505,7 +622,7 @@ function MagentoOrderList() {
               onClick={resetFilters}
               className="px-8 py-3 border border-gray-300 rounded-2xl text-sm font-medium hover:bg-gray-50"
             >
-              Reset
+              Reset All
             </button>
             <button
               onClick={() => setShowFilters(false)}
@@ -526,7 +643,7 @@ function MagentoOrderList() {
               onChange={(e) => {
                 const value = e.target.value;
                 if (value && value !== "Actions") {
-                  alert(`Action: ${value} applied to ${selected.length || filteredOrders.length} selected records`);
+                  alert(`Action: ${value} applied to ${selected.length || paginatedOrders.length} selected records`);
                   e.target.value = "Actions";
                 }
               }}
@@ -545,7 +662,7 @@ function MagentoOrderList() {
           </div>
 
           <span className="text-sm text-gray-600 font-medium">
-            {totalCount} records found
+            {filteredOrders.length} records found
           </span>
         </div>
 
@@ -560,7 +677,6 @@ function MagentoOrderList() {
               <option value={30}>30</option>
               <option value={50}>50</option>
               <option value={100}>100</option>
-              <option value={200}>200</option>
             </select>
             <span>per page</span>
           </div>
@@ -575,7 +691,7 @@ function MagentoOrderList() {
             </button>
 
             <div className="px-5 py-2 text-sm font-medium text-gray-800 bg-white border border-gray-200 rounded-xl">
-              {currentPage} of {totalPages}
+              Page {currentPage} of {totalPages}
             </div>
 
             <button
@@ -621,27 +737,27 @@ function MagentoOrderList() {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.length === 0 ? (
+            {paginatedOrders.length === 0 ? (
               <tr>
                 <td colSpan={30} className="py-20 text-center">
                   <p className="text-gray-500 text-xl">We couldn't find any records matching your filters.</p>
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order: MagentoOrder, idx: number) => (
+              paginatedOrders.map((order: MagentoOrder, idx: number) => (
                 <tr key={order.entity_id} className={`border-b border-gray-100 hover:bg-teal-50/60 transition-all ${idx % 2 === 1 ? "bg-gray-50" : "bg-white"}`}>
                   <td className="px-6 py-4">
                     <input type="checkbox" checked={selected.includes(order.increment_id)} onChange={() => toggleSelect(order.increment_id)} className="accent-teal-500" />
                   </td>
-                  {visibleColumns.id && <td className={`${tdClass} font-medium`}>{order.increment_id}</td>}
+                  {visibleColumns.id && <td className={`${tdClass} font-medium text-teal-600`}>{order.increment_id}</td>}
                   {visibleColumns.purchasePoint && <td className={tdClass}>{order.order_currency_code}</td>}
                   {visibleColumns.purchaseDate && <td className={tdClass}>{new Date(order.created_at).toLocaleDateString()}</td>}
                   {visibleColumns.billToName && <td className={tdClass}>{order.customer_firstname} {order.customer_lastname}</td>}
                   {visibleColumns.shipToName && <td className={tdClass}>{order.customer_firstname} {order.customer_lastname}</td>}
-                  {visibleColumns.grandTotalBase && <td className={tdClass}>${order.grand_total}</td>}
-                  {visibleColumns.grandTotalPurchased && <td className={tdClass}>${order.grand_total}</td>}
+                  {visibleColumns.grandTotalBase && <td className={`${tdClass} font-semibold`}>${order.grand_total.toFixed(2)}</td>}
+                  {visibleColumns.grandTotalPurchased && <td className={`${tdClass} font-semibold`}>${order.grand_total.toFixed(2)}</td>}
                   {visibleColumns.status && <td className={tdClass}>
-                    <span className={`px-3 py-1 text-xs rounded-full ${order.status === 'closed' ? 'bg-green-100 text-green-700' : order.status === 'processing' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`px-3 py-1 text-xs rounded-full ${getStatusBadge(order.status)}`}>
                       {order.status}
                     </span>
                   </td>}
@@ -656,11 +772,13 @@ function MagentoOrderList() {
                   </td>}
                   {visibleColumns.customerEmail && <td className={tdClass}>{order.customer_email}</td>}
                   {visibleColumns.customerGroup && <td className={tdClass}>General</td>}
-                  {visibleColumns.subtotal && <td className={tdClass}>${order.subtotal}</td>}
-                  {visibleColumns.shippingAndHandling && <td className={tdClass}>${order.shipping_amount}</td>}
+                  {visibleColumns.subtotal && <td className={tdClass}>${order.subtotal.toFixed(2)}</td>}
+                  {visibleColumns.shippingAndHandling && <td className={tdClass}>${order.shipping_amount.toFixed(2)}</td>}
                   {visibleColumns.customerName && <td className={tdClass}>{order.customer_firstname} {order.customer_lastname}</td>}
-                  {visibleColumns.paymentMethod && <td className={tdClass}>{order.payment?.method || "-"}</td>}
-                  {visibleColumns.totalRefunded && <td className={tdClass}>$0</td>}
+                  {visibleColumns.paymentMethod && <td className={tdClass}>
+                    <span className="capitalize">{order.payment?.method?.replace("_", " ") || "-"}</span>
+                  </td>}
+                  {visibleColumns.totalRefunded && <td className={tdClass}>$0.00</td>}
                   {visibleColumns.action && (
                     <td 
                       onClick={() => navigate(`/orders/${order.entity_id}`)} 
