@@ -66,7 +66,7 @@ export default function StoreViewDropdown({ onChange }: StoreViewDropdownProps) 
             {/* Trigger Button */}
             <button
                 onClick={() => setOpen((prev) => !prev)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors min-w-[180px] justify-between"
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors min-w-[180px] justify-between cursor-pointer"
             >
                 <div className="flex items-center gap-2">
                     <FaGlobe className="text-teal-500" />

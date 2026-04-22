@@ -50,7 +50,7 @@ const Searchbar = () => {
                     </div>
 
                     {/* RESET */}
-                    <button className="px-5 flex items-center gap-2 text-sm text-blue-500 hover:underline">
+                    <button className="px-5 flex items-center gap-2 text-sm text-blue-500 hover:underline cursor-pointer">
                         <FaRedo className="text-xs" />
                         Reset Filter
                     </button>

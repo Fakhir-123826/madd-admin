@@ -294,7 +294,7 @@ const Login = () => {
                     <button
                         onClick={handleLogin}
                         disabled={loginLoading}
-                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white text-sm shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white text-sm shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                         style={{ background: "linear-gradient(135deg, #3ab5e6, #1a8fc0)" }}
                     >
                         {loginLoading ? "Logging in..." : (
@@ -315,7 +315,7 @@ const Login = () => {
                     {/* Google */}
                     <button
                         onClick={() => console.log("Google login")}
-                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm"
+                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm cursor-pointer"
                     >
                         <FcGoogle className="text-lg" />
                         Continue with Google
@@ -324,7 +324,7 @@ const Login = () => {
                     {/* Apple */}
                     <button
                         onClick={() => console.log("Apple login")}
-                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm"
+                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm cursor-pointer"
                     >
                         <FaApple className="text-lg text-gray-800" />
                         Continue with Apple

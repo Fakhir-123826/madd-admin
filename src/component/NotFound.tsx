@@ -165,13 +165,13 @@ const NotFound = () => {
           <div className="flex gap-3 w-full">
             <button
               onClick={() => navigate(-1)}
-              className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-500 text-sm font-medium hover:bg-gray-50 transition-all"
+              className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-500 text-sm font-medium hover:bg-gray-50 transition-all cursor-pointer"
             >
               ← Go Back
             </button>
             <button
               onClick={() => navigate("/")}
-              className="flex-1 py-3 rounded-xl text-white text-sm font-semibold transition-all hover:opacity-90"
+              className="flex-1 py-3 rounded-xl text-white text-sm font-semibold transition-all hover:opacity-90 cursor-pointer"
               style={{
                 background: "linear-gradient(to right, #38bdf8, #22d3ee, #3b82f6)",
               }}
