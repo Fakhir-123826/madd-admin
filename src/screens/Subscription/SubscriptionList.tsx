@@ -177,6 +177,9 @@ const SubscriptionList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSubscription, setSelectedSubscription] =
     useState<Subscription | null>(null);
+  const [deleteSubscription] = useDeleteSubscriptionMutation();
+  const [createSubscription] = useCreateSubscriptionMutation();
+  const [updateSubscription] = useUpdateSubscriptionMutation();
 
   const {
     data: subscriptions = [],
@@ -184,14 +187,6 @@ const SubscriptionList = () => {
     error,
     refetch,
   } = useGetSubscriptionsQuery();
-  const [deleteSubscription] = useDeleteSubscriptionMutation();
-  const [createSubscription] = useCreateSubscriptionMutation();
-  const [updateSubscription] = useUpdateSubscriptionMutation();
-
-  const showToast = (type: "success" | "error", msg: string) => {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 3000);
-  };
 
   // Handle Create/Edit Save
   const handleSaveSubscription = async (data: Partial<Subscription>) => {
@@ -219,6 +214,11 @@ const SubscriptionList = () => {
       );
       throw error; // Re-throw to let modal handle loading state
     }
+  };
+
+  const showToast = (type: "success" | "error", msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 3000);
   };
 
   const handleEdit = (subscription: Subscription) => {
@@ -299,11 +299,10 @@ const SubscriptionList = () => {
       {toast && (
         <div
           className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
-                    ${
-                      toast.type === "success"
-                        ? "bg-green-50 text-green-700 border border-green-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
-                    }`}
+                    ${toast.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+            }`}
         >
           <span>{toast.type === "success" ? "✓" : "✕"}</span>
           {toast.msg}
@@ -339,11 +338,10 @@ const SubscriptionList = () => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2 rounded text-sm font-medium transition cursor-pointer ${
-              activeTab === tab.key
+            className={`px-5 py-2 rounded text-sm font-medium transition cursor-pointer ${activeTab === tab.key
                 ? "bg-gradient-to-r from-teal-400 to-green-400 text-white shadow"
                 : "text-gray-500 hover:text-gray-700"
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -397,7 +395,7 @@ const SubscriptionList = () => {
               label="Price"
               options={[]}
               value=""
-              onChange={() => {}}
+              onChange={() => { }}
             />
           </div>
 
@@ -522,16 +520,14 @@ const SubscriptionList = () => {
                   {/* Status pill — matching reference: green "Active" / pink "Disabled" */}
                   <td className="px-5 py-4">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border ${
-                        isActive(s)
+                      className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border ${isActive(s)
                           ? "bg-emerald-50 text-emerald-600 border-emerald-200"
                           : "bg-rose-50 text-rose-500 border-rose-200"
-                      }`}
+                        }`}
                     >
                       <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          isActive(s) ? "bg-emerald-500" : "bg-rose-500"
-                        }`}
+                        className={`w-1.5 h-1.5 rounded-full ${isActive(s) ? "bg-emerald-500" : "bg-rose-500"
+                          }`}
                       />
                       {isActive(s) ? "Active" : "Disabled"}
                     </span>
@@ -568,11 +564,10 @@ const SubscriptionList = () => {
             <button
               key={i}
               onClick={() => setPage(i + 1)}
-              className={`px-3 py-1 rounded-md cursor-pointer ${
-                page === i + 1
+              className={`px-3 py-1 rounded-md cursor-pointer ${page === i + 1
                   ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
                   : "hover:bg-gray-100"
-              }`}
+                }`}
             >
               {i + 1}
             </button>

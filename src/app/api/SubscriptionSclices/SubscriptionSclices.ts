@@ -1,88 +1,110 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { Subscription } from '../../../model/susbcription/ISubscription'
+import {
+  createApi,
+  fetchBaseQuery,
+} from "@reduxjs/toolkit/query/react";
+import type { Subscription } from "../../../model/susbcription/ISubscription";
 
-const baseURL = import.meta.env.VITE_BASE_URL
+const baseURL = import.meta.env.VITE_BASE_URL;
+
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: baseURL,
+
+  prepareHeaders: (headers) => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
+
+    headers.set("Accept", "application/json");
+
+    return headers;
+  },
+});
+
+const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+
+  // If token expired / unauthorized
+  if (result.error && result.error.status === 401) {
+    localStorage.removeItem("token");
+
+    // redirect to login page
+    window.location.href = "/login";
+  }
+
+  return result;
+};
 
 export const subscriptionApi = createApi({
-  reducerPath: 'subscriptionApi',
+  reducerPath: "subscriptionApi",
 
-  baseQuery: fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('token')
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`)
-      }
-      return headers
-    },
-  }),
+  baseQuery: baseQueryWithAuthCheck,
 
-  tagTypes: ['Subscription'],
+  tagTypes: ["Subscription"],
 
   endpoints: (builder) => ({
-    // ================= GET ALL PLANS =================
     getSubscriptions: builder.query<Subscription[], void>({
       query: () => ({
-        url: 'admin/plans',
-        method: 'GET',
+        url: "admin/plans",
+        method: "GET",
       }),
-      providesTags: ['Subscription'],
+      providesTags: ["Subscription"],
     }),
 
-    // ================= GET SINGLE PLAN =================
     getSubscription: builder.query<Subscription, number>({
       query: (id) => ({
         url: `admin/plans/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: ['Subscription'],
+      providesTags: ["Subscription"],
     }),
 
-    // ================= CREATE PLAN =================
     createSubscription: builder.mutation<
       Subscription,
       Partial<Subscription>
     >({
       query: (data) => ({
-        url: 'admin/plans',
-        method: 'POST',
+        url: "admin/plans",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
     }),
 
-    // ================= UPDATE PLAN =================
     updateSubscription: builder.mutation<
       Subscription,
       { id: number; data: Partial<Subscription> }
     >({
       query: ({ id, data }) => ({
         url: `admin/plans/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
     }),
 
-    // ================= DELETE PLAN =================
     deleteSubscription: builder.mutation<void, number>({
       query: (id) => ({
         url: `admin/plans/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
     }),
 
-    // ================= SET DEFAULT PLAN =================
     setDefaultPlan: builder.mutation<void, number>({
       query: (id) => ({
         url: `admin/plans/${id}/set-default`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
     }),
   }),
-})
+});
 
 export const {
   useGetSubscriptionsQuery,
@@ -91,4 +113,4 @@ export const {
   useUpdateSubscriptionMutation,
   useDeleteSubscriptionMutation,
   useSetDefaultPlanMutation,
-} = subscriptionApi
+} = subscriptionApi;
