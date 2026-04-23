@@ -1,41 +1,3 @@
-// import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-// const baseURL = import.meta.env.VITE_BASE_URL;
-
-// export const storeListApi = createApi({
-//     reducerPath: "storeListApi",
-
-//     baseQuery: fetchBaseQuery({
-//         baseUrl: baseURL,
-//         prepareHeaders: (headers) => {
-//             const token = localStorage.getItem("token");
-//             if (token) {
-//                 headers.set("authorization", `Bearer ${token}`);
-//             }
-//             return headers;
-//         },
-//     }),
-
-//     tagTypes: ["Stores"],
-
-//     endpoints: (builder) => ({
-
-//         // ================= GET ALL STORES =================
-//         getStores: builder.query({
-//             query: () => ({
-//                 url: "admin/stores",
-//                 method: "GET",
-//             }),
-//             providesTags: ["Stores"],
-//         }),
-
-//     }),
-// });
-
-// export const { useGetStoresQuery } = storeListApi;
-
-
-
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -46,11 +8,65 @@ export interface Store {
     id: number;
     uuid: string;
     name: string;
-    status: "active" | "inactive";
-    vendor?: Record<string, unknown>;
-    domain?: Record<string, unknown>;
+    slug: string;
+    description?: string;
+    logo?: string;
+    banner?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    country_code?: string;
+    currency?: string;
+    timezone?: string;
+    status: "active" | "inactive" | "pending";
+    meta_title?: string;
+    meta_description?: string;
+    facebook_url?: string;
+    instagram_url?: string;
+    twitter_url?: string;
+    whatsapp_number?: string;
+    vendor_id?: number;
+    vendor?: {
+        id: number;
+        company_name: string;
+    };
+    domain?: {
+        id: number;
+        domain: string;
+        type: string;
+    };
     theme?: Record<string, unknown>;
     products?: Record<string, unknown>[];
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface CreateStorePayload {
+    vendor_id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    logo?: string;
+    banner?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    country_code?: string;
+    currency?: string;
+    timezone?: string;
+    status?: "active" | "inactive" | "pending";
+    meta_title?: string;
+    meta_description?: string;
+    facebook_url?: string;
+    instagram_url?: string;
+    twitter_url?: string;
+    whatsapp_number?: string;
 }
 
 export interface StoreStats {
@@ -79,7 +95,25 @@ export interface StoreSingleResponse {
 
 export interface StoreUpdatePayload {
     name?: string;
-    status?: "active" | "inactive";
+    description?: string;
+    logo?: string;
+    banner?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    country_code?: string;
+    currency?: string;
+    timezone?: string;
+    status?: "active" | "inactive" | "pending";
+    meta_title?: string;
+    meta_description?: string;
+    facebook_url?: string;
+    instagram_url?: string;
+    twitter_url?: string;
+    whatsapp_number?: string;
     [key: string]: unknown;
 }
 
@@ -87,23 +121,53 @@ export interface AddDomainPayload {
     domain: string;
 }
 
+export interface Vendor {
+    id: number;
+    company_name: string;
+    status: string;
+}
+
+export interface VendorsResponse {
+    success: boolean;
+    data: Vendor[];
+}
+
+// Raw base query with headers configuration
+const rawBaseQuery = fetchBaseQuery({
+    baseUrl: baseURL,
+    prepareHeaders: (headers) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            headers.set("authorization", `Bearer ${token}`);
+        }
+        headers.set("Content-Type", "application/json");
+        return headers;
+    },
+});
+
+// Base query with authentication check
+const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
+    args,
+    api,
+    extraOptions
+) => {
+    const result = await rawBaseQuery(args, api, extraOptions);
+
+    // If token expired / unauthorized
+    if (result.error && result.error.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+    }
+
+    return result;
+};
+
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const storeListApi = createApi({
     reducerPath: "storeListApi",
-
-    baseQuery: fetchBaseQuery({
-        baseUrl: baseURL,
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
-            if (token) {
-                headers.set("authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
-    }),
-
-    tagTypes: ["Stores", "StoreStats"],
+    baseQuery: baseQueryWithAuthCheck,
+    tagTypes: ["Stores", "StoreStats", "Vendors"],
 
     endpoints: (builder) => ({
 
@@ -125,6 +189,16 @@ export const storeListApi = createApi({
             providesTags: (_result, _error, uuid) => [{ type: "Stores", id: uuid }],
         }),
 
+        // POST /admin/stores (CREATE)
+        createStore: builder.mutation<StoreSingleResponse, CreateStorePayload>({
+            query: (data) => ({
+                url: "admin/stores",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["Stores"],
+        }),
+
         // PUT /admin/stores/{id}
         updateStore: builder.mutation<StoreSingleResponse, { id: number | string; data: StoreUpdatePayload }>({
             query: ({ id, data }) => ({
@@ -134,7 +208,7 @@ export const storeListApi = createApi({
             }),
             invalidatesTags: (_result, _error, { id }) => [
                 "Stores",
-                { type: "Stores", id },
+                { type: "Stores", id: id.toString() },
             ],
         }),
 
@@ -155,7 +229,7 @@ export const storeListApi = createApi({
             }),
             invalidatesTags: (_result, _error, id) => [
                 "Stores",
-                { type: "Stores", id },
+                { type: "Stores", id: id.toString() },
             ],
         }),
 
@@ -167,7 +241,7 @@ export const storeListApi = createApi({
             }),
             invalidatesTags: (_result, _error, id) => [
                 "Stores",
-                { type: "Stores", id },
+                { type: "Stores", id: id.toString() },
             ],
         }),
 
@@ -178,7 +252,7 @@ export const storeListApi = createApi({
                 method: "POST",
                 body: data,
             }),
-            invalidatesTags: (_result, _error, { id }) => [{ type: "Stores", id }],
+            invalidatesTags: (_result, _error, { id }) => [{ type: "Stores", id: id.toString() }],
         }),
 
         // GET /admin/stores/{id}/stats
@@ -187,7 +261,16 @@ export const storeListApi = createApi({
                 url: `admin/stores/${id}/stats`,
                 method: "GET",
             }),
-            providesTags: (_result, _error, id) => [{ type: "StoreStats", id }],
+            providesTags: (_result, _error, id) => [{ type: "StoreStats", id: id.toString() }],
+        }),
+
+        // GET /admin/stores/vendors (Helper for dropdown)
+        getVendorsForStore: builder.query<VendorsResponse, void>({
+            query: () => ({
+                url: "admin/stores/vendors",
+                method: "GET",
+            }),
+            providesTags: ["Vendors"],
         }),
 
     }),
@@ -196,10 +279,14 @@ export const storeListApi = createApi({
 export const {
     useGetStoresQuery,
     useGetStoreQuery,
+    useCreateStoreMutation,
     useUpdateStoreMutation,
     useDeleteStoreMutation,
     useActivateStoreMutation,
     useDeactivateStoreMutation,
     useAddStoreDomainMutation,
     useGetStoreStatsQuery,
+    useGetVendorsForStoreQuery,
 } = storeListApi;
+
+export default storeListApi;

@@ -25,32 +25,45 @@ export interface CreateVendorPayload {
     country_code: string;
     company_name: string;
     company_slug?: string;
-
     description?: string;
     plan_id?: number;
     status?: string;
 }
 
+// Raw base query with headers configuration
+const rawBaseQuery = fetchBaseQuery({
+    baseUrl: baseURL,
+    prepareHeaders: (headers) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            headers.set("authorization", `Bearer ${token}`);
+        }
+        headers.set("Content-Type", "application/json");
+        return headers;
+    },
+});
+
+// Base query with authentication check
+const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
+    args,
+    api,
+    extraOptions
+) => {
+    const result = await rawBaseQuery(args, api, extraOptions);
+
+    // If token expired / unauthorized
+    if (result.error && result.error.status === 401) {
+        localStorage.removeItem("token");
+        // redirect to login page
+        window.location.href = "/login";
+    }
+
+    return result;
+};
 
 export const vendorApi = createApi({
     reducerPath: "vendorApi",
-
-    baseQuery: fetchBaseQuery({
-        baseUrl: baseURL,
-
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
-
-            if (token) {
-                headers.set("authorization", `Bearer ${token}`);
-            }
-
-            headers.set("Content-Type", "application/json");
-
-            return headers;
-        },
-    }),
-
+    baseQuery: baseQueryWithAuthCheck,
     tagTypes: ["Vendors"],
 
     endpoints: (builder) => ({
@@ -157,7 +170,11 @@ export const vendorApi = createApi({
             invalidatesTags: ["Vendors"],
         }),
 
-
+        /*
+        =========================================
+        CREATE VENDOR
+        =========================================
+        */
         createVendor: builder.mutation<any, CreateVendorPayload>({
             query: (data) => ({
                 url: "admin/vendors",
@@ -166,6 +183,7 @@ export const vendorApi = createApi({
             }),
             invalidatesTags: ["Vendors"],
         }),
+
         /*
         =========================================
         REJECT KYC

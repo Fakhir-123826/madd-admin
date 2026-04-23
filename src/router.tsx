@@ -181,6 +181,7 @@ import MagentoNotificationsList from "./screens/System/Notification/MagentoNotif
 import SettlementList from "./screens/Settlements/Settlementlist.tsx";
 import SettlementDetail from "./screens/Settlements/SettlementDetail.tsx";
 import GenerateSettlement from "./screens/Settlements/GenerateSettlement.tsx";
+import UserCreate from "./screens/Users/UserCreate.tsx";
 // router.tsx
 
 // ==================== ROUTE CONSTANTS ====================
@@ -203,6 +204,7 @@ export const ROUTES = {
   STORE_CARD_LIST: "/storeCardList",
   STORE: "/store",
   CREATE_STORE: "/CreateStore",
+  EDIT_STORE : (id: string | number = ":id") => `/UpdateStore/${id}`,
 
   // Order Section
   ORDER_LIST: "/orderlist",
@@ -269,6 +271,7 @@ export const ROUTES = {
 
   // Users
   USER_LIST: "/userlist",
+  // ADD_USER: "/adduser",
   ADD_USER: "/adduser",
   USER_DETAILS: (id: string | number = ":id") => `/user/${id}`,
 
@@ -551,8 +554,10 @@ const protectedRoutes = [
 
   // Users
   { path: ROUTES.USER_LIST, element: <UserList /> },
-  { path: ROUTES.ADD_USER, element: <AddUser /> },
-  { path: ROUTES.USER_DETAILS(), element: <UserDetails /> },
+  // { path: ROUTES.ADD_USER, element: <AddUser /> },UserCreate
+  { path: ROUTES.ADD_USER, element: <UserCreate /> },
+  { path: ROUTES.USER_DETAILS(), element: <UserCreate /> },
+  // { path: ROUTES.USER_DETAILS(), element: <UserDetails /> },
 
   // User Roles
   { path: ROUTES.USER_ROLES, element: <UsersRoles /> },
