@@ -401,7 +401,7 @@ const CreateStore = () => {
                     
                     <div className="font-bold text-lg">Store Information</div>
                     
-                    {/* STORE BASIC INFO */}
+                    {/* STORE BASIC INFO **/}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Vendor Selection */}
                         <div>
