@@ -8,7 +8,7 @@ interface AddButtonProps {
 
 const AddButton = ({ label, onClick ,type = "button"}: AddButtonProps) => {
   return (
-    <div>
+    <>
       <button
         onClick={onClick}
         type={type}
@@ -31,7 +31,7 @@ const AddButton = ({ label, onClick ,type = "button"}: AddButtonProps) => {
 
         {label}
       </button>
-    </div>
+    </>
   );
 };
 

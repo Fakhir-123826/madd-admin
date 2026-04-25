@@ -1,657 +1,6 @@
-// import { useState, useRef, useEffect } from "react";
-// import { FiFilter, FiRefreshCw, FiSearch, FiChevronDown } from "react-icons/fi";
-// import { FaEllipsisV, FaPlus, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-// import {
-//   useGetUsersQuery,
-//   useCreateUserMutation,
-//   useUpdateUserMutation,
-//   useDeleteUserMutation,
-// } from "../../app/api/UserSlices/UserApi";
-// import UserModal from "../../component/UserModal";
-// import { Link, useNavigate } from "react-router-dom";
-// import { ROUTES } from "../../router";
-
-// // ============ USER TYPE DEFINITION ============
-// interface User {
-//   id: string;
-//   full_name: string;
-//   email: string;
-//   phone: string | null;
-//   user_type: string;
-//   status: string;
-//   country_code: string | null;
-//   is_email_verified: boolean;
-//   is_phone_verified: boolean;
-//   is_kyc_verified: boolean;
-//   created_at: string;
-//   vendor?: {
-//     company_name: string;
-//   };
-// }
-
-// // ============ HELPERS ============
-// const fmtDate = (d: string) =>
-//   new Date(d).toLocaleDateString("en-GB", {
-//     day: "2-digit",
-//     month: "short",
-//     year: "numeric",
-//   });
-
-// // ============ STATUS STYLES ============
-// const statusStyle = (status: string) => {
-//   switch (status) {
-//     case "active":
-//       return "bg-emerald-50 text-emerald-600 border border-emerald-200";
-//     case "suspended":
-//       return "bg-red-100 text-red-600";
-//     case "pending":
-//       return "bg-yellow-100 text-yellow-600";
-//     case "banned":
-//       return "bg-gray-200 text-gray-600";
-//     default:
-//       return "bg-gray-100 text-gray-500";
-//   }
-// };
-
-// const userTypeStyle = (type: string) => {
-//   switch (type) {
-//     case "super_admin":
-//       return "bg-purple-100 text-purple-600";
-//     case "vendor":
-//       return "bg-blue-100 text-blue-600";
-//     case "customer":
-//       return "bg-teal-100 text-teal-600";
-//     case "mlm_agent":
-//       return "bg-orange-100 text-orange-500";
-//     default:
-//       return "bg-gray-100 text-gray-500";
-//   }
-// };
-
-// // ============ FILTER DROPDOWN ============
-// const FilterDropdown = ({
-//   label,
-//   options,
-//   value,
-//   onChange,
-// }: {
-//   label: string;
-//   options: string[];
-//   value: string;
-//   onChange: (v: string) => void;
-// }) => {
-//   const [open, setOpen] = useState(false);
-//   const ref = useRef<HTMLDivElement>(null);
-
-//   useEffect(() => {
-//     const handler = (e: MouseEvent) => {
-//       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-//     };
-//     document.addEventListener("mousedown", handler);
-//     return () => document.removeEventListener("mousedown", handler);
-//   }, []);
-
-//   return (
-//     <div className="relative" ref={ref}>
-//       <button
-//         onClick={() => setOpen(!open)}
-//         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition cursor-pointer"
-//       >
-//         <span className="font-medium">{value || label}</span>
-//         <FiChevronDown
-//           className={`text-gray-400 transition-transform ${open ? "rotate-180" : ""
-//             }`}
-//         />
-//       </button>
-//       {open && (
-//         <div className="absolute top-full left-0 mt-1 z-30 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
-//           <button
-//             onClick={() => {
-//               onChange("");
-//               setOpen(false);
-//             }}
-//             className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-50 cursor-pointer"
-//           >
-//             All
-//           </button>
-//           {options.map((opt) => (
-//             <button
-//               key={opt}
-//               onClick={() => {
-//                 onChange(opt);
-//                 setOpen(false);
-//               }}
-//               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
-//             >
-//               {opt.replace("_", " ")}
-//             </button>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// // ============ ROW ACTION MENU ============
-// const RowMenu = ({
-//   user,
-//   onEdit,
-//   onDelete,
-//   onView,
-// }: {
-//   user: User;
-//   onEdit: () => void;
-//   onDelete: () => void;
-//   onView: () => void;
-// }) => {
-//   const [open, setOpen] = useState(false);
-//   const ref = useRef<HTMLDivElement>(null);
-
-//   useEffect(() => {
-//     const handler = (e: MouseEvent) => {
-//       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-//     };
-//     document.addEventListener("mousedown", handler);
-//     return () => document.removeEventListener("mousedown", handler);
-//   }, []);
-
-//   return (
-//     <div className="relative" ref={ref}>
-//       <button
-//         onClick={() => setOpen(!open)}
-//         className="text-gray-400 hover:text-gray-600 transition p-1 cursor-pointer"
-//       >
-//         <FaEllipsisV className="text-sm" />
-//       </button>
-//       {open && (
-//         <div className="absolute right-0 top-7 z-30 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-40 text-sm">
-//           <button
-//             onClick={() => {
-//               onView();
-//               setOpen(false);
-//             }}
-//             className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-600 cursor-pointer"
-//           >
-//             View Details
-//           </button>
-//           <button
-//             onClick={() => {
-//               onEdit();
-//               setOpen(false);
-//             }}
-//             className="w-full text-left px-4 py-2 hover:bg-teal-50 text-teal-700 cursor-pointer"
-//           >
-//             Edit
-//           </button>
-//           <button
-//             onClick={() => {
-//               onDelete();
-//               setOpen(false);
-//             }}
-//             className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 cursor-pointer"
-//           >
-//             Delete
-//           </button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// // ============ MAIN COMPONENT ============
-// const ITEMS_PER_PAGE = 10;
-
-// const UserList = () => {
-//   const navigate = useNavigate();
-//   const [page, setPage] = useState(1);
-//   const [activeTab, setActiveTab] = useState<"list" | "type" | "status">(
-//     "list"
-//   );
-//   const [filterStatus, setFilterStatus] = useState("");
-//   const [filterType, setFilterType] = useState("");
-//   const [filterVerification, setFilterVerification] = useState("");
-//   const [searchInput, setSearchInput] = useState("");
-//   const [search, setSearch] = useState("");
-//   const [toast, setToast] = useState<{
-//     type: "success" | "error";
-//     msg: string;
-//   } | null>(null);
-
-//   // Modal states
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-//   const { data, isLoading, error, refetch } = useGetUsersQuery({});
-//   const [createUser] = useCreateUserMutation();
-//   const [updateUser] = useUpdateUserMutation();
-//   const [deleteUser] = useDeleteUserMutation();
-
-//   const users: User[] = data?.data ?? [];
-
-//   const showToast = (type: "success" | "error", msg: string) => {
-//     setToast({ type, msg });
-//     setTimeout(() => setToast(null), 3000);
-//   };
-
-//   // Handle View Details
-//   const handleViewDetails = (userId: string) => {
-//     navigate(ROUTES.USER_DETAILS(userId));
-//   };
-
-//   // Handle Create/Edit Save
-//   const handleSaveUser = async (formData: Partial<User>) => {
-//     try {
-//       if (selectedUser) {
-//         await updateUser({
-//           id: selectedUser.id,
-//           data: formData,
-//         }).unwrap();
-//         showToast("success", "User updated successfully!");
-//       } else {
-//         await createUser(formData).unwrap();
-//         showToast("success", "User created successfully!");
-//       }
-//       refetch();
-//       setIsModalOpen(false);
-//       setSelectedUser(null);
-//     } catch (error: any) {
-//       console.error("Save error:", error);
-//       showToast("error", error?.data?.message || "Failed to save user");
-//       throw error;
-//     }
-//   };
-
-//   const handleEdit = (user: User) => {
-//     setSelectedUser(user);
-//     setIsModalOpen(true);
-//   };
-
-//   const handleAddNew = () => {
-//     setSelectedUser(null);
-//     setIsModalOpen(true);
-//   };
-
-//   const handleDelete = async (id: string) => {
-//     if (!confirm("Are you sure you want to delete this user?")) return;
-//     try {
-//       await deleteUser(id).unwrap();
-//       showToast("success", "User deleted successfully.");
-//       refetch();
-//     } catch (error: any) {
-//       showToast("error", error?.data?.message || "Failed to delete user.");
-//     }
-//   };
-
-//   // Get unique values for filters
-//   const userTypes = [...new Set(users.map((u) => u.user_type).filter(Boolean))];
-//   const statuses = [...new Set(users.map((u) => u.status).filter(Boolean))];
-
-//   // Filter & Search
-//   const filtered = users.filter((user) => {
-//     const matchStatus = !filterStatus || user.status === filterStatus;
-//     const matchType = !filterType || user.user_type === filterType;
-//     const matchVerification =
-//       !filterVerification ||
-//       (filterVerification === "Verified"
-//         ? user.is_email_verified
-//         : !user.is_email_verified);
-//     const matchSearch =
-//       !search ||
-//       user.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-//       user.email?.toLowerCase().includes(search.toLowerCase()) ||
-//       user.phone?.toLowerCase().includes(search.toLowerCase());
-//     return matchStatus && matchType && matchVerification && matchSearch;
-//   });
-
-//   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-//   const paginated = filtered.slice(
-//     (page - 1) * ITEMS_PER_PAGE,
-//     page * ITEMS_PER_PAGE
-//   );
-
-//   const handleReset = () => {
-//     setFilterStatus("");
-//     setFilterType("");
-//     setFilterVerification("");
-//     setSearch("");
-//     setSearchInput("");
-//     setPage(1);
-//   };
-
-//   const handleSearch = () => {
-//     setSearch(searchInput);
-//     setPage(1);
-//   };
-
-//   if (isLoading) {
-//     return (
-//       <div className="flex items-center justify-center min-h-[60vh] gap-3 text-gray-400">
-//         <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
-//         <span className="text-sm">Loading users…</span>
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="flex items-center justify-center min-h-[60vh] text-red-400 text-sm">
-//         Error loading users. Please try again.
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="bg-gray-50 min-h-screen p-6">
-//       {/* Toast Notification */}
-//       {toast && (
-//         <div
-//           className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
-//                     ${toast.type === "success"
-//               ? "bg-green-50 text-green-700 border border-green-200"
-//               : "bg-red-50 text-red-700 border border-red-200"
-//             }`}
-//         >
-//           <span>{toast.type === "success" ? "✓" : "✕"}</span>
-//           {toast.msg}
-//         </div>
-//       )}
-
-//       {/* Header Section */}
-//       <div className="mb-8">
-//         <div className="flex items-center justify-between">
-//           <div>
-//             <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-//             <p className="text-sm text-gray-500 mt-1">Manage and monitor all users in the system</p>
-//           </div>
-
-//           <Link to={ROUTES.ADD_USER}>
-//             <button
-//               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-green-400 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all cursor-pointer"
-//             >
-//               <FaPlus className="text-xs" />
-//               Add New User
-//             </button>
-//           </Link>
-//         </div>
-//       </div>
-
-//       {/* Tabs */}
-//       <div className="flex items-center gap-2 mb-6">
-//         {([
-//           { key: "list", label: "Users List" },
-//           { key: "type", label: "User Types" },
-//           { key: "status", label: "Status" },
-//         ] as const).map((tab) => (
-//           <button
-//             key={tab.key}
-//             onClick={() => setActiveTab(tab.key)}
-//             className={`px-5 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${activeTab === tab.key
-//                 ? "bg-gradient-to-r from-teal-400 to-green-400 text-white shadow-md"
-//                 : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-//               }`}
-//           >
-//             {tab.label}
-//           </button>
-//         ))}
-//       </div>
-
-//       {/* Filter Bar */}
-//       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
-//         <div className="flex flex-wrap items-center justify-between gap-4 p-4">
-//           {/* Left Filters */}
-//           <div className="flex flex-wrap items-center gap-2 flex-1">
-//             <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
-//               <FiFilter className="text-sm text-gray-400" />
-//               <span className="text-sm text-gray-500 font-medium">Filter By:</span>
-//             </div>
-
-//             <FilterDropdown
-//               label="Status"
-//               options={statuses}
-//               value={filterStatus}
-//               onChange={(v) => {
-//                 setFilterStatus(v);
-//                 setPage(1);
-//               }}
-//             />
-
-//             <FilterDropdown
-//               label="User Type"
-//               options={userTypes}
-//               value={filterType}
-//               onChange={(v) => {
-//                 setFilterType(v);
-//                 setPage(1);
-//               }}
-//             />
-
-//             <FilterDropdown
-//               label="Email Verification"
-//               options={["Verified", "Not Verified"]}
-//               value={filterVerification}
-//               onChange={(v) => {
-//                 setFilterVerification(v);
-//                 setPage(1);
-//               }}
-//             />
-
-//             <button
-//               onClick={handleReset}
-//               className="flex items-center gap-2 px-3 py-2 text-sm text-teal-500 font-medium hover:text-teal-700 transition cursor-pointer rounded-lg hover:bg-teal-50"
-//             >
-//               <FiRefreshCw className="text-sm" />
-//               Reset
-//             </button>
-//           </div>
-
-//           {/* Search */}
-//           <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg min-w-[260px]">
-//             <FiSearch className="text-gray-400 text-sm flex-shrink-0" />
-//             <input
-//               value={searchInput}
-//               onChange={(e) => setSearchInput(e.target.value)}
-//               onKeyDown={(e) => {
-//                 if (e.key === "Enter") {
-//                   handleSearch();
-//                 }
-//               }}
-//               placeholder="Search by name, email or phone..."
-//               className="flex-1 text-sm text-gray-600 bg-transparent outline-none placeholder:text-gray-400"
-//             />
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Table with Top Scrollbar */}
-//       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-//         {/* Top scrollbar wrapper */}
-//         <div className="relative">
-//           {/* Top scrollbar - mirrors the bottom one */}
-//           <div
-//             className="overflow-x-auto overflow-y-hidden"
-//             onScroll={(e) => {
-//               const bottomScroll = document.getElementById('table-scroll-bottom');
-//               if (bottomScroll) {
-//                 bottomScroll.scrollLeft = e.currentTarget.scrollLeft;
-//               }
-//             }}
-//           >
-//             <div style={{ width: '1200px', height: '8px' }} />
-//           </div>
-
-//           {/* Main table with bottom scrollbar */}
-//           <div
-//             id="table-scroll-bottom"
-//             className="overflow-x-auto overflow-y-visible"
-//             onScroll={(e) => {
-//               const topScroll = e.currentTarget.parentElement?.previousElementSibling;
-//               if (topScroll) {
-//                 topScroll.scrollLeft = e.currentTarget.scrollLeft;
-//               }
-//             }}
-//           >
-//             <table className="w-full min-w-[1200px]">
-//               <thead>
-//                 <tr className="bg-gradient-to-r from-teal-400 to-green-400 sticky top-0">
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">User</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Email</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Phone</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Type</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Country</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Verified</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">KYC</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Vendor</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
-//                   <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Created</th>
-//                   <th className="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
-//                 </tr>
-//               </thead>
-
-//               <tbody className="divide-y divide-gray-100">
-//                 {paginated.length === 0 ? (
-//                   <tr>
-//                     <td colSpan={11} className="text-center py-16 text-gray-400 text-sm">
-//                       No users found
-//                     </td>
-//                   </tr>
-//                 ) : (
-//                   paginated.map((user) => (
-//                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-//                       <td className="px-6 py-4">
-//                         <div className="flex items-center gap-3">
-//                           <img
-//                             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-//                               user.full_name
-//                             )}&background=14B8A6&color=ffffff&bold=true`}
-//                             className="w-8 h-8 rounded-full"
-//                             alt={user.full_name}
-//                           />
-//                           <span className="font-medium text-gray-800">{user.full_name}</span>
-//                         </div>
-//                       </td>
-
-//                       <td className="px-6 py-4 text-gray-600 text-sm">{user.email}</td>
-//                       <td className="px-6 py-4 text-gray-600 text-sm">{user.phone ?? "—"}</td>
-
-//                       <td className="px-6 py-4">
-//                         <span
-//                           className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize ${userTypeStyle(
-//                             user.user_type
-//                           )}`}
-//                         >
-//                           {user.user_type.replace("_", " ")}
-//                         </span>
-//                       </td>
-
-//                       <td className="px-6 py-4 text-gray-600 text-sm">
-//                         {user.country_code ?? "—"}
-//                       </td>
-
-//                       <td className="px-6 py-4">
-//                         {user.is_email_verified ? (
-//                           <FaCheckCircle className="text-emerald-500 text-lg" />
-//                         ) : (
-//                           <FaTimesCircle className="text-gray-300 text-lg" />
-//                         )}
-//                       </td>
-
-//                       <td className="px-6 py-4">
-//                         {user.is_kyc_verified ? (
-//                           <FaCheckCircle className="text-emerald-500 text-lg" />
-//                         ) : (
-//                           <FaTimesCircle className="text-gray-300 text-lg" />
-//                         )}
-//                       </td>
-
-//                       <td className="px-6 py-4 text-gray-600 text-sm">
-//                         {user.vendor?.company_name ?? "—"}
-//                       </td>
-
-//                       <td className="px-6 py-4">
-//                         <span
-//                           className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusStyle(
-//                             user.status
-//                           )}`}
-//                         >
-//                           {user.status}
-//                         </span>
-//                       </td>
-
-//                       <td className="px-6 py-4 text-gray-500 text-sm whitespace-nowrap">
-//                         {fmtDate(user.created_at)}
-//                       </td>
-
-//                       <td className="px-6 py-4 text-center">
-//                         <RowMenu
-//                           user={user}
-//                           onView={() => handleViewDetails(user.id)}
-//                           onEdit={() => handleEdit(user)}
-//                           onDelete={() => handleDelete(user.id)}
-//                         />
-//                       </td>
-//                     </tr>
-//                   ))
-//                 )}
-//               </tbody>
-//             </table>
-//           </div>
-//         </div>
-
-//         {/* Pagination */}
-//         {totalPages > 1 && (
-//           <div className="flex items-center justify-center gap-2 py-6 border-t border-gray-100">
-//             <button
-//               disabled={page === 1}
-//               onClick={() => setPage(page - 1)}
-//               className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition cursor-pointer"
-//             >
-//               ← Previous
-//             </button>
-//             {[...Array(totalPages)].map((_, i) => (
-//               <button
-//                 key={i}
-//                 onClick={() => setPage(i + 1)}
-//                 className={`min-w-[32px] h-8 rounded-lg text-sm transition cursor-pointer ${
-//                   page === i + 1
-//                     ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-//                     : "text-gray-600 hover:bg-gray-100"
-//                 }`}
-//               >
-//                 {i + 1}
-//               </button>
-//             ))}
-//             <button
-//               disabled={page === totalPages}
-//               onClick={() => setPage(page + 1)}
-//               className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition cursor-pointer"
-//             >
-//               Next →
-//             </button>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* User Modal */}
-//       <UserModal
-//         isOpen={isModalOpen}
-//         onClose={() => {
-//           setIsModalOpen(false);
-//           setSelectedUser(null);
-//         }}
-//         user={selectedUser}
-//         onSave={handleSaveUser}
-//       />
-//     </div>
-//   );
-// };
-
-// export default UserList;
-
-
-
 import { useState, useRef, useEffect } from "react";
-import { FiFilter, FiRefreshCw, FiSearch, FiChevronDown, FiShield, FiAlertCircle, FiUserCheck } from "react-icons/fi";
-import { FaEllipsisV, FaPlus, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaEllipsisV, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FiShield, FiAlertCircle, FiUserCheck, FiEye } from "react-icons/fi";
 import {
   useGetUsersQuery,
   useCreateUserMutation,
@@ -662,10 +11,12 @@ import {
   useActivateUserMutation,
 } from "../../app/api/UserSlices/UserApi";
 import UserModal from "../../component/UserModal";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../router";
+import PageHeader from "../../component/PageHeader/Pageheaderfilterbar";
 
-// ============ USER TYPE DEFINITION ============
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface User {
   id: string;
   full_name: string;
@@ -678,12 +29,11 @@ interface User {
   is_phone_verified: boolean;
   is_kyc_verified: boolean;
   created_at: string;
-  vendor?: {
-    company_name: string;
-  };
+  vendor?: { company_name: string };
 }
 
-// ============ HELPERS ============
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 const fmtDate = (d: string) =>
   new Date(d).toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -691,38 +41,41 @@ const fmtDate = (d: string) =>
     year: "numeric",
   });
 
-// ============ STATUS STYLES ============
 const statusStyle = (status: string) => {
   switch (status) {
     case "active":
-      return "bg-emerald-50 text-emerald-600 border border-emerald-200";
+      return "bg-emerald-50 text-emerald-600 border-emerald-200";
     case "suspended":
-      return "bg-yellow-100 text-yellow-600 border border-yellow-200";
+      return "bg-yellow-50 text-yellow-600 border-yellow-200";
     case "pending":
-      return "bg-blue-100 text-blue-600 border border-blue-200";
+      return "bg-blue-50 text-blue-600 border-blue-200";
     case "banned":
-      return "bg-red-100 text-red-600 border border-red-200";
+      return "bg-red-50 text-red-600 border-red-200";
     default:
-      return "bg-gray-100 text-gray-500";
+      return "bg-gray-100 text-gray-500 border-gray-200";
   }
 };
 
 const userTypeStyle = (type: string) => {
   switch (type) {
-    case "super_admin":
-      return "bg-purple-100 text-purple-600";
-    case "vendor":
-      return "bg-blue-100 text-blue-600";
-    case "customer":
-      return "bg-teal-100 text-teal-600";
-    case "mlm_agent":
-      return "bg-orange-100 text-orange-500";
-    default:
-      return "bg-gray-100 text-gray-500";
+    case "super_admin": return "bg-purple-100 text-purple-700";
+    case "vendor": return "bg-blue-100 text-blue-700";
+    case "customer": return "bg-teal-100 text-teal-700";
+    case "mlm_agent": return "bg-orange-100 text-orange-600";
+    default: return "bg-gray-100 text-gray-500";
   }
 };
 
-// ============ STATUS MANAGEMENT MODAL ============
+// ─── Tabs config ──────────────────────────────────────────────────────────────
+
+const TABS = [
+  { key: "list", label: "Users List" },
+  { key: "type", label: "User Types" },
+  { key: "status", label: "Status" },
+];
+
+// ─── Status Management Modal ──────────────────────────────────────────────────
+
 const StatusManagementModal = ({
   isOpen,
   onClose,
@@ -737,66 +90,45 @@ const StatusManagementModal = ({
   const [suspendUser, { isLoading: isSuspending }] = useSuspendUserMutation();
   const [banUser, { isLoading: isBanning }] = useBanUserMutation();
   const [activateUser, { isLoading: isActivating }] = useActivateUserMutation();
-  
+
   const [suspendReason, setSuspendReason] = useState("");
   const [banReason, setBanReason] = useState("");
   const [showSuspendInput, setShowSuspendInput] = useState(false);
   const [showBanInput, setShowBanInput] = useState(false);
-  const [showToast, setShowToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [modalToast, setModalToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  const showMessage = (type: "success" | "error", msg: string) => {
-    setShowToast({ type, msg });
-    setTimeout(() => setShowToast(null), 3000);
+  const showMsg = (type: "success" | "error", msg: string) => {
+    setModalToast({ type, msg });
+    setTimeout(() => setModalToast(null), 3000);
   };
 
   const handleSuspend = async () => {
     if (!user) return;
-    if (!suspendReason.trim()) {
-      showMessage("error", "Please provide a reason for suspension");
-      return;
-    }
+    if (!suspendReason.trim()) { showMsg("error", "Please provide a reason for suspension"); return; }
     try {
       await suspendUser({ id: user.id, reason: suspendReason }).unwrap();
-      showMessage("success", `${user.full_name} has been suspended`);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 1500);
-    } catch (error: any) {
-      showMessage("error", error?.data?.message || "Failed to suspend user");
-    }
+      showMsg("success", `${user.full_name} has been suspended`);
+      setTimeout(() => { onSuccess(); onClose(); }, 1500);
+    } catch (e: any) { showMsg("error", e?.data?.message || "Failed to suspend"); }
   };
 
   const handleBan = async () => {
     if (!user) return;
-    if (!banReason.trim()) {
-      showMessage("error", "Please provide a reason for ban");
-      return;
-    }
+    if (!banReason.trim()) { showMsg("error", "Please provide a reason for ban"); return; }
     try {
       await banUser({ id: user.id, reason: banReason }).unwrap();
-      showMessage("success", `${user.full_name} has been banned`);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 1500);
-    } catch (error: any) {
-      showMessage("error", error?.data?.message || "Failed to ban user");
-    }
+      showMsg("success", `${user.full_name} has been banned`);
+      setTimeout(() => { onSuccess(); onClose(); }, 1500);
+    } catch (e: any) { showMsg("error", e?.data?.message || "Failed to ban"); }
   };
 
   const handleActivate = async () => {
     if (!user) return;
     try {
       await activateUser(user.id).unwrap();
-      showMessage("success", `${user.full_name} has been activated`);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 1500);
-    } catch (error: any) {
-      showMessage("error", error?.data?.message || "Failed to activate user");
-    }
+      showMsg("success", `${user.full_name} has been activated`);
+      setTimeout(() => { onSuccess(); onClose(); }, 1500);
+    } catch (e: any) { showMsg("error", e?.data?.message || "Failed to activate"); }
   };
 
   if (!isOpen || !user) return null;
@@ -807,185 +139,131 @@ const StatusManagementModal = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Toast inside modal */}
-      {showToast && (
-        <div
-          className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
-            ${showToast.type === "success"
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-            }`}
-        >
-          <span>{showToast.type === "success" ? "✓" : "✕"}</span>
-          {showToast.msg}
+      {modalToast && (
+        <div className={`fixed top-5 right-5 z-[60] flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
+          ${modalToast.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+          <span>{modalToast.type === "success" ? "✓" : "✕"}</span>
+          {modalToast.msg}
         </div>
       )}
-
-      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
-      
+      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full">
+          {/* Top gradient bar */}
+          <div className="h-1 bg-gradient-to-r from-teal-400 to-green-400 rounded-t-2xl" />
           {/* Header */}
-          <div className="relative">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 to-green-400 rounded-t-2xl" />
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">User Status Management</h2>
-              <p className="text-sm text-gray-500 mt-1">Manage status for {user.full_name}</p>
+          <div className="px-6 py-4 border-b border-gray-100 flex items-start justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-gray-800">Manage User Status</h2>
+              <p className="text-sm text-gray-500 mt-0.5">{user.full_name}</p>
             </div>
-            <button
-              onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition"
-            >
-              ✕
-            </button>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 mt-0.5 cursor-pointer">✕</button>
           </div>
 
-          {/* Current Status Badge */}
+          {/* Current status */}
           <div className="px-6 pt-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Current Status:</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${statusStyle(user.status)}`}>
-                  {user.status}
-                </span>
-              </div>
+            <div className="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
+              <span className="text-sm text-gray-500">Current Status</span>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(user.status)}`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+              </span>
             </div>
           </div>
 
-          {/* Status Switches */}
-          <div className="p-6 space-y-4">
-            {/* Activate Switch - Only show for suspended users */}
+          <div className="p-6 space-y-3">
+            {/* Activate — for suspended */}
             {isSuspended && (
-              <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+              <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <FiUserCheck className="text-green-600 text-lg" />
+                  <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <FiUserCheck className="text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">Activate User</h3>
-                    <p className="text-xs text-gray-500">Reactivate this user account</p>
+                    <p className="font-semibold text-gray-800 text-sm">Activate User</p>
+                    <p className="text-xs text-gray-500">Restore account access</p>
                   </div>
                 </div>
-                <button
-                  onClick={handleActivate}
-                  disabled={isActivating}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    isActivating
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-green-500 text-white hover:bg-green-600"
-                  }`}
-                >
-                  {isActivating ? "Activating..." : "Activate"}
+                <button onClick={handleActivate} disabled={isActivating}
+                  className="px-4 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition disabled:opacity-50 cursor-pointer">
+                  {isActivating ? "..." : "Activate"}
                 </button>
               </div>
             )}
 
-            {/* Suspend Switch - Only show for active users */}
+            {/* Suspend — for active */}
             {isActive && (
-              <div className="flex flex-col gap-3 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+              <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                      <FiShield className="text-yellow-600 text-lg" />
+                    <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center">
+                      <FiShield className="text-yellow-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">Suspend User</h3>
-                      <p className="text-xs text-gray-500">Temporarily block user access</p>
+                      <p className="font-semibold text-gray-800 text-sm">Suspend User</p>
+                      <p className="text-xs text-gray-500">Temporarily block access</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showSuspendInput}
-                      onChange={() => setShowSuspendInput(!showSuspendInput)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                    <input type="checkbox" checked={showSuspendInput} onChange={() => setShowSuspendInput(!showSuspendInput)} className="sr-only peer" />
+                    <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
                   </label>
                 </div>
-                
                 {showSuspendInput && (
-                  <div className="mt-2">
-                    <textarea
-                      value={suspendReason}
-                      onChange={(e) => setSuspendReason(e.target.value)}
-                      placeholder="Enter reason for suspension..."
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none resize-none"
-                      rows={2}
-                    />
-                    <button
-                      onClick={handleSuspend}
-                      disabled={isSuspending}
-                      className="mt-2 w-full px-4 py-2 rounded-lg bg-yellow-500 text-white text-sm font-medium hover:bg-yellow-600 transition disabled:opacity-50"
-                    >
+                  <>
+                    <textarea value={suspendReason} onChange={e => setSuspendReason(e.target.value)}
+                      placeholder="Reason for suspension..." rows={2}
+                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-yellow-400 resize-none" />
+                    <button onClick={handleSuspend} disabled={isSuspending}
+                      className="w-full py-2 rounded-lg bg-yellow-500 text-white text-sm font-medium hover:bg-yellow-600 transition disabled:opacity-50 cursor-pointer">
                       {isSuspending ? "Suspending..." : "Confirm Suspend"}
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
             )}
 
-            {/* Ban Switch - Only show for active users */}
+            {/* Ban — for active */}
             {isActive && (
-              <div className="flex flex-col gap-3 p-4 bg-red-50 rounded-xl border border-red-200">
+              <div className="p-4 bg-red-50 rounded-xl border border-red-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                      <FiAlertCircle className="text-red-600 text-lg" />
+                    <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center">
+                      <FiAlertCircle className="text-red-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">Ban User</h3>
-                      <p className="text-xs text-gray-500">Permanently block user account</p>
+                      <p className="font-semibold text-gray-800 text-sm">Ban User</p>
+                      <p className="text-xs text-gray-500">Permanently block account</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showBanInput}
-                      onChange={() => setShowBanInput(!showBanInput)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                    <input type="checkbox" checked={showBanInput} onChange={() => setShowBanInput(!showBanInput)} className="sr-only peer" />
+                    <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-red-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
                   </label>
                 </div>
-                
                 {showBanInput && (
-                  <div className="mt-2">
-                    <textarea
-                      value={banReason}
-                      onChange={(e) => setBanReason(e.target.value)}
-                      placeholder="Enter reason for ban..."
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-none"
-                      rows={2}
-                    />
-                    <button
-                      onClick={handleBan}
-                      disabled={isBanning}
-                      className="mt-2 w-full px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition disabled:opacity-50"
-                    >
+                  <>
+                    <textarea value={banReason} onChange={e => setBanReason(e.target.value)}
+                      placeholder="Reason for ban..." rows={2}
+                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-red-400 resize-none" />
+                    <button onClick={handleBan} disabled={isBanning}
+                      className="w-full py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition disabled:opacity-50 cursor-pointer">
                       {isBanning ? "Banning..." : "Confirm Ban"}
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
             )}
 
-            {/* Info message for banned users */}
             {isBanned && (
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
-                <p className="text-sm text-gray-500">
-                  This user is permanently banned and cannot be modified.
-                </p>
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center text-sm text-gray-400">
+                This user is permanently banned.
               </div>
             )}
           </div>
 
-          {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-            <button
-              onClick={onClose}
-              className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition"
-            >
+          <div className="px-6 py-3 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+            <button onClick={onClose} className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 font-medium transition cursor-pointer">
               Close
             </button>
           </div>
@@ -995,82 +273,14 @@ const StatusManagementModal = ({
   );
 };
 
-// ============ FILTER DROPDOWN ============
-const FilterDropdown = ({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+// ─── Row Action Menu ──────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition cursor-pointer"
-      >
-        <span className="font-medium">{value || label}</span>
-        <FiChevronDown
-          className={`text-gray-400 transition-transform ${open ? "rotate-180" : ""
-            }`}
-        />
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-30 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
-          <button
-            onClick={() => {
-              onChange("");
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-50 cursor-pointer"
-          >
-            All
-          </button>
-          {options.map((opt) => (
-            <button
-              key={opt}
-              onClick={() => {
-                onChange(opt);
-                setOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
-            >
-              {opt.replace("_", " ")}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ============ ROW ACTION MENU ============
 const RowMenu = ({
-  user,
-  onEdit,
-  onDelete,
-  onView,
-  onStatusManage,
+  onView, onEdit, onDelete, onStatusManage,
 }: {
-  user: User;
+  onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onView: () => void;
   onStatusManage: () => void;
 }) => {
   const [open, setOpen] = useState(false);
@@ -1086,48 +296,26 @@ const RowMenu = ({
 
   return (
     <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="text-gray-400 hover:text-gray-600 transition p-1 cursor-pointer"
-      >
+      <button onClick={() => setOpen(!open)}
+        className="text-gray-400 hover:text-gray-600 p-1 transition cursor-pointer">
         <FaEllipsisV className="text-sm" />
       </button>
       {open && (
         <div className="absolute right-0 top-7 z-30 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-44 text-sm">
-          <button
-            onClick={() => {
-              onView();
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-600 cursor-pointer"
-          >
+          <button onClick={() => { onView(); setOpen(false); }}
+            className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-600 cursor-pointer">
             View Details
           </button>
-          <button
-            onClick={() => {
-              onStatusManage();
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2 hover:bg-purple-50 text-purple-600 cursor-pointer"
-          >
+          <button onClick={() => { onStatusManage(); setOpen(false); }}
+            className="w-full text-left px-4 py-2 hover:bg-purple-50 text-purple-600 cursor-pointer">
             Manage Status
           </button>
-          <button
-            onClick={() => {
-              onEdit();
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2 hover:bg-teal-50 text-teal-700 cursor-pointer"
-          >
+          <button onClick={() => { onEdit(); setOpen(false); }}
+            className="w-full text-left px-4 py-2 hover:bg-teal-50 text-teal-700 cursor-pointer">
             Edit
           </button>
-          <button
-            onClick={() => {
-              onDelete();
-              setOpen(false);
-            }}
-            className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 cursor-pointer"
-          >
+          <button onClick={() => { onDelete(); setOpen(false); }}
+            className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 cursor-pointer">
             Delete
           </button>
         </div>
@@ -1136,32 +324,107 @@ const RowMenu = ({
   );
 };
 
-// ============ MAIN COMPONENT ============
+// ─── User Detail Drawer (View Details — same page) ────────────────────────────
+
+const UserDetailDrawer = ({
+  user,
+  onClose,
+}: {
+  user: User | null;
+  onClose: () => void;
+}) => {
+  if (!user) return null;
+  return (
+    <>
+      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col">
+        {/* Drawer header */}
+        <div className="h-1 bg-gradient-to-r from-teal-400 to-green-400" />
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-bold text-gray-800">User Details</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg">✕</button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {/* Avatar + name */}
+          <div className="flex items-center gap-4">
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=14B8A6&color=ffffff&bold=true&size=80`}
+              className="w-16 h-16 rounded-full"
+              alt={user.full_name}
+            />
+            <div>
+              <p className="text-lg font-bold text-gray-800">{user.full_name}</p>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border mt-1 ${statusStyle(user.status)}`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+              </span>
+            </div>
+          </div>
+
+          {/* Details grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: "Email", value: user.email },
+              { label: "Phone", value: user.phone ?? "—" },
+              { label: "Country", value: user.country_code ?? "—" },
+              { label: "User Type", value: user.user_type.replace(/_/g, " ") },
+              { label: "Vendor", value: user.vendor?.company_name ?? "—" },
+              { label: "Joined", value: fmtDate(user.created_at) },
+            ].map(({ label, value }) => (
+              <div key={label} className="bg-gray-50 rounded-xl p-3">
+                <p className="text-xs text-gray-400 mb-1">{label}</p>
+                <p className="text-sm font-medium text-gray-700 capitalize truncate">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Verification badges */}
+          <div>
+            <p className="text-xs text-gray-400 font-medium mb-2 uppercase tracking-wide">Verification Status</p>
+            <div className="flex gap-3">
+              {[
+                { label: "Email", verified: user.is_email_verified },
+                { label: "Phone", verified: user.is_phone_verified },
+                { label: "KYC", verified: user.is_kyc_verified },
+              ].map(({ label, verified }) => (
+                <div key={label} className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-xl border text-xs font-medium
+                  ${verified ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "bg-gray-50 border-gray-200 text-gray-400"}`}>
+                  {verified
+                    ? <FaCheckCircle className="text-lg text-emerald-500" />
+                    : <FaTimesCircle className="text-lg text-gray-300" />}
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 const ITEMS_PER_PAGE = 10;
 
 const UserList = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const [activeTab, setActiveTab] = useState<"list" | "type" | "status">(
-    "list"
-  );
+  const [activeTab, setActiveTab] = useState("list");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterVerification, setFilterVerification] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [toast, setToast] = useState<{
-    type: "success" | "error";
-    msg: string;
-  } | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const { data, isLoading, error, refetch } = useGetUsersQuery({});
-  const [createUser] = useCreateUserMutation();
   const [updateUser] = useUpdateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
 
@@ -1172,391 +435,260 @@ const UserList = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Handle View Details
-  const handleViewDetails = (userId: string) => {
-    navigate(ROUTES.USER_DETAILS(userId));
-  };
-
-  // Handle Status Management
-  const handleStatusManage = (user: User) => {
-    setSelectedUser(user);
-    setIsStatusModalOpen(true);
-  };
-
-  // Handle Create/Edit Save
   const handleSaveUser = async (formData: Partial<User>) => {
     try {
       if (selectedUser) {
-        await updateUser({
-          id: selectedUser.id,
-          data: formData,
-        }).unwrap();
+        await updateUser({ id: selectedUser.id, data: formData }).unwrap();
         showToast("success", "User updated successfully!");
-      } else {
-        await createUser(formData).unwrap();
-        showToast("success", "User created successfully!");
       }
       refetch();
-      setIsModalOpen(false);
+      setIsEditModalOpen(false);
       setSelectedUser(null);
-    } catch (error: any) {
-      console.error("Save error:", error);
-      showToast("error", error?.data?.message || "Failed to save user");
-      throw error;
+    } catch (e: any) {
+      showToast("error", e?.data?.message || "Failed to save user");
+      throw e;
     }
-  };
-
-  const handleEdit = (user: User) => {
-    setSelectedUser(user);
-    setIsModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
       await deleteUser(id).unwrap();
-      showToast("success", "User deleted successfully.");
+      showToast("success", "User deleted.");
       refetch();
-    } catch (error: any) {
-      showToast("error", error?.data?.message || "Failed to delete user.");
+    } catch (e: any) {
+      showToast("error", e?.data?.message || "Failed to delete.");
     }
   };
 
-  // Get unique values for filters
-  const userTypes = [...new Set(users.map((u) => u.user_type).filter(Boolean))];
-  const statuses = [...new Set(users.map((u) => u.status).filter(Boolean))];
+  const handleReset = () => {
+    setFilterStatus(""); setFilterType(""); setFilterVerification("");
+    setSearch(""); setSearchInput(""); setPage(1);
+  };
 
-  // Filter & Search
-  const filtered = users.filter((user) => {
-    const matchStatus = !filterStatus || user.status === filterStatus;
-    const matchType = !filterType || user.user_type === filterType;
-    const matchVerification =
-      !filterVerification ||
-      (filterVerification === "Verified"
-        ? user.is_email_verified
-        : !user.is_email_verified);
-    const matchSearch =
-      !search ||
-      user.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-      user.email?.toLowerCase().includes(search.toLowerCase()) ||
-      user.phone?.toLowerCase().includes(search.toLowerCase());
-    return matchStatus && matchType && matchVerification && matchSearch;
+  // ── Derived ──
+  const userTypes = [...new Set(users.map(u => u.user_type).filter(Boolean))];
+  const statuses = [...new Set(users.map(u => u.status).filter(Boolean))];
+
+  const filtered = users.filter(u => {
+    const matchStatus = !filterStatus || u.status === filterStatus;
+    const matchType = !filterType || u.user_type === filterType;
+    const matchVerif = !filterVerification ||
+      (filterVerification === "Verified" ? u.is_email_verified : !u.is_email_verified);
+    const matchSearch = !search ||
+      u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+      u.email?.toLowerCase().includes(search.toLowerCase()) ||
+      u.phone?.toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchType && matchVerif && matchSearch;
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated = filtered.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  const handleReset = () => {
-    setFilterStatus("");
-    setFilterType("");
-    setFilterVerification("");
-    setSearch("");
-    setSearchInput("");
-    setPage(1);
-  };
+  // ── Filters config for PageHeader ──
+  const filters = [
+    { label: "Status", options: statuses, value: filterStatus, onChange: (v: string) => { setFilterStatus(v); setPage(1); } },
+    { label: "User Type", options: userTypes, value: filterType, onChange: (v: string) => { setFilterType(v); setPage(1); } },
+    { label: "Verified", options: ["Verified", "Not Verified"], value: filterVerification, onChange: (v: string) => { setFilterVerification(v); setPage(1); } },
+  ];
 
-  const handleSearch = () => {
-    setSearch(searchInput);
-    setPage(1);
-  };
+  // if (isLoading) return (
+  //   <div className="flex items-center justify-center min-h-[60vh] gap-3 text-gray-400">
+  //     <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
+  //     <span className="text-sm">Loading users…</span>
+  //   </div>
+  // );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] gap-3 text-gray-400">
-        <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
-        <span className="text-sm">Loading users…</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-red-400 text-sm">
-        Error loading users. Please try again.
-      </div>
-    );
-  }
+  // if (error) return (
+  //   <div className="flex items-center justify-center min-h-[60vh] text-red-400 text-sm">
+  //     Error loading users. Please try again.
+  //   </div>
+  // );
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
-      {/* Toast Notification */}
+    <div className="bg-white min-h-screen p-6">
+      {/* Toast */}
       {toast && (
-        <div
-          className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
-                    ${toast.type === "success"
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-            }`}
-        >
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
+          ${toast.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
           <span>{toast.type === "success" ? "✓" : "✕"}</span>
           {toast.msg}
         </div>
       )}
 
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-            <p className="text-sm text-gray-500 mt-1">Manage and monitor all users in the system</p>
-          </div>
+      {/* ── Shared reusable PageHeader ── */}
+      <PageHeader
+        title="User Management"
+        addButtonLabel="Add New User"
+        onAdd={() => navigate(ROUTES.ADD_USER)}   // ← separate route
+        tabs={TABS}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        filters={filters}
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        onSearchSubmit={() => { setSearch(searchInput); setPage(1); }}
+        onResetFilters={handleReset}
+        searchPlaceholder="Search by name, email, phone..."
+      />
 
-          <Link to={ROUTES.ADD_USER}>
-            <button
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-green-400 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all cursor-pointer"
-            >
-              <FaPlus className="text-xs" />
-              Add New User
-            </button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-2 mb-6">
-        {([
-          { key: "list", label: "Users List" },
-          { key: "type", label: "User Types" },
-          { key: "status", label: "Status" },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${activeTab === tab.key
-                ? "bg-gradient-to-r from-teal-400 to-green-400 text-white shadow-md"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Filter Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4">
-          {/* Left Filters */}
-          <div className="flex flex-wrap items-center gap-2 flex-1">
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
-              <FiFilter className="text-sm text-gray-400" />
-              <span className="text-sm text-gray-500 font-medium">Filter By:</span>
-            </div>
-
-            <FilterDropdown
-              label="Status"
-              options={statuses}
-              value={filterStatus}
-              onChange={(v) => {
-                setFilterStatus(v);
-                setPage(1);
-              }}
-            />
-
-            <FilterDropdown
-              label="User Type"
-              options={userTypes}
-              value={filterType}
-              onChange={(v) => {
-                setFilterType(v);
-                setPage(1);
-              }}
-            />
-
-            <FilterDropdown
-              label="Email Verification"
-              options={["Verified", "Not Verified"]}
-              value={filterVerification}
-              onChange={(v) => {
-                setFilterVerification(v);
-                setPage(1);
-              }}
-            />
-
-            <button
-              onClick={handleReset}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-teal-500 font-medium hover:text-teal-700 transition cursor-pointer rounded-lg hover:bg-teal-50"
-            >
-              <FiRefreshCw className="text-sm" />
-              Reset
-            </button>
-          </div>
-
-          {/* Search */}
-          <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg min-w-[260px]">
-            <FiSearch className="text-gray-400 text-sm flex-shrink-0" />
-            <input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch();
-                }
-              }}
-              placeholder="Search by name, email or phone..."
-              className="flex-1 text-sm text-gray-600 bg-transparent outline-none placeholder:text-gray-400"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      {/* ── Table ── */}
+      <div className="rounded-2xl shadow-sm border border-gray-100 overflow-hidden ">
+        <div className="overflow-x-auto min-h-[500px]">
+          <table className="w-full table-auto">
             <thead>
-              <tr className="bg-gradient-to-r from-teal-400 to-green-400">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">User</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Email</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Type</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Country</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Verified</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">KYC</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Vendor</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Created</th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
-               </tr>
+              <tr className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
+                {["User", "Email", "Phone", "Type", "Country", "Email ✓", "Phone ✓", "KYC", "Vendor", "Status", "Joined", ""].map((col, i) => (
+                  <th key={i} className="px-4 py-4 text-left font-semibold text-sm whitespace-nowrap">{col}</th>
+                ))}
+              </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
-              {paginated.length === 0 ? (
-                <tr>
-                  <td colSpan={11} className="text-center py-16 text-gray-400 text-sm">
-                    No users found
-                  </td>
-                </tr>
-              ) : (
-                paginated.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            user.full_name
-                          )}&background=14B8A6&color=ffffff&bold=true`}
-                          className="w-8 h-8 rounded-full"
-                          alt={user.full_name}
-                        />
-                        <span className="font-medium text-gray-800">{user.full_name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 text-sm">{user.email}</td>
-                    <td className="px-6 py-4 text-gray-600 text-sm">{user.phone ?? "—"}</td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize ${userTypeStyle(
-                          user.user_type
-                        )}`}
-                      >
-                        {user.user_type.replace("_", " ")}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 text-sm">
-                      {user.country_code ?? "—"}
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.is_email_verified ? (
-                        <FaCheckCircle className="text-emerald-500 text-lg" />
-                      ) : (
-                        <FaTimesCircle className="text-gray-300 text-lg" />
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.is_kyc_verified ? (
-                        <FaCheckCircle className="text-emerald-500 text-lg" />
-                      ) : (
-                        <FaTimesCircle className="text-gray-300 text-lg" />
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 text-sm">
-                      {user.vendor?.company_name ?? "—"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusStyle(
-                          user.status
-                        )}`}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500 text-sm whitespace-nowrap">
-                      {fmtDate(user.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <RowMenu
-                        user={user}
-                        onView={() => handleViewDetails(user.id)}
-                        onEdit={() => handleEdit(user)}
-                        onDelete={() => handleDelete(user.id)}
-                        onStatusManage={() => handleStatusManage(user)}
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
+            <tbody className="bg-white">
+  {isLoading ? (
+    <tr>
+      <td colSpan={12} className="text-center py-16">
+        <div className="flex items-center justify-center gap-3 text-gray-400">
+          <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
+          <span className="text-sm">Loading users…</span>
+        </div>
+      </td>
+    </tr>
+  ) : error ? (
+    <tr>
+      <td colSpan={12} className="text-center py-16 text-red-400 text-sm">
+        Error loading users. Please try again.
+      </td>
+    </tr>
+  ) : paginated.length === 0 ? (
+    <tr>
+      <td colSpan={12} className="text-center py-16 text-gray-300 text-sm">
+        No users found.
+      </td>
+    </tr>
+  ) : (
+    paginated.map((user, idx) => (
+      <tr
+        key={user.id}
+        className="hover:bg-gray-50/60 transition"
+        style={{
+          borderBottom: idx < paginated.length - 1 ? "1px solid #f3f4f6" : "none",
+          marginBottom: "10px",
+        }}
+      >
+        {/* User — left teal accent */}
+        <td className="relative pl-5 pr-4 py-3">
+          <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-teal-400 to-teal-300" />
+          <div className="flex items-center gap-2.5">
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=14B8A6&color=ffffff&bold=true`}
+              className="w-8 h-8 rounded-full shrink-0"
+              alt={user.full_name}
+            />
+            <span className="font-semibold text-gray-800 whitespace-nowrap">{user.full_name}</span>
+          </div>
+        </td>
+
+        <td className="px-4 py-3 text-gray-600 text-xs">{user.email}</td>
+        <td className="px-4 py-3 text-gray-600 text-xs">{user.phone ?? "—"}</td>
+
+        <td className="px-4 py-3 whitespace-nowrap">
+          <span className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize ${userTypeStyle(user.user_type)}`}>
+            {user.user_type.replace(/_/g, " ")}
+          </span>
+        </td>
+
+        <td className="px-4 py-3 text-gray-500 text-xs">{user.country_code ?? "—"}</td>
+
+        {/* Verification checks */}
+        <td className="px-4 py-3 text-center">
+          {user.is_email_verified
+            ? <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
+            : <FaTimesCircle className="text-gray-300 text-base mx-auto" />}
+        </td>
+        <td className="px-4 py-3 text-center">
+          {user.is_phone_verified
+            ? <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
+            : <FaTimesCircle className="text-gray-300 text-base mx-auto" />}
+        </td>
+        <td className="px-4 py-3 text-center">
+          {user.is_kyc_verified
+            ? <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
+            : <FaTimesCircle className="text-gray-300 text-base mx-auto" />}
+        </td>
+
+        <td className="px-4 py-3 text-gray-500 text-xs">{user.vendor?.company_name ?? "—"}</td>
+
+        {/* Status pill */}
+        <td className="px-4 py-3">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(user.status)}`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+            {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+          </span>
+        </td>
+
+        <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{fmtDate(user.created_at)}</td>
+
+        {/* Actions — right green accent */}
+        <td className="relative pl-4 pr-5 py-3 text-right">
+          <span className="absolute right-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-green-400 to-green-300" />
+          <RowMenu
+            onView={() => { setSelectedUser(user); setIsDrawerOpen(true); }}
+            onEdit={() => { setSelectedUser(user); setIsEditModalOpen(true); }}
+            onDelete={() => handleDelete(user.id)}
+            onStatusManage={() => { setSelectedUser(user); setIsStatusModalOpen(true); }}
+          />
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 py-6 border-t border-gray-100">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-              className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition cursor-pointer"
-            >
-              ← Previous
-            </button>
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setPage(i + 1)}
-                className={`min-w-[32px] h-8 rounded-lg text-sm transition cursor-pointer ${
-                  page === i + 1
-                    ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-              className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition cursor-pointer"
-            >
-              Next →
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* User Modal */}
+      {/* ── Pagination ── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-600">
+          <button disabled={page === 1} onClick={() => setPage(page - 1)}
+            className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-40 cursor-pointer">
+            ← Back
+          </button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button key={i} onClick={() => setPage(i + 1)}
+              className={`px-3 py-1 rounded-md cursor-pointer ${page === i + 1
+                ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
+                : "hover:bg-gray-100"}`}>
+              {i + 1}
+            </button>
+          ))}
+          <button disabled={page === totalPages} onClick={() => setPage(page + 1)}
+            className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-40 cursor-pointer">
+            Next →
+          </button>
+        </div>
+      )}
+
+      {/* ── Edit Modal (same page) ── */}
       <UserModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedUser(null);
-        }}
+        isOpen={isEditModalOpen}
+        onClose={() => { setIsEditModalOpen(false); setSelectedUser(null); }}
         user={selectedUser}
         onSave={handleSaveUser}
       />
 
-      {/* Status Management Modal */}
+      {/* ── Status Management Modal (same page) ── */}
       <StatusManagementModal
         isOpen={isStatusModalOpen}
-        onClose={() => {
-          setIsStatusModalOpen(false);
-          setSelectedUser(null);
-        }}
+        onClose={() => { setIsStatusModalOpen(false); setSelectedUser(null); }}
         user={selectedUser}
         onSuccess={refetch}
+      />
+
+      {/* ── View Details Side Drawer (same page) ── */}
+      <UserDetailDrawer
+        user={isDrawerOpen ? selectedUser : null}
+        onClose={() => { setIsDrawerOpen(false); setSelectedUser(null); }}
       />
     </div>
   );

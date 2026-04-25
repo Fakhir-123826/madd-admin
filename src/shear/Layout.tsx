@@ -32,7 +32,7 @@ import {
   FaTicketAlt,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useLogoutMutation } from "../app/api/AuthSlices/AuthSlices";
+import { useLogoutUserMutation } from "../app/api/AuthSlices/AuthSlices";
 import { ROUTES } from "../router.tsx";
 
 import { router } from "../router";
@@ -184,7 +184,7 @@ const Layout = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredMenuItems, setFilteredMenuItems] = useState<MenuItem[]>([]);
 
-  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const handleLogout = async () => {
     await logoutApi({});
     navigate("/login");
@@ -1025,9 +1025,9 @@ const getFullMenuItems = (): MenuItem[] => [
       icon: FaUsers,
       children: [
         { label: "All Users", path: "/userlist" },
-        { label: "Add Users", path: "/adduser" },
-        { label: "Roles", path: "/usersroles" },
-        { label: "Groups", path: "/usersgroup" }
+        { label: "Add User", path: "/adduser" },
+        // { label: "Roles", path: "/usersroles" },
+        // { label: "Groups", path: "/usersgroup" }
       ]
     },
 
