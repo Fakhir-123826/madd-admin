@@ -30,6 +30,7 @@ import {
   FaCalendarAlt,
   FaSlidersH,
   FaTicketAlt,
+  FaChartLine,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLogoutUserMutation } from "../app/api/AuthSlices/AuthSlices";
@@ -195,7 +196,7 @@ const Layout = () => {
   // Get user from localStorage
   const userRaw = localStorage.getItem("user");
   const user = userRaw ? JSON.parse(userRaw) : null;
-  
+
   // Check if user has admin or super_admin role
   const hasAdminAccess = user?.roles?.some(
     (role: string) => role === "super_admin" || role === "admin"
@@ -677,7 +678,7 @@ const Layout = () => {
   // ];
 
 
-const getFullMenuItems = (): MenuItem[] => [
+  const getFullMenuItems = (): MenuItem[] => [
     { label: "Dashboard", icon: FaHome, path: "/" },
 
     {
@@ -1016,8 +1017,8 @@ const getFullMenuItems = (): MenuItem[] => [
     },
 
     // ==================== SUPERADMIN NAVIGATION (Updated with correct routes) ====================
-    
-  
+
+
 
     // Users
     {
@@ -1038,8 +1039,8 @@ const getFullMenuItems = (): MenuItem[] => [
       children: [
         { label: "All Vendors", path: "/Vendor" },
         { label: "Add Vendor", path: "/CreateVerder" },
-        { label: "Vendor Onboarding", path: "/CreateVerderOnboard" },
-        { label: "Vendor Requests", path: "/vendor/requests" }
+        // { label: "Vendor Onboarding", path: "/CreateVerderOnboard" },
+        // { label: "Vendor Requests", path: "/vendor/requests" }
       ]
     },
 
@@ -1049,24 +1050,24 @@ const getFullMenuItems = (): MenuItem[] => [
       icon: FaStore,
       children: [
         { label: "All Stores", path: "/storeList" },
-        { label: "Store Cards", path: "/storeCardList" },
+        // { label: "Store Cards", path: "/storeCardList" },
         { label: "Add Store", path: "/CreateStore" },
-        { label: "Subscriptions", path: "/SubscriptionList" }
+        // { label: "Subscriptions", path: "/SubscriptionList" }
       ]
     },
 
     // Products / Catalog
     {
-      label: "Catalog",
+      label: "Products",
       icon: FaBox,
       children: [
         { label: "All Products", path: "/ProductBaseList" },
         { label: "Add Product", path: "/CreateProductBase" },
-        { label: "Categories", path: "/CategoryList" },
-        { label: "Add Category", path: "/CreateCategory" },
-        { label: "Inventory Management", path: "/InventoryManagementList" },
-        { label: "Product Sharing", path: "/ProductSharingList" },
-        { label: "Legality Control", path: "/LegalityControlList" }
+        // { label: "Categories", path: "/CategoryList" },
+        // { label: "Add Category", path: "/CreateCategory" },
+        // { label: "Inventory Management", path: "/InventoryManagementList" },
+        // { label: "Product Sharing", path: "/ProductSharingList" },
+        // { label: "Legality Control", path: "/LegalityControlList" }
       ]
     },
 
@@ -1106,10 +1107,10 @@ const getFullMenuItems = (): MenuItem[] => [
       label: "Settings",
       icon: FaCog,
       children: [
-        { label: "Translation", path: "/translation" },
-        { label: "Updates", path: "/updates" },
-        { label: "Backups", path: "/backups" },
-        { label: "Audit Logs", path: "/auditlogs" }
+        { label: "System", path: "/settings/system" },
+        { label: "Payment", path: "/settings/payment" },
+        { label: "Tax", path: "/settings/tax" },
+        { label: "Email", path: "/settings/email" }
       ]
     },
 
@@ -1118,9 +1119,14 @@ const getFullMenuItems = (): MenuItem[] => [
       label: "Config",
       icon: FaSlidersH,
       children: [
-        { label: "Countries", path: "/country-management" },
-        { label: "Currencies", path: "/currency-management" },
-        { label: "Languages", path: "/language-management" }
+        { label: "Countries", path: "/config/countries" },
+        { label: "Countries", path: "/config/sales-policies" },
+        { label: "Currencies", path: "/config/currencies" },
+        { label: "Languages", path: "/config/languages" },
+        { label: "themes", path: "/config/themes" },
+        { label: "couriers", path: "/config/couriers" }
+
+
       ]
     },
 
@@ -1139,23 +1145,60 @@ const getFullMenuItems = (): MenuItem[] => [
       label: "MLM",
       icon: FaProjectDiagram,
       children: [
-        { label: "MLM Dashboard", path: "/mlmdashboard" },
-        { label: "User Tree", path: "/usertree" },
-        { label: "Earnings Report", path: "/reports" },
-        { label: "Level Wise", path: "/levelwise" },
-        { label: "Member Growth", path: "/membergrowth" }
-      ]
+        {
+          label: "MLM Dashboard", path: "/mlm/dashboard",
+        },
+        {
+          label: "Agents", path: "/mlm/agents",
+        },
+        {
+          label: "Add Agent", path: "/mlm/agents/add",
+        },
+        {
+          label: "Agent Detail", path: "/mlm/agents/:id",
+        },
+        {
+          label: "Edit Agent", path: "/mlm/agents/edit/:id",
+        },
+        {
+          label: "Commissions", path: "/mlm/commissions",
+        },
+        {
+          label: "Structure", path: "/mlm/structure",
+        },
+        {
+          label: "Levels", path: "/mlm/levels",
+        },
+      ],
     },
 
-    // Reports
+
+
+
+
     {
       label: "Reports",
-      icon: FaChartBar,
+      icon: FaChartLine,
       children: [
-        { label: "Platform Reports", path: "/reports-main" },
-        { label: "Tax Reports", path: "/taxes" },
-        { label: "Invoice Management", path: "/invoicemanagement" }
-      ]
+        {
+          label: "Platform Report", path: "/reports/platform",
+        },
+        {
+          label: "Financial Report", path: "/reports/financial",
+        },
+        {
+          label: "Sales Report", path: "/reports/sales",
+        },
+        {
+          label: "Vendor Performance", path: "/reports/vendor-performance",
+        },
+        {
+          label: "Product Performance", path: "/reports/product-performance",
+        },
+        {
+          label: "Export Reports", path: "/reports/export",
+        },
+      ],
     },
 
     // System
@@ -1210,13 +1253,13 @@ const getFullMenuItems = (): MenuItem[] => [
   // Filter menu items based on user role
   useEffect(() => {
     const fullMenu = getFullMenuItems();
-    
+
     if (hasAdminAccess) {
       // If user is admin or super_admin, show all menus
       setFilteredMenuItems(fullMenu);
     } else {
       // If not admin, only show Dashboard and Magento
-      const allowedMenus = fullMenu.filter(item => 
+      const allowedMenus = fullMenu.filter(item =>
         item.label === "Dashboard" || item.label === "Magento"
       );
       setFilteredMenuItems(allowedMenus);

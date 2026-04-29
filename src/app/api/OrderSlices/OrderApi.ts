@@ -13,13 +13,30 @@ export type OrderStatus =
     | "cancelled"
     | "refunded";
 
-export type PaymentStatus = "pending" | "paid" | "refunded" | "chargeback";
+export type PaymentStatus =
+    | "pending"
+    | "paid"
+    | "refunded"
+    | "chargeback";
 
-export type FulfillmentStatus = "pending" | "processing" | "shipped" | "delivered" | "returned";
+export type FulfillmentStatus =
+    | "pending"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "returned";
 
-export type SyncStatus = "pending" | "synced" | "failed";
+export type SyncStatus =
+    | "pending"
+    | "synced"
+    | "failed";
 
-export type OrderSource = "web" | "mobile" | "marketplace" | "erp" | "pos";
+export type OrderSource =
+    | "web"
+    | "mobile"
+    | "marketplace"
+    | "erp"
+    | "pos";
 
 export interface OrderAddress {
     street: string;
@@ -108,23 +125,9 @@ export interface Order {
     customer?: OrderCustomer | null;
 }
 
-export interface OrderListParams {
-    page?: number;
-    per_page?: number;
-    status?: OrderStatus | "";
-    payment_status?: PaymentStatus | "";
-    fulfillment_status?: FulfillmentStatus | "";
-    source?: OrderSource | "";
-    search?: string;
-    vendor_id?: number;
-    date_from?: string;
-    date_to?: string;
-}
-
-// REPLACE the OrderListResponse interface with this:
 export interface OrderListResponse {
     success: boolean;
-    data: Order[];              // ← direct array, NOT paginated object
+    data: Order[];
     summary: {
         total_orders: number;
         total_revenue: string;
@@ -176,6 +179,22 @@ export interface CancelOrderPayload {
     notes?: string;
 }
 
+export interface GetOrdersParams {
+    page?: number;
+    per_page?: number;
+    status?: string;
+    payment_status?: string;
+    fulfillment_status?: string;
+    source?: string;
+    vendor_id?: string;
+    store_id?: string;
+    search?: string;
+    date_from?: string;
+    date_to?: string;
+    amount_min?: number;
+    amount_max?: number;
+}
+
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const orderApi = createApi({
@@ -185,7 +204,11 @@ export const orderApi = createApi({
         baseUrl: baseURL,
         prepareHeaders: (headers) => {
             const token = localStorage.getItem("token");
-            if (token) headers.set("authorization", `Bearer ${token}`);
+
+            if (token) {
+                headers.set("authorization", `Bearer ${token}`);
+            }
+
             return headers;
         },
     }),
@@ -193,69 +216,307 @@ export const orderApi = createApi({
     tagTypes: ["Orders"],
 
     endpoints: (builder) => ({
+        // ─── GET /admin/orders ────────────────────────────────────────────────
+        getOrders: builder.query<
+            OrderListResponse,
+            GetOrdersParams | void
+        >({
+            query: (params) => {
+                const queryParams = new URLSearchParams();
 
-        // GET /admin/orders
-        // Supports: status, payment_status, fulfillment_status, source, search, vendor_id, date_from, date_to, page, per_page
-        getOrders: builder.query<OrderListResponse, OrderListParams>({
-            query: (params = {}) => ({
-                url: "admin/orders",
-                method: "GET",
-                params,
-            }),
+                if (params) {
+                    if (params.page) {
+                        queryParams.append(
+                            "page",
+                            params.page.toString()
+                        );
+                    }
+
+                    if (params.per_page) {
+                        queryParams.append(
+                            "per_page",
+                            params.per_page.toString()
+                        );
+                    }
+
+                    if (params.status) {
+                        queryParams.append(
+                            "status",
+                            params.status
+                        );
+                    }
+
+                    if (params.payment_status) {
+                        queryParams.append(
+                            "payment_status",
+                            params.payment_status
+                        );
+                    }
+
+                    if (params.fulfillment_status) {
+                        queryParams.append(
+                            "fulfillment_status",
+                            params.fulfillment_status
+                        );
+                    }
+
+                    if (params.source) {
+                        queryParams.append(
+                            "source",
+                            params.source
+                        );
+                    }
+
+                    if (params.vendor_id) {
+                        queryParams.append(
+                            "vendor_id",
+                            params.vendor_id
+                        );
+                    }
+
+                    if (params.store_id) {
+                        queryParams.append(
+                            "store_id",
+                            params.store_id
+                        );
+                    }
+
+                    if (params.search) {
+                        queryParams.append(
+                            "search",
+                            params.search
+                        );
+                    }
+
+                    if (params.date_from) {
+                        queryParams.append(
+                            "date_from",
+                            params.date_from
+                        );
+                    }
+
+                    if (params.date_to) {
+                        queryParams.append(
+                            "date_to",
+                            params.date_to
+                        );
+                    }
+
+                    if (params.amount_min !== undefined) {
+                        queryParams.append(
+                            "amount_min",
+                            params.amount_min.toString()
+                        );
+                    }
+
+                    if (params.amount_max !== undefined) {
+                        queryParams.append(
+                            "amount_max",
+                            params.amount_max.toString()
+                        );
+                    }
+                }
+
+                const url = `admin/orders${
+                    queryParams.toString()
+                        ? `?${queryParams.toString()}`
+                        : ""
+                }`;
+
+                return {
+                    url,
+                    method: "GET",
+                };
+            },
+
             providesTags: ["Orders"],
         }),
 
-        // GET /admin/orders/statistics
-        getOrderStatistics: builder.query<OrderStatisticsResponse, void>({
+        // ─── GET /admin/orders/statistics ───────────────────────────────────
+        getOrderStatistics: builder.query<
+            OrderStatisticsResponse,
+            void
+        >({
             query: () => ({
                 url: "admin/orders/statistics",
                 method: "GET",
             }),
+
             providesTags: ["Orders"],
         }),
 
-        // GET /admin/orders/{id}
-        getOrder: builder.query<OrderSingleResponse, number | string>({
+        // ─── GET /admin/orders/{id} ─────────────────────────────────────────
+        getOrder: builder.query<
+            OrderSingleResponse,
+            number | string
+        >({
             query: (id) => ({
                 url: `admin/orders/${id}`,
                 method: "GET",
             }),
-            providesTags: (_result, _error, id) => [{ type: "Orders", id }],
+
+            providesTags: (_result, _error, id) => [
+                { type: "Orders", id },
+            ],
         }),
 
-        // PUT /admin/orders/{id}/status
-        // Body: { status: OrderStatus, notes?: string }
-        updateOrderStatus: builder.mutation<OrderSingleResponse, { id: number | string; data: UpdateStatusPayload }>({
+        // ─── PUT /admin/orders/{id}/status ─────────────────────────────────
+        updateOrderStatus: builder.mutation<
+            OrderSingleResponse,
+            {
+                id: number | string;
+                data: UpdateStatusPayload;
+            }
+        >({
             query: ({ id, data }) => ({
                 url: `admin/orders/${id}/status`,
                 method: "PUT",
                 body: data,
             }),
-            invalidatesTags: (_result, _error, { id }) => ["Orders", { type: "Orders", id }],
+
+            invalidatesTags: (_result, _error, { id }) => [
+                "Orders",
+                { type: "Orders", id },
+            ],
         }),
 
-        // POST /admin/orders/{id}/refund
-        // Body: { amount: number, reason: string, notes?: string }
-        processRefund: builder.mutation<OrderSingleResponse, { id: number | string; data: ProcessRefundPayload }>({
+        // ─── POST /admin/orders/{id}/refund ────────────────────────────────
+        processRefund: builder.mutation<
+            OrderSingleResponse,
+            {
+                id: number | string;
+                data: ProcessRefundPayload;
+            }
+        >({
             query: ({ id, data }) => ({
                 url: `admin/orders/${id}/refund`,
                 method: "POST",
                 body: data,
             }),
-            invalidatesTags: (_result, _error, { id }) => ["Orders", { type: "Orders", id }],
+
+            invalidatesTags: (_result, _error, { id }) => [
+                "Orders",
+                { type: "Orders", id },
+            ],
         }),
 
-        // POST /admin/orders/{id}/cancel
-        // Body: { reason: string, notes?: string }
-        cancelOrder: builder.mutation<OrderSingleResponse, { id: number | string; data: CancelOrderPayload }>({
+        // ─── POST /admin/orders/{id}/cancel ────────────────────────────────
+        cancelOrder: builder.mutation<
+            OrderSingleResponse,
+            {
+                id: number | string;
+                data: CancelOrderPayload;
+            }
+        >({
             query: ({ id, data }) => ({
                 url: `admin/orders/${id}/cancel`,
                 method: "POST",
                 body: data,
             }),
-            invalidatesTags: (_result, _error, { id }) => ["Orders", { type: "Orders", id }],
+
+            invalidatesTags: (_result, _error, { id }) => [
+                "Orders",
+                { type: "Orders", id },
+            ],
         }),
 
+        // ─── GET /admin/orders/by-store/{storeId} ──────────────────────────
+        getStoreOrders: builder.query<
+            OrderListResponse,
+            {
+                storeId: string;
+                page?: number;
+                per_page?: number;
+                status?: string;
+            }
+        >({
+            query: ({ storeId, page, per_page, status }) => {
+                const queryParams = new URLSearchParams();
+
+                if (page) {
+                    queryParams.append(
+                        "page",
+                        page.toString()
+                    );
+                }
+
+                if (per_page) {
+                    queryParams.append(
+                        "per_page",
+                        per_page.toString()
+                    );
+                }
+
+                if (status) {
+                    queryParams.append(
+                        "status",
+                        status
+                    );
+                }
+
+                const url = `admin/orders/by-store/${storeId}${
+                    queryParams.toString()
+                        ? `?${queryParams.toString()}`
+                        : ""
+                }`;
+
+                return {
+                    url,
+                    method: "GET",
+                };
+            },
+
+            providesTags: ["Orders"],
+        }),
+
+        // ─── GET /admin/orders/by-vendor/{vendorId} ────────────────────────
+        getVendorOrders: builder.query<
+            OrderListResponse,
+            {
+                vendorId: string;
+                page?: number;
+                per_page?: number;
+                status?: string;
+            }
+        >({
+            query: ({ vendorId, page, per_page, status }) => {
+                const queryParams = new URLSearchParams();
+
+                if (page) {
+                    queryParams.append(
+                        "page",
+                        page.toString()
+                    );
+                }
+
+                if (per_page) {
+                    queryParams.append(
+                        "per_page",
+                        per_page.toString()
+                    );
+                }
+
+                if (status) {
+                    queryParams.append(
+                        "status",
+                        status
+                    );
+                }
+
+                const url = `admin/orders/by-vendor/${vendorId}${
+                    queryParams.toString()
+                        ? `?${queryParams.toString()}`
+                        : ""
+                }`;
+
+                return {
+                    url,
+                    method: "GET",
+                };
+            },
+
+            providesTags: ["Orders"],
+        }),
     }),
 });
 
@@ -266,4 +527,6 @@ export const {
     useUpdateOrderStatusMutation,
     useProcessRefundMutation,
     useCancelOrderMutation,
+    useGetStoreOrdersQuery,
+    useGetVendorOrdersQuery,
 } = orderApi;

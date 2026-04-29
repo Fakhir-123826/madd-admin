@@ -225,46 +225,120 @@ export interface StoresByVendorResponse {
     };
 }
 
-// Raw base query with headers configuration
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
+// Helper function to get base route from localStorage
+const getUserBasePath = () => {
+    try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const role = user?.roles?.[0] || user?.user_type;
 
-// Base query with authentication check
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
-    args,
-    api,
-    extraOptions
-) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
+        if (["super_admin", "admin"].includes(role)) return "admin";
+        if (["vendor", "customer"].includes(role)) return role;
 
-    // If token expired / unauthorized
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
+        return "admin";
+    } catch {
+        return "admin";
     }
+};
 
-    return result;
+// Custom dynamic base query that handles role-based routing
+const dynamicBaseQuery = async (args: any, api: any, extraOptions: any) => {
+    const basePath = getUserBasePath();
+    
+    // Handle both string URL and object args
+    let url: string;
+    let method: string = 'GET';
+    let body: any = undefined;
+    let params: any = undefined;
+    
+    if (typeof args === 'string') {
+        url = args;
+    } else {
+        url = args.url;
+        method = args.method || 'GET';
+        body = args.body;
+        params = args.params;
+    }
+    
+    // Remove any existing base path prefix if present
+    const cleanEndpoint = url.replace(/^(admin|vendor|customer)\//, '');
+    
+    // Construct the full URL with dynamic base path
+    let finalUrl = `${baseURL}/${basePath}/${cleanEndpoint}`;
+    
+    // Add query parameters if they exist
+    if (params) {
+        const queryString = new URLSearchParams(params).toString();
+        finalUrl += `?${queryString}`;
+    }
+    
+    // Prepare headers
+    const headers = new Headers();
+    const token = localStorage.getItem("token");
+    if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+    }
+    headers.set("Content-Type", "application/json");
+    
+    // Prepare fetch options
+    const fetchOptions: RequestInit = {
+        method,
+        headers,
+        ...extraOptions,
+    };
+    
+    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+        fetchOptions.body = JSON.stringify(body);
+    }
+    
+    // Make the request
+    try {
+        const response = await fetch(finalUrl, fetchOptions);
+        let data;
+        
+        // Try to parse JSON, but handle non-JSON responses
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            data = await response.text();
+        }
+        
+        // Handle unauthorized
+        if (response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "/login";
+            return { error: { status: 401, data: { message: "Unauthorized" } } };
+        }
+        
+        // Handle other error status codes
+        if (!response.ok) {
+            return { 
+                error: { 
+                    status: response.status, 
+                    data: data,
+                    message: data?.message || `Request failed with status ${response.status}`
+                } 
+            };
+        }
+        
+        return { data };
+    } catch (error) {
+        console.error("API Request Error:", error);
+        return { error: { status: 'FETCH_ERROR', error: String(error) } };
+    }
 };
 
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const storeListApi = createApi({
     reducerPath: "storeListApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Stores", "StoreStats", "VendorsForStores"],
 
     endpoints: (builder) => ({
 
-        // GET /admin/stores - Get all stores with filters
+        // GET /{basePath}/stores - Get all stores with filters
         getStores: builder.query<StoreListResponse, {
             page?: number;
             per_page?: number;
@@ -274,47 +348,47 @@ export const storeListApi = createApi({
             search?: string;
         } | void>({
             query: (params) => {
-                const queryParams = new URLSearchParams();
+                const queryParams: Record<string, string> = {};
                 if (params) {
-                    if (params.page) queryParams.append('page', params.page.toString());
-                    if (params.per_page) queryParams.append('per_page', params.per_page.toString());
-                    if (params.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
-                    if (params.status) queryParams.append('status', params.status);
-                    if (params.country_code) queryParams.append('country_code', params.country_code);
-                    if (params.search) queryParams.append('search', params.search);
+                    if (params.page) queryParams.page = params.page.toString();
+                    if (params.per_page) queryParams.per_page = params.per_page.toString();
+                    if (params.vendor_id) queryParams.vendor_id = params.vendor_id.toString();
+                    if (params.status) queryParams.status = params.status;
+                    if (params.country_code) queryParams.country_code = params.country_code;
+                    if (params.search) queryParams.search = params.search;
                 }
-                const url = `admin/stores${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return {
-                    url,
+                    url: "stores",
                     method: "GET",
+                    params: Object.keys(queryParams).length ? queryParams : undefined,
                 };
             },
             providesTags: ["Stores"],
         }),
 
-        // GET /admin/stores/{uuid} - Get single store
+        // GET /{basePath}/stores/{uuid} - Get single store
         getStore: builder.query<StoreSingleResponse, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}`,
+                url: `stores/${uuid}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, uuid) => [{ type: "Stores", id: uuid }],
         }),
 
-        // POST /admin/stores - Create store
+        // POST /{basePath}/stores - Create store
         createStore: builder.mutation<StoreSingleResponse, CreateStorePayload>({
             query: (data) => ({
-                url: "admin/stores",
+                url: "stores",
                 method: "POST",
                 body: data,
             }),
             invalidatesTags: ["Stores"],
         }),
 
-        // PUT /admin/stores/{id} - Update store (uses ID, not UUID for update per controller)
+        // PUT /{basePath}/stores/{id} - Update store (uses ID, not UUID for update per controller)
         updateStore: builder.mutation<StoreSingleResponse, { id: number; data: UpdateStorePayload }>({
             query: ({ id, data }) => ({
-                url: `admin/stores/${id}`,
+                url: `stores/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -324,37 +398,37 @@ export const storeListApi = createApi({
             ],
         }),
 
-        // DELETE /admin/stores/{id} - Soft delete store
+        // DELETE /{basePath}/stores/{uuid} - Soft delete store
         deleteStore: builder.mutation<{ success: boolean; message: string }, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}`,
+                url: `stores/${uuid}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Stores"],
         }),
 
-        // DELETE /admin/stores/{id}/force - Force delete store (permanent)
+        // DELETE /{basePath}/stores/{uuid}/force - Force delete store (permanent)
         forceDeleteStore: builder.mutation<{ success: boolean; message: string }, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}/force`,
+                url: `stores/${uuid}/force`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Stores"],
         }),
 
-        // POST /admin/stores/{id}/restore - Restore soft-deleted store
+        // POST /{basePath}/stores/{uuid}/restore - Restore soft-deleted store
         restoreStore: builder.mutation<{ success: boolean; message: string; data: Store }, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}/restore`,
+                url: `stores/${uuid}/restore`,
                 method: "POST",
             }),
             invalidatesTags: ["Stores"],
         }),
 
-        // POST /admin/stores/{id}/activate - Activate store
+        // POST /{basePath}/stores/{uuid}/activate - Activate store
         activateStore: builder.mutation<{ success: boolean; message: string; data: Store }, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}/activate`,
+                url: `stores/${uuid}/activate`,
                 method: "POST",
             }),
             invalidatesTags: (_result, _error, uuid) => [
@@ -363,10 +437,10 @@ export const storeListApi = createApi({
             ],
         }),
 
-        // POST /admin/stores/{id}/deactivate - Deactivate store
+        // POST /{basePath}/stores/{uuid}/deactivate - Deactivate store
         deactivateStore: builder.mutation<{ success: boolean; message: string; data: Store }, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}/deactivate`,
+                url: `stores/${uuid}/deactivate`,
                 method: "POST",
             }),
             invalidatesTags: (_result, _error, uuid) => [
@@ -375,47 +449,48 @@ export const storeListApi = createApi({
             ],
         }),
 
-        // POST /admin/stores/{id}/domain - Add domain to store
+        // POST /{basePath}/stores/{uuid}/domain - Add domain to store
         addStoreDomain: builder.mutation<{ success: boolean; message: string; data: Domain }, { uuid: string; data: AddDomainPayload }>({
             query: ({ uuid, data }) => ({
-                url: `admin/stores/${uuid}/domain`,
+                url: `stores/${uuid}/domain`,
                 method: "POST",
                 body: data,
             }),
             invalidatesTags: (_result, _error, { uuid }) => [{ type: "Stores", id: uuid }],
         }),
 
-        // GET /admin/stores/{id}/stats - Get store statistics
+        // GET /{basePath}/stores/{uuid}/stats - Get store statistics
         getStoreStats: builder.query<StoreStatsResponse, string>({
             query: (uuid) => ({
-                url: `admin/stores/${uuid}/stats`,
+                url: `stores/${uuid}/stats`,
                 method: "GET",
             }),
             providesTags: (_result, _error, uuid) => [{ type: "StoreStats", id: uuid }],
         }),
 
-        // GET /admin/stores/by-vendor/{vendorId} - Get stores by vendor UUID
+        // GET /{basePath}/stores/by-vendor/{vendorUuid} - Get stores by vendor UUID
         getStoresByVendor: builder.query<StoresByVendorResponse, string>({
             query: (vendorUuid) => ({
-                url: `admin/stores/by-vendor/${vendorUuid}`,
+                url: `stores/by-vendor/${vendorUuid}`,
                 method: "GET",
             }),
             providesTags: ["Stores"],
         }),
 
-        // POST /admin/stores/bulk-status - Bulk update store status
+        // POST /{basePath}/stores/bulk-status - Bulk update store status
         bulkStatusUpdate: builder.mutation<{ success: boolean; message: string; data: { updated_count: number; status: string } }, BulkStatusUpdatePayload>({
             query: (data) => ({
-                url: "admin/stores/bulk-status",
+                url: "stores/bulk-status",
                 method: "POST",
                 body: data,
             }),
             invalidatesTags: ["Stores"],
         }),
-        // Add to endpoints in storeApi.ts
+
+        // GET /{basePath}/vendors - Get vendors for store dropdown
         getVendorsForStore: builder.query<VendorsResponse, void>({
             query: () => ({
-                url: "admin/vendors",
+                url: "vendors",
                 method: "GET",
             }),
             providesTags: ["VendorsForStores"],
@@ -423,6 +498,7 @@ export const storeListApi = createApi({
     }),
 });
 
+// Export all hooks
 export const {
     useGetStoresQuery,
     useGetStoreQuery,
@@ -434,7 +510,7 @@ export const {
     useActivateStoreMutation,
     useDeactivateStoreMutation,
     useAddStoreDomainMutation,
-    useGetVendorsForStoreQuery, 
+    useGetVendorsForStoreQuery,
     useGetStoreStatsQuery,
     useGetStoresByVendorQuery,
     useBulkStatusUpdateMutation,

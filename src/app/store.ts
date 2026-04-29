@@ -26,6 +26,17 @@ import { dashboardApi } from './api/DashboardSlices/DashboardApi';
 
 import { orderApi } from "./api/OrderSlices/OrderApi";
 
+import { couponApi } from "./api/CouponSlices/CouponApi";
+
+import { settingsApi } from "./api/SettingsSlices/SettingsApi";
+
+import { configApi } from "./api/ConfigSlices/ConfigApi";
+
+import { planApi } from "./api/PlanSlices/PlanApi";
+import { mlmApi } from "./api/MlmSlices/MlmApi";
+import { reportApi } from "./api/ReportSlices/ReportApi";
+
+
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -47,10 +58,17 @@ export const store = configureStore({
 
     [storeListApi.reducerPath]: storeListApi.reducer,
 
-    [settlementApi.reducerPath]: settlementApi.reducer ,
-    
-    [dashboardApi.reducerPath]: dashboardApi.reducer ,
-    [orderApi.reducerPath]: orderApi.reducer
+    [settlementApi.reducerPath]: settlementApi.reducer,
+
+    [dashboardApi.reducerPath]: dashboardApi.reducer,
+    [orderApi.reducerPath]: orderApi.reducer,
+    [couponApi.reducerPath]: couponApi.reducer,
+    [settingsApi.reducerPath]: settingsApi.reducer,
+    [configApi.reducerPath]: configApi.reducer,
+    [planApi.reducerPath]: planApi.reducer,
+    [mlmApi.reducerPath]: mlmApi.reducer,
+    [reportApi.reducerPath]: reportApi.reducer,
+
 
 
   },
@@ -66,13 +84,18 @@ export const store = configureStore({
       inventoryApi.middleware,
       attributeApi.middleware,
       attributeSetApi.middleware,
-      vendorApi.middleware,  
-      userApi.middleware,      
+      vendorApi.middleware,
+      userApi.middleware,
       storeListApi.middleware,
       settlementApi.middleware,
       dashboardApi.middleware,
-      orderApi.middleware
-
+      orderApi.middleware,
+      couponApi.middleware,
+      settingsApi.middleware,
+      configApi.middleware,
+      planApi.middleware,
+      mlmApi.middleware,
+      reportApi.middleware,
     ),
 });
 

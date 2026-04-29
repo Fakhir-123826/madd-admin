@@ -1,4 +1,4 @@
-import { createBrowserRouter, useNavigate } from "react-router-dom";
+import { createBrowserRouter, useNavigate, Navigate } from "react-router-dom";
 import Login from './screens/Login.tsx'
 import Signup from './screens/Signup.tsx'
 import VerifyEmail from "./screens/VerifyEmail.tsx";
@@ -66,11 +66,11 @@ import CreateSEOSetting from "./screens/Return/SEO setting/CreateSEOSetting.tsx"
 import SEOSettingList from "./screens/Return/SEO setting/SEOSettingList.tsx";
 import EmailMarketingList from "./screens/Return/Email Marketing/EmailMarketingList.tsx";
 import SEOSEtting from "./screens/Return/SEO setting/SEOSetting.tsx";
-import MlmDashboard from "./screens/MlmDashboard/MlmDashboard.tsx";
-import UserTree from "./component/MlmDashboard/UserTree.tsx";
-import Earning from "./component/MlmDashboard/Earning.tsx";
-import LevelWise from "./component/MlmDashboard/LevelWise.tsx";
-import MemberGrowth from "./component/MlmDashboard/MemberGrowth.tsx";
+// import MlmDashboard from "./screens/MlmDashboard/MlmDashboard.tsx";
+// import UserTree from "./component/MlmDashboard/UserTree.tsx";
+// import Earning from "./component/MlmDashboard/Earning.tsx";
+// import LevelWise from "./component/MlmDashboard/LevelWise.tsx";
+// import MemberGrowth from "./component/MlmDashboard/MemberGrowth.tsx";
 import PaymentProviderManagement from "./screens/Payment/PaymentProviderManagement.tsx";
 import PaymentProviderDetails from "./component/Payment/PaymentProviderDetails.tsx";
 import AddStripe from "./component/Payment/AddStripe.tsx";
@@ -177,12 +177,49 @@ import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/Mage
 import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
 import MagentoNotificationsList from "./screens/System/Notification/MagentoNotificationsList.tsx";
 
-
 import SettlementList from "./screens/Settlements/Settlementlist.tsx";
 import SettlementDetail from "./screens/Settlements/SettlementDetail.tsx";
 import GenerateSettlement from "./screens/Settlements/GenerateSettlement.tsx";
 import UserCreate from "./screens/Users/UserCreate.tsx";
-// router.tsx
+
+// Settings
+import Settings from "./screens/Settings/Settings";
+import SystemSettings from "./screens/Settings/SystemSettings";
+import PaymentSettings from "./screens/Settings/PaymentSettings";
+import ShippingSettings from "./screens/Settings/ShippingSettings";
+import TaxSettings from "./screens/Settings/TaxSettings";
+import EmailSettings from "./screens/Settings/EmailSettings";
+
+// Configs
+import Config from "./screens/Config/Config";
+import Countries from "./screens/Config/Countries";
+import SalesPolicies from "./screens/Config/SalesPolicies";
+import Currencies from "./screens/Config/Currencies";
+import Languages from "./screens/Config/Languages";
+import Themes from "./screens/Config/Themes";
+import Couriers from "./screens/Config/Couriers";
+
+// Plans
+import PlanList from "./screens/Plans/PlanList.tsx";
+import PlanForm from "./screens/Plans/PlanList.tsx";
+
+// Mlm
+import MLM from "./screens/MLM/MLM";
+import MlmDashboard from "./screens/MLM/MlmDashboard";
+import Agents from "./screens/MLM/Agents";
+import AgentDetail from "./screens/MLM/AgentDetail";
+import AgentForm from "./screens/MLM/AgentForm";
+import Commissions from "./screens/MLM/Commissions";
+import Structure from "./screens/MLM/Structure";
+import Levels from "./screens/MLM/Levels";
+
+import Reports from "./screens/Reports/Reports";
+import PlatformReport from "./screens/Reports/PlatformReport";
+import FinancialReport from "./screens/Reports/FinancialReport";
+import SalesReport from "./screens/Reports/SalesReport";
+import VendorPerformanceReport from "./screens/Reports/VendorPerformanceReport";
+import ProductPerformanceReport from "./screens/Reports/ProductPerformanceReport";
+import ExportReport from "./screens/Reports/ExportReport";
 
 // ==================== ROUTE CONSTANTS ====================
 export const ROUTES = {
@@ -204,12 +241,11 @@ export const ROUTES = {
   STORE_CARD_LIST: "/storeCardList",
   STORE: "/store",
   CREATE_STORE: "/CreateStore",
-  EDIT_STORE : (id: string | number = ":id") => `/UpdateStore/${id}`,
+  EDIT_STORE: (id: string | number = ":id") => `/UpdateStore/${id}`,
 
   // Order Section
   ORDER_LIST: "/orderlist",
   ORDER_STATISTICS: "/OrderStatistics",
-
   ADD_ORDER: "/addorder",
   ORDER_DETAILS: (id: string | number = ":id") => `/order/${id}`,
 
@@ -271,7 +307,6 @@ export const ROUTES = {
 
   // Users
   USER_LIST: "/userlist",
-  // ADD_USER: "/adduser",
   ADD_USER: "/adduser",
   USER_DETAILS: (id: string | number = ":id") => `/user/${id}`,
 
@@ -305,12 +340,46 @@ export const ROUTES = {
   ADD_BACKUP: "/addbackup",
   AUDIT_LOGS: "/auditlogs",
 
+  // Settings - New Routes
+  SETTINGS: "/settings",
+  SETTINGS_SYSTEM: "/settings/system",
+  SETTINGS_PAYMENT: "/settings/payment",
+  SETTINGS_SHIPPING: "/settings/shipping",
+  SETTINGS_TAX: "/settings/tax",
+  SETTINGS_EMAIL: "/settings/email",
+
+  CONFIG: "/config",
+  CONFIG_COUNTRIES: "/config/countries",
+  CONFIG_SALES_POLICIES: "/config/sales-policies",
+  CONFIG_CURRENCIES: "/config/currencies",
+  CONFIG_LANGUAGES: "/config/languages",
+  CONFIG_THEMES: "/config/themes",
+  CONFIG_COURIERS: "/config/couriers",
+
+  // Plans
+  PLANS: "/plans",
+  CREATE_PLAN: "/plans/create",
+  EDIT_PLAN: (id: string | number = ":id") => `/plans/${id}/edit`,
+
+
   // MLM Dashboard
-  MLM_DASHBOARD: "/mlmdashboard",
-  USER_TREE: "/usertree",
-  EARNINGS_REPORT: "/reports",
-  LEVEL_WISE: "/levelwise",
-  MEMBER_GROWTH: "/membergrowth",
+  MLM: "/mlm",
+  MLM_DASHBOARD: "/mlm/dashboard",
+  MLM_AGENTS: "/mlm/agents",
+  MLM_AGENTS_ADD: "/mlm/agents/add",
+  MLM_AGENTS_EDIT: (id: string | number = ":id") => `/mlm/agents/edit/${id}`,
+  MLM_AGENTS_VIEW: (id: string | number = ":id") => `/mlm/agents/${id}`,
+  MLM_COMMISSIONS: "/mlm/commissions",
+  MLM_STRUCTURE: "/mlm/structure",
+
+  // Reports
+  REPORTS: "/reports",
+  REPORTS_PLATFORM: "/reports/platform",
+  REPORTS_FINANCIAL: "/reports/financial",
+  REPORTS_SALES: "/reports/sales",
+  REPORTS_VENDOR_PERFORMANCE: "/reports/vendor-performance",
+  REPORTS_PRODUCT_PERFORMANCE: "/reports/product-performance",
+  REPORTS_EXPORT: "/reports/export",
 
   // Payment Providers
   PAYMENT_PROVIDERS: "/payment-providers",
@@ -463,17 +532,16 @@ export const ROUTES = {
 
   VENDOR: "/Verdor",
 
-
-MAGENTO_SETTLEMENTS_LIST: "/settlements",
-MAGENTO_SETTLEMENT_DETAIL: (id: string | number = ":id") => `/settlements/${id}`,
-MAGENTO_SETTLEMENT_GENERATE: "/settlements/generate",
+  MAGENTO_SETTLEMENTS_LIST: "/settlements",
+  MAGENTO_SETTLEMENT_DETAIL: (id: string | number = ":id") => `/settlements/${id}`,
+  MAGENTO_SETTLEMENT_GENERATE: "/settlements/generate",
 
 
 
 
 } as const;
 
-// ==================== ROUTE CONFIGURATION ====================
+// ==================== PROTECTED ROUTES ====================
 const protectedRoutes = [
   { path: ROUTES.DASHBOARD, element: <Dashboard /> },
 
@@ -486,21 +554,14 @@ const protectedRoutes = [
   // Order Section
   { path: ROUTES.ORDER_LIST, element: <OrderList /> },
   { path: ROUTES.ORDER_STATISTICS, element: <OrderStatistics /> },
-
   { path: ROUTES.ADD_ORDER, element: <AddOrder /> },
   { path: ROUTES.ORDER_DETAILS(), element: <OrderDetails /> },
 
   // Vendor Section
   { path: ROUTES.VENDOR_LIST, element: <VendorList /> },
   { path: ROUTES.VENDOR_DETAIL, element: <Vendor /> },
-  {
-    path: ROUTES.CREATE_VENDOR,
-    element: <CreateVendor />
-  },
-  {
-    path: ROUTES.EDIT_VENDOR,
-    element: <CreateVendor />
-  },
+  { path: ROUTES.CREATE_VENDOR, element: <CreateVendor /> },
+  { path: ROUTES.EDIT_VENDOR, element: <CreateVendor /> },
   { path: ROUTES.CREATE_VENDOR_ONBOARD, element: <CreateVendoronBoard /> },
   { path: ROUTES.VENDOR_ONBOARD, element: <VendorOnboard /> },
   { path: ROUTES.VENDOR_DASHBOARD, element: <VendorDashBoard /> },
@@ -554,10 +615,8 @@ const protectedRoutes = [
 
   // Users
   { path: ROUTES.USER_LIST, element: <UserList /> },
-  // { path: ROUTES.ADD_USER, element: <AddUser /> },UserCreate
   { path: ROUTES.ADD_USER, element: <UserCreate /> },
   { path: ROUTES.USER_DETAILS(), element: <UserCreate /> },
-  // { path: ROUTES.USER_DETAILS(), element: <UserDetails /> },
 
   // User Roles
   { path: ROUTES.USER_ROLES, element: <UsersRoles /> },
@@ -582,19 +641,85 @@ const protectedRoutes = [
   { path: ROUTES.ADD_RULE, element: <AddRule /> },
   { path: ROUTES.INVOICE_MANAGEMENT, element: <InvoiceManagement /> },
 
-  // Settings
+  // Settings - Traditional Routes (keeping for backward compatibility)
   { path: ROUTES.TRANSLATION, element: <Translation /> },
   { path: ROUTES.UPDATES, element: <Updates /> },
   { path: ROUTES.BACKUPS, element: <Backups /> },
   { path: ROUTES.ADD_BACKUP, element: <AddBackup /> },
   { path: ROUTES.AUDIT_LOGS, element: <AuditLogs /> },
 
+  // Settings - New Nested Routes
+  {
+    path: ROUTES.SETTINGS,
+    element: <Settings />,
+    children: [
+      { index: true, element: <Navigate to="system" replace /> },
+      { path: "system", element: <SystemSettings /> },
+      { path: "payment", element: <PaymentSettings /> },
+      { path: "shipping", element: <ShippingSettings /> },
+      { path: "tax", element: <TaxSettings /> },
+      { path: "email", element: <EmailSettings /> },
+    ],
+  },
+  {
+    path: ROUTES.CONFIG,
+    element: <Config />,
+    children: [
+      { index: true, element: <Navigate to="countries" replace /> },
+      { path: "countries", element: <Countries /> },
+      { path: "sales-policies", element: <SalesPolicies /> },
+      { path: "currencies", element: <Currencies /> },
+      { path: "languages", element: <Languages /> },
+      { path: "themes", element: <Themes /> },
+      { path: "couriers", element: <Couriers /> },
+    ],
+  },
+
+  { path: ROUTES.PLANS, element: <PlanList /> },
+  { path: ROUTES.CREATE_PLAN, element: <PlanForm /> },
+  { path: ROUTES.EDIT_PLAN(), element: <PlanForm /> },
+
+  {
+    path: "/mlm",
+    element: <MLM />,
+    children: [
+      { index: true, element: <Navigate to="dashboard" replace /> },
+      { path: "dashboard", element: <Dashboard /> },
+      { path: "agents", element: <Agents /> },
+      { path: "agents/add", element: <AgentForm /> },
+      { path: "agents/:id", element: <AgentDetail /> },
+      { path: "agents/edit/:id", element: <AgentForm /> },
+      { path: "commissions", element: <Commissions /> },
+      { path: "structure", element: <Structure /> },
+      { path: "levels", element: <Levels /> },
+    ],
+  },
+  {
+    path: ROUTES.REPORTS,
+    element: <Reports />,
+    children: [
+      { index: true, element: <Navigate to="platform" replace /> },
+      { path: "platform", element: <PlatformReport /> },
+      { path: "financial", element: <FinancialReport /> },
+      { path: "sales", element: <SalesReport /> },
+      { path: "vendor-performance", element: <VendorPerformanceReport /> },
+      { path: "product-performance", element: <ProductPerformanceReport /> },
+      { path: "export", element: <ExportReport /> },
+    ],
+  },
+  // Alternative flat routes (can be used alongside nested for direct access)
+  { path: ROUTES.SETTINGS_SYSTEM, element: <SystemSettings /> },
+  { path: ROUTES.SETTINGS_PAYMENT, element: <PaymentSettings /> },
+  { path: ROUTES.SETTINGS_SHIPPING, element: <ShippingSettings /> },
+  { path: ROUTES.SETTINGS_TAX, element: <TaxSettings /> },
+  { path: ROUTES.SETTINGS_EMAIL, element: <EmailSettings /> },
+
   // MLM Dashboard
-  { path: ROUTES.MLM_DASHBOARD, element: <MlmDashboard /> },
-  { path: ROUTES.USER_TREE, element: <UserTree /> },
-  { path: ROUTES.EARNINGS_REPORT, element: <Earning /> },
-  { path: ROUTES.LEVEL_WISE, element: <LevelWise /> },
-  { path: ROUTES.MEMBER_GROWTH, element: <MemberGrowth /> },
+  // { path: ROUTES.MLM_DASHBOARD, element: <MlmDashboard /> },
+  // { path: ROUTES.USER_TREE, element: <UserTree /> },
+  // { path: ROUTES.EARNINGS_REPORT, element: <Earning /> },
+  // { path: ROUTES.LEVEL_WISE, element: <LevelWise /> },
+  // { path: ROUTES.MEMBER_GROWTH, element: <MemberGrowth /> },
 
   // Payment Providers
   { path: ROUTES.PAYMENT_PROVIDERS, element: <PaymentProviderManagement /> },
@@ -617,7 +742,7 @@ const protectedRoutes = [
   { path: ROUTES.ADD_SUBDOMAIN, element: <AddSubdomain /> },
   { path: ROUTES.ADD_SSL_CERTIFICATE, element: <AddSslCertificate /> },
 
-  // Magento Routes (all)
+  // Magento Routes
   { path: ROUTES.MAGENTO_ORDERS, element: <MagentoOrderList /> },
   { path: ROUTES.MAGENTO_ORDER_DETAILS(), element: <MogentoOrder /> },
   { path: ROUTES.MAGENTO_PRODUCTS, element: <MagentoProductList /> },
@@ -726,12 +851,10 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
   { path: ROUTES.VENDOR, element: <VendorList /> },
 
-
-{ path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
-{ path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
-{ path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
-
-
+  // Settlements
+  { path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
+  { path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
+  { path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
 ];
 
 // ==================== CREATE ROUTER ====================
@@ -771,5 +894,13 @@ export const useAppNavigate = () => {
     navigateToShippingProvider: (id: string | number) => navigate(ROUTES.SHIPPING_PROVIDER_DETAILS(id)),
     navigateToMagentoOrder: (id: string | number) => navigate(ROUTES.MAGENTO_ORDER_DETAILS(id)),
     navigateToMagentoShipment: (id: string | number) => navigate(ROUTES.MAGENTO_SHIPMENT_DETAILS(id)),
+
+    // Settings navigation
+    navigateToSettings: () => navigate(ROUTES.SETTINGS),
+    navigateToSystemSettings: () => navigate(ROUTES.SETTINGS_SYSTEM),
+    navigateToPaymentSettings: () => navigate(ROUTES.SETTINGS_PAYMENT),
+    navigateToShippingSettings: () => navigate(ROUTES.SETTINGS_SHIPPING),
+    navigateToTaxSettings: () => navigate(ROUTES.SETTINGS_TAX),
+    navigateToEmailSettings: () => navigate(ROUTES.SETTINGS_EMAIL),
   };
 };
