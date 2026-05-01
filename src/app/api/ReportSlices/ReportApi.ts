@@ -291,22 +291,6 @@ export const reportApi = createApi({
                 body: data,
             }),
         }),
-        // Add to ReportApi.ts endpoints
-        getSalesReport: builder.query<{ success: boolean; data: SalesReport }, {
-            period?: "day" | "week" | "month" | "quarter" | "year";
-            date_from?: string;
-            date_to?: string;
-        }>({
-            query: (params) => {
-                const queryParams = new URLSearchParams();
-                if (params.period) queryParams.append('period', params.period);
-                if (params.date_from) queryParams.append('date_from', params.date_from);
-                if (params.date_to) queryParams.append('date_to', params.date_to);
-                const url = `admin/reports/sales${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-                return { url, method: "GET" };
-            },
-            providesTags: ["Reports"],
-        }),
     }),
 });
 

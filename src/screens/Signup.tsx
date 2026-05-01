@@ -134,9 +134,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaLock, FaUser, FaArrowRight, FaBuilding, FaMapMarkerAlt, FaCity, FaEnvelope, FaPhone, FaSpinner } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
-import { useRegisterMutation } from "../app/api/AuthSlices/AuthSlices";
+import { useRegisterMutation, useSocialLoginMutation } from "../app/api/AuthSlices/AuthSlices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ROUTES } from "../router";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Signup = () => {
     // Form fields
@@ -168,9 +169,31 @@ const Signup = () => {
     
     const navigate = useNavigate();
     const [register, { isLoading, error }] = useRegisterMutation();
+    const [socialLogin, { isLoading: isSocialLoading }] = useSocialLoginMutation();
     const errorData = (error as any)?.data;
     const fieldErrors = errorData?.errors;
     const generalError = errorData?.message;
+    
+    const loginWithGoogle = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                const res = await socialLogin({
+                    provider: 'google',
+                    access_token: tokenResponse.access_token,
+                }).unwrap();
+                
+                const user = res.data.user;
+                if (!user.is_email_verified) {
+                    navigate(ROUTES.VERIFY_EMAIL, { state: { email: user.email } });
+                } else if (!user.is_vendor) {
+                    navigate(ROUTES.DASHBOARD, { replace: true });
+                }
+            } catch (error) {
+                console.error("Google login error:", error);
+            }
+        },
+        onError: (error) => console.log('Google Login Failed:', error)
+    });
     
     // Fetch countries from backend
     useEffect(() => {
@@ -660,11 +683,12 @@ const Signup = () => {
                     
                     {/* Social Buttons */}
                     <button
-                        onClick={() => console.log("Google login")}
-                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm"
+                        onClick={() => loginWithGoogle()}
+                        disabled={isLoading || isSocialLoading}
+                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <FcGoogle className="text-lg" />
-                        Continue with Google
+                        {isSocialLoading ? "Connecting..." : "Continue with Google"}
                     </button>
                     
                     <button

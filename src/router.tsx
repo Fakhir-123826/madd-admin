@@ -6,6 +6,7 @@ import ForgotPassword from './screens/ForgotPassword.tsx'
 import EnterOTP from './screens/EnterOTP.tsx'
 import Dashboard from './screens/Dashboard.tsx'
 import Layout from './shear/Layout.tsx'
+import ResetPassword from "./screens/ResetPassword.tsx";
 import StoreList from './screens/Store/StoreList.tsx'
 import StoreCardList from './screens/Store/StoreCardList.tsx'
 import Store from './screens/Store/Store.tsx'
@@ -55,7 +56,7 @@ import Translation from "./screens/Setting/Translation.tsx";
 import Updates from "./screens/Setting/Updates.tsx";
 import Backups from "./screens/Setting/Backups.tsx";
 import AddBackup from "./component/Setting/Backup/AddBackup.tsx";
-import AuditLogs from "./screens/Setting/Audit.logs.tsx";
+
 import ProductBase from "./screens/Catalog/ProductBase/ProductBase.tsx";
 import Category from "./screens/Catalog/Category/Category.tsx";
 import CouponManagement from "./screens/Return/Coupon management/CouponManagement.tsx";
@@ -143,8 +144,8 @@ import MagentoTaxRulesList from "./screens/Magento/Stores/TaxRules/MagentoTaxRul
 import AddMagentoTaxRule from "./screens/Magento/Stores/TaxRules/AddMagentoTaxRule.tsx";
 import MagentoProductRatingsList from "./screens/Magento/Stores/Rating/MagentoProductRatingsList.tsx";
 import AddMagentoRating from "./screens/Magento/Stores/Rating/AddMagentoProductRating.tsx";
-import MagentoStockList from "./screens/Magento/Stores/Stock/MagentoStockList.tsx";
 import AddMagentoStock from "./screens/Magento/Stores/Stock/AddMagentoStock.tsx";
+import MagentoStockList from "./screens/Magento/Stores/Stock/MagentoStockList.tsx";
 import MagentoTaxZonesList from "./screens/Magento/Stores/TaxZoneAndRates/MagentoTaxZonesList.tsx";
 import AddMagentoTaxZone from "./screens/Magento/Stores/TaxZoneAndRates/AddMagentoTaxZone.tsx";
 import AddCurrencySymbols from "./screens/Magento/Stores/CurrencySymbols/AddCurrencySymbols.tsx";
@@ -176,6 +177,11 @@ import MagentoOrderedProductsReportList from "./screens/Magento/Reports/Ordered/
 import MagentoDownloadsReportList from "./screens/Magento/Reports/Downloads/MagentoDownloadsReportList.tsx";
 import PageBuilderScreen from "./screens/Magento/Content/Pages/PageBuilder/PageBuilderScreen.tsx";
 import MagentoNotificationsList from "./screens/System/Notification/MagentoNotificationsList.tsx";
+import SystemLogs from "./screens/System/SystemLogs/SystemLogs.tsx";
+import SystemCache from "./screens/System/SystemCache/SystemCache.tsx";
+import SystemQueues from "./screens/System/SystemQueues/SystemQueues.tsx";
+import SystemMaintenance from "./screens/System/SystemMaintenance/SystemMaintenance.tsx";
+import Profile from "./screens/Profile.tsx";
 
 import SettlementList from "./screens/Settlements/Settlementlist.tsx";
 import SettlementDetail from "./screens/Settlements/SettlementDetail.tsx";
@@ -235,6 +241,7 @@ export const ROUTES = {
 
   // Protected Routes
   DASHBOARD: "/",
+  PROFILE: "/profile",
 
   // Store Section
   STORE_LIST: "/storeList",
@@ -338,7 +345,7 @@ export const ROUTES = {
   UPDATES: "/updates",
   BACKUPS: "/backups",
   ADD_BACKUP: "/addbackup",
-  AUDIT_LOGS: "/auditlogs",
+
 
   // Settings - New Routes
   SETTINGS: "/settings",
@@ -530,6 +537,12 @@ export const ROUTES = {
   MAGENTO_DOWNLOADS_REPORT: "/MagentoDownloadsReportList",
   MAGENTO_NOTIFICATIONS_LIST: "/MagentoNotificationsList",
 
+  // System Management
+  SYSTEM_LOGS: "/system/logs",
+  SYSTEM_CACHE: "/system/cache",
+  SYSTEM_QUEUES: "/system/queues",
+  SYSTEM_MAINTENANCE: "/system/maintenance",
+
   VENDOR: "/Verdor",
 
   MAGENTO_SETTLEMENTS_LIST: "/settlements",
@@ -544,6 +557,7 @@ export const ROUTES = {
 // ==================== PROTECTED ROUTES ====================
 const protectedRoutes = [
   { path: ROUTES.DASHBOARD, element: <Dashboard /> },
+  { path: ROUTES.PROFILE, element: <Profile /> },
 
   // Store Section
   { path: ROUTES.STORE_LIST, element: <StoreList /> },
@@ -646,7 +660,7 @@ const protectedRoutes = [
   { path: ROUTES.UPDATES, element: <Updates /> },
   { path: ROUTES.BACKUPS, element: <Backups /> },
   { path: ROUTES.ADD_BACKUP, element: <AddBackup /> },
-  { path: ROUTES.AUDIT_LOGS, element: <AuditLogs /> },
+
 
   // Settings - New Nested Routes
   {
@@ -851,6 +865,12 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
   { path: ROUTES.VENDOR, element: <VendorList /> },
 
+  // System Management
+  { path: ROUTES.SYSTEM_LOGS, element: <SystemLogs /> },
+  { path: ROUTES.SYSTEM_CACHE, element: <SystemCache /> },
+  { path: ROUTES.SYSTEM_QUEUES, element: <SystemQueues /> },
+  { path: ROUTES.SYSTEM_MAINTENANCE, element: <SystemMaintenance /> },
+
   // Settlements
   { path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
   { path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
@@ -876,6 +896,7 @@ export const router = createBrowserRouter([
   { path: ROUTES.OTP, element: <EnterOTP /> },
   { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPassword /> },
   { path: ROUTES.REGISTER, element: <Signup /> },
+  { path: ROUTES.RESET_PASSWORD, element: <ResetPassword /> },
   { path: ROUTES.NOT_FOUND, element: <NotFound /> },
 ]);
 

@@ -6,9 +6,10 @@ import { FaApple } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import { useLoginAdminMutation } from "../app/api/AuthSlices/AuthSlices";
+import { useLoginAdminMutation, useSocialLoginMutation } from "../app/api/AuthSlices/AuthSlices";
 import { selectIsAuthenticated } from "../app/api/AuthSlices/authSlice";
 import { ROUTES } from "../router";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -19,6 +20,28 @@ const Login = () => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
 
     const [loginAdmin, { isLoading, error }] = useLoginAdminMutation();
+    const [socialLogin, { isLoading: isSocialLoading }] = useSocialLoginMutation();
+
+    const loginWithGoogle = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                const res = await socialLogin({
+                    provider: 'google',
+                    access_token: tokenResponse.access_token,
+                }).unwrap();
+                
+                const user = res.data.user;
+                if (!user.is_email_verified) {
+                    navigate(ROUTES.VERIFY_EMAIL, { state: { email: user.email } });
+                } else if (!user.is_vendor) {
+                    navigate(ROUTES.DASHBOARD, { replace: true });
+                }
+            } catch (error) {
+                console.error("Google login error:", error);
+            }
+        },
+        onError: (error) => console.log('Google Login Failed:', error)
+    });
 
     // ── If already authenticated, skip to dashboard ───────────────────────────
     useEffect(() => {
@@ -188,7 +211,7 @@ const Login = () => {
                     {/* Forgot password */}
                     <div className="text-right -mt-3">
                         <Link
-                            to="/ForgotPassword"
+                            to={ROUTES.FORGOT_PASSWORD}
                             className="text-sm font-medium text-blue-500 hover:text-blue-600 hover:underline transition-colors"
                         >
                             Forgot Password?
@@ -223,11 +246,12 @@ const Login = () => {
 
                     {/* Google */}
                     <button
-                        onClick={() => console.log("Google login")}
-                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm cursor-pointer"
+                        onClick={() => loginWithGoogle()}
+                        disabled={isLoading || isSocialLoading}
+                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <FcGoogle className="text-lg" />
-                        Continue with Google
+                        {isSocialLoading ? "Connecting..." : "Continue with Google"}
                     </button>
 
                     {/* Apple */}

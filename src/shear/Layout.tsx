@@ -4,6 +4,7 @@ import {
   FaHome,
   FaStore,
   FaUsers,
+  FaUser,
   FaBox,
   FaHandshake,
   FaExchangeAlt,
@@ -24,6 +25,7 @@ import {
   FaMagento,
   FaChevronDown,
   FaChevronRight,
+  FaChevronLeft,
   FaBell,
   FaSearch,
   FaServer,
@@ -32,6 +34,7 @@ import {
   FaTicketAlt,
   FaChartLine,
 } from "react-icons/fa";
+import { RiLogoutBoxLine } from "react-icons/ri";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLogoutUserMutation } from "../app/api/AuthSlices/AuthSlices";
 import { ROUTES } from "../router.tsx";
@@ -179,6 +182,7 @@ const RecursiveMenuItem = ({
 const Layout = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -187,7 +191,7 @@ const Layout = () => {
 
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutUserMutation();
   const handleLogout = async () => {
-    await logoutApi({});
+    await logoutApi().unwrap();
     navigate("/login");
   };
 
@@ -1206,7 +1210,7 @@ const Layout = () => {
       label: "System",
       icon: FaServer,
       children: [
-        { label: "Logs", path: "/auditlogs" },
+        { label: "Logs", path: "/system/logs" },
         { label: "Cache", path: "/system/cache" },
         { label: "Queues", path: "/system/queues" },
         { label: "Maintenance", path: "/system/maintenance" }
@@ -1214,41 +1218,41 @@ const Layout = () => {
     },
 
     // Additional Modules
-    {
-      label: "Payments",
-      icon: FaCreditCard,
-      children: [
-        { label: "Payment Providers", path: "/payment-providers" },
-        { label: "Add Provider", path: "/addprovider" }
-      ]
-    },
-    {
-      label: "Shipping",
-      icon: FaTruck,
-      children: [
-        { label: "Shipping Management", path: "/shipping-mangement" },
-        { label: "Add Shipping Provider", path: "/add-shipping-provider" }
-      ]
-    },
-    {
-      label: "Domain",
-      icon: FaGlobe,
-      children: [
-        { label: "Domains", path: "/domains" },
-        { label: "SSL", path: "/ssl" },
-        { label: "DNS", path: "/dns" },
-        { label: "Subdomains", path: "/subdomains" }
-      ]
-    },
-    {
-      label: "Return Platform",
-      icon: FaUndoAlt,
-      children: [
-        { label: "Coupon Management", path: "/CouponManagementList" },
-        { label: "Email Marketing", path: "/EmailMarketingList" },
-        { label: "SEO Settings", path: "/SEOSettingList" }
-      ]
-    }
+    // {
+    //   label: "Payments",
+    //   icon: FaCreditCard,
+    //   children: [
+    //     { label: "Payment Providers", path: "/payment-providers" },
+    //     { label: "Add Provider", path: "/addprovider" }
+    //   ]
+    // },
+    // {
+    //   label: "Shipping",
+    //   icon: FaTruck,
+    //   children: [
+    //     { label: "Shipping Management", path: "/shipping-mangement" },
+    //     { label: "Add Shipping Provider", path: "/add-shipping-provider" }
+    //   ]
+    // },
+    // {
+    //   label: "Domain",
+    //   icon: FaGlobe,
+    //   children: [
+    //     { label: "Domains", path: "/domains" },
+    //     { label: "SSL", path: "/ssl" },
+    //     { label: "DNS", path: "/dns" },
+    //     { label: "Subdomains", path: "/subdomains" }
+    //   ]
+    // },
+    // {
+    //   label: "Return Platform",
+    //   icon: FaUndoAlt,
+    //   children: [
+    //     { label: "Coupon Management", path: "/CouponManagementList" },
+    //     { label: "Email Marketing", path: "/EmailMarketingList" },
+    //     { label: "SEO Settings", path: "/SEOSettingList" }
+    //   ]
+    // }
   ];
   // Filter menu items based on user role
   useEffect(() => {
@@ -1302,6 +1306,11 @@ const Layout = () => {
     };
   }, [showSearch]);
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const toggleMenu = (key: string) => {
     setOpenMenus(prev =>
       prev.includes(key)
@@ -1341,26 +1350,41 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100 overflow-x-hidden">
+    <div className="h-screen flex bg-gray-100 overflow-hidden">
+      {/* MOBILE BACKDROP */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-20 bg-black/50 lg:hidden" 
+          onClick={() => setMobileMenuOpen(false)} 
+        />
+      )}
+
       {/* SIDEBAR */}
-      <aside className={`${collapsed ? "w-20" : "w-64"} bg-white flex flex-col transition-all duration-300 overflow-hidden`}>
+      <aside 
+        className={`
+          fixed lg:relative z-40 h-full bg-white flex flex-col transition-all duration-300 border-r border-gray-200
+          ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${collapsed ? "lg:w-20" : "lg:w-64"}
+          w-64
+        `}
+      >
         {/* LOGO */}
         <div className="h-20 flex items-center justify-center">
           <img
-            src="madd-admin.png"
+            src="/madd-admin.png"
             alt="Logo"
-            className={`transition-all duration-300 ${collapsed ? "w-8" : "w-40"}`}
+            className={`transition-all duration-300 ${(collapsed) ? "lg:w-8 w-40" : "w-40"}`}
           />
         </div>
 
         {/* NAV */}
-        <nav className="flex-1 px-4 space-y-1 text-sm overflow-y-auto overflow-x-hidden">
+        <nav className="flex-1 px-4 py-4 space-y-1 text-sm overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300">
           {filteredMenuItems.map((item) => (
             <RecursiveMenuItem
               key={item.label}
               item={item}
               depth={0}
-              collapsed={collapsed}
+              collapsed={mobileMenuOpen ? false : collapsed}
               currentPath={location.pathname}
               openMenus={openMenus}
               toggleMenu={toggleMenu}
@@ -1370,17 +1394,25 @@ const Layout = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 p-6 space-y-6 overflow-x-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden">
         {/* TOP BAR */}
-        <div className="h-14 bg-white rounded-xl shadow-sm flex items-center justify-between px-6">
+        <div className="h-16 flex-shrink-0 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-30 relative">
           <div className="flex items-center gap-2 text-gray-700">
+            {/* Desktop Hamburger */}
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="p-2 rounded-lg hover:bg-gray-100"
+              className="hidden lg:flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {collapsed ? <FaChevronRight className="text-gray-600" /> : <FaChevronLeft className="text-gray-600" />}
+            </button>
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
             >
               <FaBars />
             </button>
-            <span className="font-medium">{getActiveParentLabel()}</span>
+            <span className="font-medium truncate max-w-[150px] sm:max-w-xs">{getActiveParentLabel()}</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -1443,11 +1475,11 @@ const Layout = () => {
                 <>
                   {/* Backdrop */}
                   <div
-                    className="fixed inset-0 z-10"
+                    className="fixed inset-0 z-40"
                     onClick={() => setShowDropdown(false)}
                   />
                   {/* Dropdown */}
-                  <div className="absolute right-0 top-12 z-20 bg-white rounded-xl shadow-lg border border-gray-100 w-52 overflow-hidden">
+                  <div className="absolute right-0 top-12 z-50 bg-white rounded-xl shadow-lg border border-gray-100 w-52 overflow-hidden">
                     {/* User info */}
                     <div className="px-4 py-3 border-b border-gray-50">
                       <p className="text-sm font-semibold text-gray-800">
@@ -1460,12 +1492,20 @@ const Layout = () => {
                         </p>
                       )}
                     </div>
+                    {/* Menu Links */}
+                    <Link
+                      to={ROUTES.PROFILE}
+                      onClick={() => setShowDropdown(false)}
+                      className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 transition-all flex items-center gap-2 border-b border-gray-50"
+                    >
+                      <FaUser className="text-gray-400" /> My Profile
+                    </Link>
                     {/* Logout */}
                     <button
                       onClick={handleLogout}
                       className="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 transition-all flex items-center gap-2"
                     >
-                      <span>🚪</span> Logout
+                      <span><RiLogoutBoxLine /></span> Logout
                     </button>
                   </div>
                 </>
@@ -1474,7 +1514,12 @@ const Layout = () => {
           </div>
         </div>
 
-        <Outlet />
+        {/* OUTLET CONTENT */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          <div className="space-y-6 max-w-full pb-10">
+            <Outlet />
+          </div>
+        </div>
       </main>
     </div>
   );

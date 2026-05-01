@@ -248,6 +248,78 @@ export const authApi = createApi({
                 }
             },
         }),
+
+        // ── Forgot Password ──────────────────────────────────────────────────
+        forgotPassword: builder.mutation<{ success: boolean; message: string }, { email: string }>({
+            query: (data) => ({
+                url: "auth/forgot-password",
+                method: "POST",
+                body: data,
+            }),
+        }),
+
+        // ── Reset Password ───────────────────────────────────────────────────
+        resetPassword: builder.mutation<
+            { success: boolean; message: string },
+            { email: string; token: string; password: string; password_confirmation: string }
+        >({
+            query: (data) => ({
+                url: "auth/reset-password",
+                method: "POST",
+                body: data,
+            }),
+        }),
+
+        // ── Social Login ─────────────────────────────────────────────────────
+        socialLogin: builder.mutation<
+            AuthResponse,
+            { provider: string; access_token: string }
+        >({
+            query: ({ provider, access_token }) => ({
+                url: `auth/social/${provider}/callback`,
+                method: "POST",
+                body: { access_token },
+            }),
+            async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    if (data?.data?.access_token) {
+                        dispatch(setCredentials(data));
+                        // toast.success("Logged in successfully!");
+                    }
+                } catch (error: any) {
+                    // toast.error(error?.error?.data?.message || "Social login failed");
+                }
+            },
+        }),
+
+        // ── Get Profile ──────────────────────────────────────────────────────
+        getProfile: builder.query<{ success: boolean; data: any }, void>({
+            query: () => ({
+                url: "user/profile",
+                method: "GET",
+            }),
+            providesTags: ["Me"],
+        }),
+
+        // ── Update Profile ───────────────────────────────────────────────────
+        updateProfile: builder.mutation<{ success: boolean; message: string; data: any }, any>({
+            query: (data) => ({
+                url: "user/profile",
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["Me"],
+        }),
+
+        // ── Change Password ──────────────────────────────────────────────────
+        changePassword: builder.mutation<{ success: boolean; message: string }, any>({
+            query: (data) => ({
+                url: "user/change-password",
+                method: "POST",
+                body: data,
+            }),
+        }),
     }),
 });
 
@@ -260,4 +332,10 @@ export const {
     useMeQuery,
     useLogoutUserMutation,
     useRefreshTokenMutation,
+    useForgotPasswordMutation,
+    useResetPasswordMutation,
+    useSocialLoginMutation,
+    useGetProfileQuery,
+    useUpdateProfileMutation,
+    useChangePasswordMutation,
 } = authApi;
