@@ -161,6 +161,7 @@ const Signup = () => {
     const [postalCode, setPostalCode] = useState("");
     
     // UI states
+    const [step, setStep] = useState(1);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -239,29 +240,106 @@ const Signup = () => {
         { code: "BR", name: "Brazil", phone_code: "+55", flag: "🇧🇷" },
         { code: "MX", name: "Mexico", phone_code: "+52", flag: "🇲🇽" },
     ];
+
+    const SecurityFields = () => (
+        <div className="space-y-5">
+            <div className="flex items-center gap-3 mb-1">
+                <div className="w-1 h-5 bg-blue-500 rounded-full" />
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+                    Security & Preferences
+                </h3>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-gray-600">Password *</label>
+                <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                    <FaLock className="text-gray-400 text-sm flex-shrink-0" />
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Min. 8 characters"
+                        className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                    />
+                    <span onClick={() => setShowPassword(!showPassword)} className="cursor-pointer text-gray-500">
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                </div>
+            </div>
+            
+            <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-gray-600">Confirm Password *</label>
+                <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                    <FaLock className="text-gray-400 text-sm flex-shrink-0" />
+                    <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={passwordConfirmation}
+                        onChange={(e) => setPasswordConfirmation(e.target.value)}
+                        placeholder="Re-enter password"
+                        className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                    />
+                    <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="cursor-pointer text-gray-500">
+                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-gray-600">Preferred Language</label>
+                <select
+                    value={locale}
+                    onChange={(e) => setLocale(e.target.value)}
+                    className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all"
+                >
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                </select>
+            </div>
+
+            <div className="flex items-center gap-3 mt-4">
+                <input
+                    type="checkbox"
+                    id="marketing"
+                    checked={marketingOptIn}
+                    onChange={(e) => setMarketingOptIn(e.target.checked)}
+                    className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="marketing" className="text-sm text-gray-600 cursor-pointer">
+                    I'd like to receive marketing emails
+                </label>
+            </div>
+        </div>
+    );
     
-    // Validation function
-    const isFormValid = () => {
-        if (!first_name.trim()) return false;
-        if (!last_name.trim()) return false;
-        if (!email.trim()) return false;
-        if (!password) return false;
-        if (!passwordConfirmation) return false;
-        if (password !== passwordConfirmation) return false;
-        if (password.length < 8) return false;
-        if (!countryCode) return false;
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) return false;
-        
+    // Validation functions for each step
+    const isStep1Valid = () => {
+        return first_name.trim() !== "" && last_name.trim() !== "" && email.trim() !== "" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const isStep2Valid = () => {
+        return countryCode !== "";
+    };
+
+    const isStep3Valid = () => {
         if (userType === "vendor") {
-            if (!companyName.trim()) return false;
-            if (!addressLine1.trim()) return false;
-            if (!city.trim()) return false;
-            if (!postalCode.trim()) return false;
+            return companyName.trim() !== "" && addressLine1.trim() !== "" && city.trim() !== "" && postalCode.trim() !== "";
         }
-        
-        return true;
+        // For customer, Step 3 is Security
+        return password.length >= 8 && password === passwordConfirmation;
+    };
+
+    const isStep4Valid = () => {
+        // Only for vendor
+        return password.length >= 8 && password === passwordConfirmation;
+    };
+
+    const isFormValid = () => {
+        if (userType === "vendor") {
+            return isStep1Valid() && isStep2Valid() && isStep3Valid() && isStep4Valid();
+        }
+        return isStep1Valid() && isStep2Valid() && isStep3Valid();
     };
     
     const handleSignup = async () => {
@@ -336,9 +414,88 @@ const Signup = () => {
                     bottom: "15%",
                     left: "10%",
                 }} />
-                <div className="relative z-10 text-center px-12">
-                    <h1 className="text-4xl font-bold text-white drop-shadow-md mb-3">Create Account</h1>
-                    <p className="text-white/80 text-lg">Join us and manage your store</p>
+                <div className="relative z-10 text-white px-16 max-w-2xl">
+                    <div className="mb-8">
+                        <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+                            {userType === "vendor" ? "Vendor Portal" : "Customer Portal"}
+                        </span>
+                        <h1 className="text-5xl font-extrabold leading-tight mb-6 drop-shadow-lg">
+                            {userType === "vendor" ? (
+                                <>Grow Your <br /><span className="text-blue-900/40">Business Faster</span></>
+                            ) : (
+                                <>Start Your <br /><span className="text-blue-900/40">Shopping Journey</span></>
+                            )}
+                        </h1>
+                        <p className="text-white/90 text-xl font-medium leading-relaxed">
+                            {userType === "vendor" 
+                                ? "Join thousands of successful sellers and scale your business with ease."
+                                : "Join our community to browse, buy, and track your orders in one place."}
+                        </p>
+                    </div>
+
+                    <div className="space-y-8 mt-12">
+                        {userType === "vendor" ? (
+                            <>
+                                <div className="flex items-start gap-5 group">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
+                                        📈
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-1">Sales Tracking</h3>
+                                        <p className="text-white/70 text-sm leading-snug">Monitor your sales performance with real-time data and insights.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-5 group">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
+                                        📦
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-1">Inventory Control</h3>
+                                        <p className="text-white/70 text-sm leading-snug">Manage your products and stock effortlessly across all regions.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-5 group">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
+                                        🌍
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-1">Global Reach</h3>
+                                        <p className="text-white/70 text-sm leading-snug">Expand your business to international markets with zero friction.</p>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex items-start gap-5 group">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
+                                        🛍️
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-1">Best Deals</h3>
+                                        <p className="text-white/70 text-sm leading-snug">Get access to exclusive discounts and the best prices online.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-5 group">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
+                                        🚚
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-1">Fast Delivery</h3>
+                                        <p className="text-white/70 text-sm leading-snug">Track your orders in real-time and enjoy blazing fast shipping.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-5 group">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
+                                        💖
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-1">Wishlist Sync</h3>
+                                        <p className="text-white/70 text-sm leading-snug">Save your favorite items and sync them across all your devices.</p>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
             
@@ -375,332 +532,320 @@ const Signup = () => {
                         </div>
                     )}
                     
-                    {/* Account Type Selection */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Account Type *</label>
-                        <div className="flex gap-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    value="customer"
-                                    checked={userType === "customer"}
-                                    onChange={(e) => setUserType(e.target.value)}
-                                    className="w-4 h-4 text-blue-500"
-                                />
-                                <span className="text-sm text-gray-700">Customer</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    value="vendor"
-                                    checked={userType === "vendor"}
-                                    onChange={(e) => setUserType(e.target.value)}
-                                    className="w-4 h-4 text-blue-500"
-                                />
-                                <span className="text-sm text-gray-700">Vendor (Seller)</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    {/* First Name + Last Name */}
-                    <div className="flex gap-4">
-                        <div className="flex-1 flex flex-col gap-1.5">
-                            <label className="text-sm font-semibold text-gray-600">First Name *</label>
-                            <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                                <FaUser className="text-gray-400 text-sm flex-shrink-0" />
-                                <input
-                                    type="text"
-                                    value={first_name}
-                                    onChange={(e) => setFirst_name(e.target.value)}
-                                    placeholder="John"
-                                    className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex-1 flex flex-col gap-1.5">
-                            <label className="text-sm font-semibold text-gray-600">Last Name *</label>
-                            <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                                <FaUser className="text-gray-400 text-sm flex-shrink-0" />
-                                <input
-                                    type="text"
-                                    value={last_name}
-                                    onChange={(e) => setLast_name(e.target.value)}
-                                    placeholder="Doe"
-                                    className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Email */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Email address *</label>
-                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                            <FaEnvelope className="text-gray-400 text-sm flex-shrink-0" />
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="esteban_schiller@gmail.com"
-                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                            />
-                        </div>
-                    </div>
-                    
-                    {/* Country Code - Dynamic from backend */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Country *</label>
-                        {loadingCountries ? (
-                            <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50">
-                                <FaSpinner className="animate-spin text-gray-400" />
-                                <span className="text-sm text-gray-500">Loading countries...</span>
-                            </div>
-                        ) : (
-                            <select
-                                value={countryCode}
-                                onChange={(e) => setCountryCode(e.target.value)}
-                                className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all cursor-pointer"
-                                required
-                            >
-                                <option value="">Select your country</option>
-                                {countries.map((country: any) => (
-                                    <option key={country.code} value={country.code}>
-                                        {country.flag || "🌍"} {country.name} ({country.phone_code})
-                                    </option>
-                                ))}
-                            </select>
-                        )}
-                    </div>
-                    
-                    {/* Phone (Optional) */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Phone Number (Optional)</label>
-                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                            <FaPhone className="text-gray-400 text-sm flex-shrink-0" />
-                            <input
-                                type="tel"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                placeholder="+1234567890"
-                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                            />
-                        </div>
-                    </div>
-                    
-                    {/* Referral Code */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Referral Code (Optional)</label>
-                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                            <FaUser className="text-gray-400 text-sm flex-shrink-0" />
-                            <input
-                                type="text"
-                                value={referralCode}
-                                onChange={(e) => setReferralCode(e.target.value)}
-                                placeholder="Enter referral code"
-                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                            />
-                        </div>
-                    </div>
-                    
-                    {/* Password */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Password *</label>
-                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                            <FaLock className="text-gray-400 text-sm flex-shrink-0" />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter your password (min. 8 characters)"
-                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                            />
-                            <span onClick={() => setShowPassword(!showPassword)} className="cursor-pointer text-gray-500">
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    {/* Confirm Password */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Confirm Password *</label>
-                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                            <FaLock className="text-gray-400 text-sm flex-shrink-0" />
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                value={passwordConfirmation}
-                                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                                placeholder="Re-enter your password"
-                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                            />
-                            <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="cursor-pointer text-gray-500">
-                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
-                        </div>
-                        {password && passwordConfirmation && password !== passwordConfirmation && (
-                            <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
-                        )}
-                    </div>
-                    
-                    {/* Locale/Language */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-gray-600">Preferred Language</label>
-                        <select
-                            value={locale}
-                            onChange={(e) => setLocale(e.target.value)}
-                            className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all"
-                        >
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                            <option value="fr">Français</option>
-                            <option value="de">Deutsch</option>
-                            <option value="it">Italiano</option>
-                            <option value="pt">Português</option>
-                            <option value="ja">日本語</option>
-                            <option value="zh">中文</option>
-                        </select>
-                    </div>
-                    
-                    {/* Vendor Specific Fields */}
-                    {userType === "vendor" && (
-                        <div className="border-t border-gray-200 pt-4 mt-2 space-y-4">
-                            <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                                <FaBuilding className="text-blue-500" />
-                                Business Information
-                            </h3>
-                            
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-sm font-semibold text-gray-600">Company Name *</label>
-                                <input
-                                    type="text"
-                                    value={companyName}
-                                    onChange={(e) => setCompanyName(e.target.value)}
-                                    placeholder="Your Business Name"
-                                    className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all w-full"
-                                />
-                            </div>
-                            
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-sm font-semibold text-gray-600">VAT Number (Optional)</label>
-                                <input
-                                    type="text"
-                                    value={vatNumber}
-                                    onChange={(e) => setVatNumber(e.target.value)}
-                                    placeholder="VAT123456789"
-                                    className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all w-full"
-                                />
-                            </div>
-                            
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-sm font-semibold text-gray-600">Address Line 1 *</label>
-                                <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                                    <FaMapMarkerAlt className="text-gray-400 text-sm flex-shrink-0" />
-                                    <input
-                                        type="text"
-                                        value={addressLine1}
-                                        onChange={(e) => setAddressLine1(e.target.value)}
-                                        placeholder="Street address"
-                                        className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-                                    />
+                    {/* Progress Indicator */}
+                    <div className="flex items-center justify-between mb-8 px-2">
+                        {(userType === "vendor" ? [1, 2, 3, 4] : [1, 2, 3]).map((s) => (
+                            <div key={s} className="flex items-center flex-1 last:flex-none">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
+                                    step >= s ? 'bg-blue-500 text-white shadow-lg shadow-blue-200' : 'bg-gray-100 text-gray-400'
+                                }`}>
+                                    {step > s ? '✓' : s}
                                 </div>
+                                {s < (userType === "vendor" ? 4 : 3) && (
+                                    <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 ${
+                                        step > s ? 'bg-blue-500' : 'bg-gray-100'
+                                    }`} />
+                                )}
                             </div>
-                            
-                            <div className="flex gap-4">
-                                <div className="flex-1 flex flex-col gap-1.5">
-                                    <label className="text-sm font-semibold text-gray-600">City *</label>
+                        ))}
+                    </div>
+
+                    <div className="min-h-[400px]">
+                        {/* STEP 1: Basic Account Info */}
+                        {step === 1 && (
+                            <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                                {/* Account Type Selection - Modern Sliding Toggle */}
+                                <div className="flex flex-col gap-3">
+                                    <label className="text-sm font-semibold text-gray-600">Account Type *</label>
+                                    <div className="relative flex w-full p-1 bg-gray-100 rounded-2xl border border-gray-200">
+                                        <div 
+                                            className="absolute top-1 bottom-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-sm border border-gray-200"
+                                            style={{ 
+                                                width: "calc(50% - 4px)", 
+                                                left: userType === "customer" ? "4px" : "calc(50%)" 
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setUserType("customer");
+                                                if (step > 3) setStep(3);
+                                            }}
+                                            className={`relative z-10 flex-1 py-3 text-sm font-semibold transition-colors duration-300 ${userType === "customer" ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                        >
+                                            Customer
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setUserType("vendor")}
+                                            className={`relative z-10 flex-1 py-3 text-sm font-semibold transition-colors duration-300 ${userType === "vendor" ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                        >
+                                            Vendor (Seller)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="h-2" />
+
+                                <div className="flex items-center gap-3 mb-1">
+                                    <div className="w-1 h-5 bg-blue-500 rounded-full" />
+                                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+                                        Personal Information
+                                    </h3>
+                                </div>
+
+                                <div className="flex gap-4">
+                                    <div className="flex-1 flex flex-col gap-1.5">
+                                        <label className="text-sm font-semibold text-gray-600">First Name *</label>
+                                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                                            <FaUser className="text-gray-400 text-sm flex-shrink-0" />
+                                            <input
+                                                type="text"
+                                                value={first_name}
+                                                onChange={(e) => setFirst_name(e.target.value)}
+                                                placeholder="John"
+                                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 flex flex-col gap-1.5">
+                                        <label className="text-sm font-semibold text-gray-600">Last Name *</label>
+                                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                                            <FaUser className="text-gray-400 text-sm flex-shrink-0" />
+                                            <input
+                                                type="text"
+                                                value={last_name}
+                                                onChange={(e) => setLast_name(e.target.value)}
+                                                placeholder="Doe"
+                                                className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-sm font-semibold text-gray-600">Email address *</label>
                                     <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
-                                        <FaCity className="text-gray-400 text-sm flex-shrink-0" />
+                                        <FaEnvelope className="text-gray-400 text-sm flex-shrink-0" />
                                         <input
-                                            type="text"
-                                            value={city}
-                                            onChange={(e) => setCity(e.target.value)}
-                                            placeholder="City"
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="john.doe@example.com"
                                             className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
                                         />
                                     </div>
                                 </div>
-                                <div className="flex-1 flex flex-col gap-1.5">
-                                    <label className="text-sm font-semibold text-gray-600">Postal Code *</label>
-                                    <input
-                                        type="text"
-                                        value={postalCode}
-                                        onChange={(e) => setPostalCode(e.target.value)}
-                                        placeholder="Postal Code"
-                                        className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all w-full"
-                                    />
+                            </div>
+                        )}
+
+                        {/* STEP 2: Location Info */}
+                        {step === 2 && (
+                            <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <div className="flex items-center gap-3 mb-1">
+                                    <div className="w-1 h-5 bg-blue-500 rounded-full" />
+                                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+                                        Location Details
+                                    </h3>
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-sm font-semibold text-gray-600">Country *</label>
+                                    {loadingCountries ? (
+                                        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50">
+                                            <FaSpinner className="animate-spin text-gray-400" />
+                                            <span className="text-sm text-gray-500">Loading countries...</span>
+                                        </div>
+                                    ) : (
+                                        <select
+                                            value={countryCode}
+                                            onChange={(e) => setCountryCode(e.target.value)}
+                                            className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all cursor-pointer"
+                                            required
+                                        >
+                                            <option value="">Select your country</option>
+                                            {countries.map((country: any) => (
+                                                <option key={country.code} value={country.code}>
+                                                    {country.flag || "🌍"} {country.name} ({country.phone_code})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-sm font-semibold text-gray-600">Phone Number (Optional)</label>
+                                    <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                                        <FaPhone className="text-gray-400 text-sm flex-shrink-0" />
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            placeholder="+1234567890"
+                                            className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* STEP 3: Business Info (Vendor Only) / Security (Customer Only) */}
+                        {step === 3 && (
+                            <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                                {userType === "vendor" ? (
+                                    <>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="w-1 h-5 bg-blue-500 rounded-full" />
+                                            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+                                                Business Information
+                                            </h3>
+                                        </div>
+                                        
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-sm font-semibold text-gray-600">Company Name *</label>
+                                            <input
+                                                type="text"
+                                                value={companyName}
+                                                onChange={(e) => setCompanyName(e.target.value)}
+                                                placeholder="Your Business Name"
+                                                className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all w-full"
+                                            />
+                                        </div>
+                                        
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-sm font-semibold text-gray-600">Address Line 1 *</label>
+                                            <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                                                <FaMapMarkerAlt className="text-gray-400 text-sm flex-shrink-0" />
+                                                <input
+                                                    type="text"
+                                                    value={addressLine1}
+                                                    onChange={(e) => setAddressLine1(e.target.value)}
+                                                    placeholder="Street address"
+                                                    className="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex gap-4">
+                                            <div className="flex-1 flex flex-col gap-1.5">
+                                                <label className="text-sm font-semibold text-gray-600">City *</label>
+                                                <input
+                                                    type="text"
+                                                    value={city}
+                                                    onChange={(e) => setCity(e.target.value)}
+                                                    placeholder="City"
+                                                    className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all w-full"
+                                                />
+                                            </div>
+                                            <div className="flex-1 flex flex-col gap-1.5">
+                                                <label className="text-sm font-semibold text-gray-600">Postal Code *</label>
+                                                <input
+                                                    type="text"
+                                                    value={postalCode}
+                                                    onChange={(e) => setPostalCode(e.target.value)}
+                                                    placeholder="Postal Code"
+                                                    className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:border-blue-400 focus:bg-white outline-none transition-all w-full"
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <SecurityFields />
+                                )}
+                            </div>
+                        )}
+
+                        {/* STEP 4: Security (Vendor Only) */}
+                        {step === 4 && userType === "vendor" && (
+                            <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <SecurityFields />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Navigation Buttons */}
+                    <div className="flex gap-4 mt-8">
+                        {step > 1 && (
+                            <button
+                                onClick={() => setStep(step - 1)}
+                                className="flex-1 py-3.5 rounded-xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all"
+                            >
+                                Back
+                            </button>
+                        )}
+                        
+                        {((userType === "vendor" && step < 4) || (userType === "customer" && step < 3)) ? (
+                            <button
+                                onClick={() => setStep(step + 1)}
+                                disabled={
+                                    (step === 1 && !isStep1Valid()) || 
+                                    (step === 2 && !isStep2Valid()) || 
+                                    (step === 3 && userType === "vendor" && !isStep3Valid())
+                                }
+                                className={`flex-[2] flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white text-sm shadow-md transition-all duration-300 
+                                    ${(
+                                        (step === 1 && !isStep1Valid()) || 
+                                        (step === 2 && !isStep2Valid()) || 
+                                        (step === 3 && userType === "vendor" && !isStep3Valid())
+                                    ) 
+                                        ? 'opacity-50 cursor-not-allowed bg-gray-300' 
+                                        : 'bg-blue-500 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer'
+                                    }`}
+                            >
+                                Continue
+                                <FaArrowRight className="text-xs" />
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleSignup}
+                                disabled={
+                                    (userType === "vendor" ? !isStep4Valid() : !isStep3Valid()) || 
+                                    isLoading || success
+                                }
+                                className={`flex-[2] flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white text-sm shadow-md transition-all duration-300 
+                                    ${(
+                                        (userType === "vendor" ? !isStep4Valid() : !isStep3Valid()) || 
+                                        isLoading || success
+                                    ) 
+                                        ? 'opacity-50 cursor-not-allowed bg-gray-300' 
+                                        : 'bg-green-500 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer'
+                                    }`}
+                            >
+                                {isLoading ? <FaSpinner className="animate-spin" /> : "Complete Signup"}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Social Login (Only on Step 1) */}
+                    {step === 1 && (
+                        <>
+                            <div className="flex items-center gap-4 mt-8">
+                                <div className="flex-1 h-px bg-gray-200" />
+                                <span className="text-xs text-gray-400 font-medium">OR</span>
+                                <div className="flex-1 h-px bg-gray-200" />
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4 mt-6">
+                                <button
+                                    onClick={() => loginWithGoogle()}
+                                    disabled={isLoading || isSocialLoading}
+                                    className="flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all"
+                                >
+                                    <FcGoogle className="text-lg" />
+                                    Google
+                                </button>
+                                <button
+                                    onClick={() => console.log("Apple login")}
+                                    className="flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all"
+                                >
+                                    <FaApple className="text-lg text-gray-800" />
+                                    Apple
+                                </button>
+                            </div>
+                        </>
                     )}
                     
-                    {/* Marketing Opt-in */}
-                    <div className="flex items-center gap-3">
-                        <input
-                            type="checkbox"
-                            id="marketing"
-                            checked={marketingOptIn}
-                            onChange={(e) => setMarketingOptIn(e.target.checked)}
-                            className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
-                        />
-                        <label htmlFor="marketing" className="text-sm text-gray-600 cursor-pointer">
-                            I'd like to receive marketing emails and updates about new features
-                        </label>
-                    </div>
-                    
-                    {/* Signup Button - Disabled until form is valid */}
-                    <button
-                        onClick={handleSignup}
-                        disabled={!isFormValid() || isLoading || loadingCountries || success}
-                        className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white text-sm shadow-md transition-all duration-300 
-                            ${!isFormValid() || isLoading || loadingCountries || success 
-                                ? 'opacity-50 cursor-not-allowed' 
-                                : 'hover:shadow-lg hover:-translate-y-0.5 cursor-pointer'
-                            }`}
-                        style={{ 
-                            background: !isFormValid() || isLoading || loadingCountries || success 
-                                ? 'linear-gradient(135deg, #b0d4e8, #8cbcd4)' 
-                                : 'linear-gradient(135deg, #3ab5e6, #1a8fc0)' 
-                        }}
-                    >
-                        {isLoading ? (
-                            <>
-                                <FaSpinner className="animate-spin" />
-                                Creating account...
-                            </>
-                        ) : (
-                            <>
-                                Sign up
-                                <FaArrowRight className="text-xs" />
-                            </>
-                        )}
-                    </button>
-                    
-                    {/* Divider */}
-                    <div className="flex items-center gap-4">
-                        <div className="flex-1 h-px bg-gray-200" />
-                        <span className="text-xs text-gray-400 font-medium">OR</span>
-                        <div className="flex-1 h-px bg-gray-200" />
-                    </div>
-                    
-                    {/* Social Buttons */}
-                    <button
-                        onClick={() => loginWithGoogle()}
-                        disabled={isLoading || isSocialLoading}
-                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                        <FcGoogle className="text-lg" />
-                        {isSocialLoading ? "Connecting..." : "Continue with Google"}
-                    </button>
-                    
-                    <button
-                        onClick={() => console.log("Apple login")}
-                        className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:shadow-sm"
-                    >
-                        <FaApple className="text-lg text-gray-800" />
-                        Continue with Apple
-                    </button>
-                    
-                    {/* Login Link */}
-                    <p className="text-center text-sm text-gray-500">
+                    <p className="text-center text-sm text-gray-500 mt-8">
                         Already have an account?{" "}
                         <Link to={ROUTES.LOGIN} className="text-blue-500 font-semibold hover:underline">
                             Log in

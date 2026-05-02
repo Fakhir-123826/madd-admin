@@ -1396,8 +1396,8 @@ const Layout = () => {
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* TOP BAR */}
-        <div className="h-16 flex-shrink-0 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-30 relative">
-          <div className="flex items-center gap-2 text-gray-700">
+        <div className="h-16 flex-shrink-0 bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 z-30 relative">
+          <div className="flex items-center gap-1 sm:gap-2 text-gray-700">
             {/* Desktop Hamburger */}
             <button
               onClick={() => setCollapsed(!collapsed)}
@@ -1412,63 +1412,57 @@ const Layout = () => {
             >
               <FaBars />
             </button>
-            <span className="font-medium truncate max-w-[150px] sm:max-w-xs">{getActiveParentLabel()}</span>
+            <span className="font-bold text-gray-800 text-sm sm:text-base truncate max-w-[100px] sm:max-w-xs">{getActiveParentLabel()}</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-4">
             <div className="relative">
               <button
                 onClick={() => setShowSearch(!showSearch)}
-                className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
                 title="Search"
               >
-                <FaSearch className="text-xl text-gray-600" />
+                <FaSearch className="text-lg sm:text-xl text-gray-600" />
               </button>
 
               {/* Search Input - Slides in */}
               {showSearch && (
-                <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-50">
+                <div className="absolute right-[-80px] sm:right-0 top-12 w-[280px] sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-50">
                   <div className="relative">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search orders, products, customers..."
+                      placeholder="Search..."
                       className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:border-teal-500 text-sm"
                       autoFocus
                     />
                     <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 px-2">
-                    Press ESC to close
-                  </p>
                 </div>
               )}
             </div>
 
             {/* Notification Bell */}
             <div className="relative cursor-pointer group">
-              <button className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative">
-                <FaBell className="text-xl text-gray-600" />
+              <button className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative">
+                <FaBell className="text-lg sm:text-xl text-gray-600" />
                 {/* Notification Dot */}
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
               </button>
-              <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded right-0 -bottom-8 whitespace-nowrap">
-                Notifications
-              </div>
             </div>
 
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2 hover:bg-gray-50 px-3 py-1.5 rounded-xl transition-all"
+                className="flex items-center gap-2 hover:bg-gray-50 p-1 sm:px-3 sm:py-1.5 rounded-xl transition-all"
               >
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
                   {user ? `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() : "A"}
                 </div>
-                <span className="text-sm text-gray-700 font-medium">
+                <span className="hidden sm:inline text-sm text-gray-700 font-bold tracking-tight">
                   {user ? `${user.first_name} ${user.last_name}` : "Admin"}
                 </span>
-                <span className="text-gray-400 text-xs">•••</span>
+                <span className="hidden sm:inline text-gray-300 text-[10px]">▼</span>
               </button>
 
               {showDropdown && (

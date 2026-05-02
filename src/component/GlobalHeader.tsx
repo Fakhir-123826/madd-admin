@@ -1,7 +1,7 @@
 // component/GlobalHeader/GlobalHeader.tsx
 import { FiFilter, FiRefreshCw, FiSearch, FiChevronDown } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa";
-import { useState, useRef, useEffect, ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 
 // ─── Filter Dropdown Component ──────────────────────────────────────────────
 
@@ -122,20 +122,20 @@ const GlobalHeader = ({
   return (
     <div className={className}>
       {/* ── Header with Title and Add Button ── */}
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800">{title}</h1>
 
         {/* Add button — pill style matching reference image */}
         {onAddClick && (
           <button
             onClick={onAddClick}
-            className="flex items-center gap-0 p-2 rounded-full bg-gradient-to-r from-teal-400 to-green-400 text-white text-sm font-semibold shadow-md hover:shadow-lg transition overflow-hidden cursor-pointer"
+            className="flex items-center gap-0 w-fit p-1.5 md:p-2 rounded-full bg-gradient-to-r from-teal-400 to-green-400 text-white text-xs md:text-sm font-semibold shadow-md hover:shadow-lg transition overflow-hidden cursor-pointer"
           >
             {/* Circle icon on left */}
-            <span className="flex items-center justify-center h-10 w-10 rounded-full bg-white/20 border-r border-white/20 ml-0">
-              <FaPlus className="text-white text-xs" />
+            <span className="flex items-center justify-center h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/20 border-r border-white/20 ml-0">
+              <FaPlus className="text-white text-[10px] md:text-xs" />
             </span>
-            <span className="px-5">{addButtonText}</span>
+            <span className="px-4 md:px-5">{addButtonText}</span>
           </button>
         )}
       </div>
@@ -145,40 +145,40 @@ const GlobalHeader = ({
 
       {/* ── Filter Bar ── */}
       {(filters.length > 0 || onSearchChange) && (
-        <div className="flex justify-between gap-4 mb-6">
+        <div className="flex flex-col lg:flex-row justify-between gap-4 mb-6">
           {/* ================= LEFT: FILTERS ================= */}
           {filters.length > 0 && (
-            <div className="flex flex-1 items-center border border-gray-200 rounded-2xl shadow-sm">
-              {/* Filter icon */}
-              <div className="border-r flex-1 py-3 border-gray-200">
-                <div className="flex flex-1 items-center gap-2 px-4 py-3 border-r border-gray-200 text-gray-400">
-                  <FiFilter className="text-base" />
-                  <span className="text-sm text-gray-500 font-medium">
-                    Filter By
-                  </span>
-                </div>
+            <div className="flex flex-1 items-center border border-gray-200 rounded-2xl shadow-sm overflow-x-auto no-scrollbar bg-white">
+              {/* Filter icon - hidden on very small screens if too crowded, or kept as a fixed lead */}
+              <div className="flex-shrink-0 flex items-center gap-2 px-4 py-3 border-r border-gray-200 text-gray-400 bg-gray-50/50 rounded-l-2xl">
+                <FiFilter className="text-base" />
+                <span className="text-xs md:text-sm text-gray-500 font-bold uppercase tracking-wider">
+                  Filters
+                </span>
               </div>
 
               {/* Dynamic Filters */}
-              {filters.map((filter) => (
-                <div key={filter.key} className="border-r flex-1 py-3 border-gray-200">
-                  <FilterDropdown
-                    label={filter.label}
-                    options={filter.options}
-                    value={filter.value}
-                    onChange={filter.onChange}
-                  />
-                </div>
-              ))}
+              <div className="flex items-center flex-1 divide-x divide-gray-100">
+                {filters.map((filter) => (
+                  <div key={filter.key} className="flex-shrink-0 min-w-[120px] md:min-w-[140px] py-1">
+                    <FilterDropdown
+                      label={filter.label}
+                      options={filter.options}
+                      value={filter.value}
+                      onChange={filter.onChange}
+                    />
+                  </div>
+                ))}
+              </div>
 
               {/* Reset Button */}
               {onReset && (
                 <button
                   onClick={onReset}
-                  className="flex items-center gap-2 px-5 py-3 text-sm text-teal-500 font-medium hover:text-teal-700 transition cursor-pointer"
+                  className="flex-shrink-0 flex items-center gap-2 px-5 py-3 text-xs md:text-sm text-teal-500 font-bold hover:text-teal-700 transition cursor-pointer border-l border-gray-100 hover:bg-teal-50/30"
                 >
                   <FiRefreshCw className="text-sm" />
-                  Reset Filter
+                  <span className="hidden md:inline">Reset</span>
                 </button>
               )}
             </div>
@@ -186,18 +186,18 @@ const GlobalHeader = ({
 
           {/* ================= RIGHT: SEARCH ================= */}
           {onSearchChange && onSearchSubmit && (
-            <div className="flex items-center gap-2 px-4 py-3 w-[30%] border border-gray-200 rounded-2xl shadow-sm min-w-[200px]">
-              <FiSearch className="text-gray-300 text-base flex-shrink-0" />
+            <div className="flex items-center gap-3 px-5 py-3 lg:w-[30%] border border-gray-200 rounded-2xl shadow-sm bg-white focus-within:border-teal-400 focus-within:ring-4 focus-within:ring-teal-500/5 transition-all">
+              <FiSearch className="text-gray-300 text-lg flex-shrink-0" />
               <input
                 value={searchValue}
-                onChange={(e) => onSearchChange(e.target.value)}
+                onChange={(e) => onSearchChange?.(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    onSearchSubmit();
+                    onSearchSubmit?.();
                   }
                 }}
-                placeholder="Search here..."
-                className="flex-1 text-sm text-gray-600 bg-transparent outline-none placeholder:text-gray-300"
+                placeholder="Search..."
+                className="flex-1 text-sm text-gray-600 bg-transparent outline-none placeholder:text-gray-400 font-medium"
               />
             </div>
           )}
