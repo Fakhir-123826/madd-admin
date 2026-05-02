@@ -15,7 +15,7 @@ const SigninSuggestion = ({
       {/* Google */}
       <button
         onClick={onGoogleClick}
-        className="flex items-center justify-center gap-3 h-11 border border-gray-400 rounded-sm hover:bg-gray-50 transition"
+        className="flex items-center justify-center gap-3 h-11 border border-gray-400 rounded-sm hover:bg-gray-50 transition cursor-pointer"
       >
         <img
           src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -30,7 +30,7 @@ const SigninSuggestion = ({
       {/* Apple */}
       <button
         onClick={onAppleClick}
-        className="flex items-center justify-center gap-3 h-11 rounded-lg border border-gray-400 hover:bg-gray-50 transition"
+        className="flex items-center justify-center gap-3 h-11 rounded-lg border border-gray-400 hover:bg-gray-50 transition cursor-pointer"
       >
         <svg
           viewBox="0 0 24 24"

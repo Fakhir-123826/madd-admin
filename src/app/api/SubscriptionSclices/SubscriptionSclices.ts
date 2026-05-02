@@ -1,61 +1,110 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { Subscription } from '../../../model/susbcription/ISubscription'
+import {
+  createApi,
+  fetchBaseQuery,
+} from "@reduxjs/toolkit/query/react";
+import type { Subscription } from "../../../model/susbcription/ISubscription";
+
+const baseURL = import.meta.env.VITE_BASE_URL;
+
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: baseURL,
+
+  prepareHeaders: (headers) => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
+
+    headers.set("Accept", "application/json");
+
+    return headers;
+  },
+});
+
+const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+
+  // If token expired / unauthorized
+  if (result.error && result.error.status === 401) {
+    localStorage.removeItem("token");
+
+    // redirect to login page
+    window.location.href = "/login";
+  }
+
+  return result;
+};
 
 export const subscriptionApi = createApi({
-  reducerPath: 'subscriptionApi',
+  reducerPath: "subscriptionApi",
 
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'http://127.0.0.1:8000/api/',
-  }),
+  baseQuery: baseQueryWithAuthCheck,
 
-  tagTypes: ['Subscription'],
+  tagTypes: ["Subscription"],
 
   endpoints: (builder) => ({
-    // ✅ GET all subscriptions
     getSubscriptions: builder.query<Subscription[], void>({
-      query: () => 'subscriptions',
-      providesTags: ['Subscription'],
+      query: () => ({
+        url: "admin/plans",
+        method: "GET",
+      }),
+      providesTags: ["Subscription"],
     }),
 
-    // GET single subscription
     getSubscription: builder.query<Subscription, number>({
-      query: (id) => `subscriptions/${id}`,
-      providesTags: ['Subscription'],
+      query: (id) => ({
+        url: `admin/plans/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Subscription"],
     }),
 
-    // CREATE subscription
-    createSubscription: builder.mutation<Subscription, Partial<Subscription>>({
+    createSubscription: builder.mutation<
+      Subscription,
+      Partial<Subscription>
+    >({
       query: (data) => ({
-        url: 'subscriptions',
-        method: 'POST',
+        url: "admin/plans",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
     }),
 
-    // UPDATE subscription
     updateSubscription: builder.mutation<
       Subscription,
       { id: number; data: Partial<Subscription> }
     >({
       query: ({ id, data }) => ({
-        url: `subscriptions/${id}`,
-        method: 'PUT',
+        url: `admin/plans/${id}`,
+        method: "PUT",
         body: data,
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
     }),
 
-    // DELETE subscription
     deleteSubscription: builder.mutation<void, number>({
       query: (id) => ({
-        url: `subscriptions/${id}`,
-        method: 'DELETE',
+        url: `admin/plans/${id}`,
+        method: "DELETE",
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ["Subscription"],
+    }),
+
+    setDefaultPlan: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `admin/plans/${id}/set-default`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Subscription"],
     }),
   }),
-})
+});
 
 export const {
   useGetSubscriptionsQuery,
@@ -63,4 +112,5 @@ export const {
   useCreateSubscriptionMutation,
   useUpdateSubscriptionMutation,
   useDeleteSubscriptionMutation,
-} = subscriptionApi
+  useSetDefaultPlanMutation,
+} = subscriptionApi;

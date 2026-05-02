@@ -1,17 +1,24 @@
 import { ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCreateUserMutation } from "../../app/api/UserSlices/UserApi"; // Adjust path as needed
 
 function AddUser() {
   const navigate = useNavigate();
+  const [createUser, { isLoading, error }] = useCreateUserMutation();
+  
   const [formData, setFormData] = useState({
-    username: "",
-    role: "",
-    roleDescription: "",
+    first_name: "",      // Changed from username
+    last_name: "",       // Added last_name
     email: "",
     phone: "",
-    status: true,
-    groups: [] as string[],
+    user_type: "customer", // Changed from role (admin/vendor/customer/mlm_agent)
+    country_code: "PK",
+    password: "",
+    status: "active",
+    roles: [] as string[],
+    // roleDescription removed — not in API
+    groups: [] as string[], // This is frontend only — backend uses roles
   });
 
   const [availableGroups] = useState([
@@ -25,40 +32,79 @@ function AddUser() {
     "Customer Support",
   ]);
 
+  // Map groups to roles (if needed)
+  const groupToRoleMap: Record<string, string> = {
+    "Marketing Team": "admin",
+    "Vendor Support": "vendor",
+    "Warehouse Staff": "vendor",
+    "Content Team": "admin",
+    "Sales Team": "vendor",
+    "IT Department": "admin",
+    "HR Department": "admin",
+    "Customer Support": "customer",
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleGroupToggle = (group: string) => {
-    setFormData(prev => ({
-      ...prev,
-      groups: prev.groups.includes(group)
+    setFormData(prev => {
+      const newGroups = prev.groups.includes(group)
         ? prev.groups.filter(g => g !== group)
-        : [...prev.groups, group]
-    }));
+        : [...prev.groups, group];
+      
+      // Automatically assign roles based on groups
+      const newRoles = newGroups.map(g => groupToRoleMap[g]).filter(Boolean);
+      
+      return {
+        ...prev,
+        groups: newGroups,
+        roles: [...new Set(newRoles)], // Remove duplicates
+      };
+    });
   };
 
   const handleStatusToggle = () => {
-    setFormData(prev => ({ ...prev, status: !prev.status }));
+    setFormData(prev => ({
+      ...prev,
+      status: prev.status === "active" ? "suspended" : "active"
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically save to backend
-    console.log("Saving user:", {
-      ...formData,
-      id: Date.now(),
-      lastLogin: "Just now",
-      joiningDate: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }),
-      group: formData.groups[0] || "No Group",
-      assignedGroups: formData.groups,
-      status: formData.status ? "Active" : "Inactive",
-    });
-    
-    // Navigate back to users list
-    navigate('/userlist');
+    // Validate required fields
+    if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
+      alert("Please fill all required fields: First Name, Last Name, Email, Password");
+      return;
+    }
+
+    // Prepare data for API
+    const userData = {
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      email: formData.email,
+      phone: formData.phone || null,
+      password: formData.password,
+      user_type: formData.user_type,
+      country_code: formData.country_code,
+      status: formData.status,
+      roles: formData.roles.length > 0 ? formData.roles : [formData.user_type],
+    };
+
+    try {
+      const response = await createUser(userData).unwrap();
+      console.log("User created successfully:", response);
+      alert("User created successfully!");
+      navigate('/userlist');
+    } catch (err: any) {
+      console.error("Failed to create user:", err);
+      const errorMessage = err?.data?.message || err?.message || "Failed to create user. Please try again.";
+      alert(errorMessage);
+    }
   };
 
   const handleCancel = () => {
@@ -94,43 +140,43 @@ function AddUser() {
 
             {/* Form Grid */}
             <div className="grid grid-cols-2 gap-6 mb-6">
-              {/* Username */}
+              {/* First Name */}
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-gray-700">
-                  Username <span className="text-red-500">*</span>
+                  First Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    name="username"
-                    value={formData.username}
+                    name="first_name"
+                    value={formData.first_name}
                     onChange={handleChange}
                     required
-                    placeholder="Enter username"
+                    placeholder="Enter first name"
                     className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
                   />
-                  {formData.username && (
+                  {formData.first_name && (
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
                   )}
                 </div>
               </div>
 
-              {/* Role */}
+              {/* Last Name */}
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-gray-700">
-                  Role <span className="text-red-500">*</span>
+                  Last Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    name="role"
-                    value={formData.role}
+                    name="last_name"
+                    value={formData.last_name}
                     onChange={handleChange}
                     required
-                    placeholder="Enter role"
+                    placeholder="Enter last name"
                     className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
                   />
-                  {formData.role && (
+                  {formData.last_name && (
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
                   )}
                 </div>
@@ -160,7 +206,7 @@ function AddUser() {
               {/* Phone Number */}
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-gray-700">
-                  Phone number <span className="text-red-500">*</span>
+                  Phone number
                 </label>
                 <div className="relative">
                   <input
@@ -168,34 +214,72 @@ function AddUser() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    required
                     placeholder="Enter phone number"
                     className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
                   />
-                  {formData.phone && (
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500">✓</span>
-                  )}
                 </div>
               </div>
 
-              {/* Role Description - Full Width */}
-              <div className="col-span-2 space-y-2">
+              {/* Password */}
+              <div className="space-y-2">
                 <label className="block text-sm font-bold text-gray-700">
-                  Role Description
-                  <span className="text-gray-400 text-xs ml-2">(100 words max)</span>
+                  Password <span className="text-red-500">*</span>
                 </label>
-                <textarea
-                  name="roleDescription"
-                  value={formData.roleDescription}
+                <div className="relative">
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    minLength={8}
+                    placeholder="Enter password (min 8 characters)"
+                    className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* User Type (Role) */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  User Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="user_type"
+                  value={formData.user_type}
                   onChange={handleChange}
-                  rows={4}
-                  placeholder="Describe the user's role and responsibilities..."
-                  className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white resize-none"
-                />
+                  required
+                  className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                >
+                  <option value="customer">Customer</option>
+                  <option value="vendor">Vendor</option>
+                  <option value="admin">Admin</option>
+                  <option value="mlm_agent">MLM Agent</option>
+                </select>
+              </div>
+
+              {/* Country Code */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">
+                  Country Code <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="country_code"
+                  value={formData.country_code}
+                  onChange={handleChange}
+                  required
+                  className="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all duration-200 bg-white"
+                >
+                  <option value="PK">Pakistan (PK)</option>
+                  <option value="US">United States (US)</option>
+                  <option value="UK">United Kingdom (UK)</option>
+                  <option value="AE">UAE (AE)</option>
+                  <option value="SA">Saudi Arabia (SA)</option>
+                </select>
               </div>
             </div>
 
-            {/* Groups Section */}
+            {/* Groups Section (Frontend only — maps to roles) */}
             <div className="mb-8">
               <h3 className="text-md font-semibold mb-4 flex items-center gap-2 text-gray-800">
                 <span className="w-1 h-5 bg-green-500 rounded-full"></span>
@@ -226,16 +310,13 @@ function AddUser() {
                   </label>
                 ))}
               </div>
-
-              {/* Save Groups Button */}
-              <div className="mt-4">
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
-                >
-                  Save Groups
-                </button>
-              </div>
+              
+              {/* Display assigned roles */}
+              {formData.roles.length > 0 && (
+                <div className="mt-3 text-sm text-gray-500">
+                  Assigned Roles: <span className="font-medium text-teal-600">{formData.roles.join(", ")}</span>
+                </div>
+              )}
             </div>
 
             {/* Status Section with Toggle Switch */}
@@ -246,7 +327,7 @@ function AddUser() {
               </h3>
               
               <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200 w-fit">
-                <span className={`text-sm font-medium ${!formData.status ? 'text-red-600' : 'text-gray-500'}`}>
+                <span className={`text-sm font-medium ${formData.status === 'suspended' ? 'text-red-600' : 'text-gray-500'}`}>
                   Inactive
                 </span>
                 
@@ -254,37 +335,52 @@ function AddUser() {
                   type="button"
                   onClick={handleStatusToggle}
                   className={`relative w-14 h-7 flex items-center rounded-full p-1 transition-all duration-300 ${
-                    formData.status ? "bg-teal-500" : "bg-gray-300"
+                    formData.status === "active" ? "bg-teal-500" : "bg-gray-300"
                   }`}
                 >
                   <span
                     className={`absolute bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-                      formData.status ? "translate-x-7" : "translate-x-0"
+                      formData.status === "active" ? "translate-x-7" : "translate-x-0"
                     }`}
                   ></span>
                 </button>
                 
-                <span className={`text-sm font-medium ${formData.status ? 'text-teal-600' : 'text-gray-500'}`}>
+                <span className={`text-sm font-medium ${formData.status === 'active' ? 'text-teal-600' : 'text-gray-500'}`}>
                   Active
                 </span>
               </div>
             </div>
+
+            {/* Loading/Error States */}
+            {isLoading && (
+              <div className="mb-4 p-3 bg-blue-50 text-blue-600 rounded-xl text-center">
+                Creating user... Please wait.
+              </div>
+            )}
+            
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-center">
+                Failed to create user. Check console for details.
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-8 py-3.5 border-2 border-red-500 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 font-medium"
+                disabled={isLoading}
+                className="flex items-center gap-2 px-8 py-3.5 border-2 border-red-500 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all duration-300 font-medium shadow-md hover:shadow-lg"
+                disabled={isLoading}
+                className="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-xl hover:from-teal-600 hover:to-green-600 transition-all duration-300 font-medium shadow-md hover:shadow-lg disabled:opacity-50"
               >
-                Save Changes
+                {isLoading ? "Creating..." : "Save Changes"}
               </button>
             </div>
           </form>

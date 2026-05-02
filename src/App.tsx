@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { increment, decrement } from "./app/Slices/counterSlice";
 import type { RootState } from './app/store';
 
+import './Style.css'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -14,7 +15,6 @@ function App() {
   return (
     <>
       <div>
-
         <h1 className="text-3xl font-bold text-blue-600">
           Tailwind is working 🚀
         </h1>

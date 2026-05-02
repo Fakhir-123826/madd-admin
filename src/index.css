@@ -3,3 +3,205 @@
 
 
 
+html, body {
+  overflow-x: hidden;
+}
+
+
+/* this all css is apply for the page builder only */
+
+.App {
+  min-height: 100vh;
+}
+
+.builder-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(182, 90, 43, 0.14), transparent 34%),
+    linear-gradient(180deg, #f8f5ef 0%, #efe7db 100%);
+}
+
+.builder-shell__topbar {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 18px 24px;
+}
+
+.builder-shell__topbar h1,
+.builder-export__header h2 {
+  color: #1b1f19;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.05;
+  margin: 0;
+}
+
+.builder-shell__eyebrow {
+  color: #7b5e4f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.builder-shell__meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.builder-shell__meta span {
+  color: #6e594e;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.builder-shell__button,
+.builder-export__close,
+.builder-export__tabs button {
+  appearance: none;
+  background: #1f2a24;
+  border: 0;
+  border-radius: 999px;
+  color: #fff9f2;
+  cursor: pointer;
+  font: inherit;
+  min-height: 44px;
+  padding: 0 18px;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.builder-shell__button:hover,
+.builder-export__close:hover,
+.builder-export__tabs button:hover {
+  opacity: 0.94;
+  transform: translateY(-1px);
+}
+
+.builder-shell__button--muted,
+.builder-export__close,
+.builder-export__tabs button {
+  background: rgba(255, 250, 242, 0.8);
+  border: 1px solid rgba(67, 52, 44, 0.14);
+  color: #3a2f28;
+}
+
+.builder-shell__editor {
+  border-top: 1px solid rgba(85, 61, 49, 0.12);
+}
+
+.builder-export {
+  inset: 0;
+  position: fixed;
+  z-index: 30;
+}
+
+.builder-export__backdrop {
+  background: rgba(21, 18, 16, 0.44);
+  inset: 0;
+  position: absolute;
+}
+
+.builder-export__panel {
+  background: #fdf8f0;
+  border-left: 1px solid rgba(67, 52, 44, 0.12);
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-left: auto;
+  max-width: 760px;
+  padding: 20px;
+  position: relative;
+  width: min(100%, 760px);
+}
+
+.builder-export__header,
+.builder-export__actions {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.builder-export__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.builder-export__tabs .is-active {
+  background: #b65a2b;
+  border-color: #b65a2b;
+  color: #fff7f1;
+}
+
+.builder-export__code {
+  background: #161617;
+  border-radius: 24px;
+  color: #f5ede4;
+  flex: 1;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 18px 0 0;
+  overflow: auto;
+  padding: 22px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 860px) {
+  .builder-shell__topbar,
+  .builder-export__header,
+  .builder-export__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .builder-export__panel {
+    max-width: 100%;
+  }
+}
+
+:root {
+  color: #1c1714;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #efe7db;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:hover {
+  cursor:pointer
+}
+
+a:hover{
+  cursor:pointer
+}

@@ -10,6 +10,8 @@ import {
 } from "../../../app/api/MagentoSlices/ProductSlice";
 import { useGetCategoriesQuery, type MagentoCategory } from "../../../app/api/MagentoSlices/CategorySlice";
 import AutoCompleteMultiSelect from "../../../component/Inputs Feilds/AutoCompleteMultiSelect";
+import type { MagentoAttribute } from "../../../app/api/MagentoSlices/Attributes";
+import AttributeSelector from "../Stores/Attributes/Attributeselector";
 
 interface CustomAttribute {
   attribute_code: string;
@@ -21,22 +23,25 @@ const AddMagentoProductFull = () => {
   const navigate = useNavigate();
   const { sku } = useParams(); // URL param
   const isEditMode = !!sku;
+  // ye attrribute k lia hy
+  const [showAttributeSelector, setShowAttributeSelector] = useState(false);
+  const [selectedAttributes, setSelectedAttributes] = useState<MagentoAttribute[]>([]);
 
   const { data: productData, isFetching: productLoading } = useGetProductQuery(sku!);// fetch all products to find by SKU
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const { data: categoryData, isLoading: categoriesLoading } = useGetCategoriesQuery();
-type FlattenedCategory = MagentoCategory & { level: number };
+  type FlattenedCategory = MagentoCategory & { level: number };
   // Flatten nested categories for multi-select
   const flattenCategories = (cat: MagentoCategory, level = 0): FlattenedCategory[] => {
-  let result: FlattenedCategory[] = [{ ...cat, level }]; // now level is guaranteed
-  if (cat.children_data && cat.children_data.length > 0) {
-    cat.children_data.forEach(child => {
-      result = result.concat(flattenCategories(child, level + 1));
-    });
-  }
-  return result;
-};
+    let result: FlattenedCategory[] = [{ ...cat, level }]; // now level is guaranteed
+    if (cat.children_data && cat.children_data.length > 0) {
+      cat.children_data.forEach(child => {
+        result = result.concat(flattenCategories(child, level + 1));
+      });
+    }
+    return result;
+  };
 
   const categories: MagentoCategory[] = categoryData
     ? Array.isArray(categoryData)
@@ -97,53 +102,102 @@ type FlattenedCategory = MagentoCategory & { level: number };
   }, [isEditMode, productData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
 
-  const { name, value, type } = target;
-  const checked = (target as HTMLInputElement).checked; // only exists on input
+    const { name, value, type } = target;
+    const checked = (target as HTMLInputElement).checked; // only exists on input
 
-  setFormData({
-    ...formData,
-    [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value
-  });
-};
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value
+    });
+  };
+
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+
+  //   const payload = {
+  //     sku: formData.sku,
+  //     name: formData.name,
+  //     attribute_set_id: formData.attribute_set_id,
+  //     price: formData.price,
+  //     status: formData.status ? 1 : 0,
+  //     visibility: formData.visibility,
+  //     type_id: formData.type_id,
+  //     extension_attributes: {
+  //       website_ids: [1],
+  //       stock_item: {
+  //         qty: formData.stock_qty,
+  //         is_in_stock: formData.is_in_stock,
+  //       },
+  //       category_links: selectedCategories.map(catId => ({
+  //         position: 0,
+  //         category_id: catId.toString(),
+  //       })),
+  //     },
+  //     custom_attributes: customAttributes.filter(attr => attr.attribute_code && attr.value),
+  //   };
+
+  //   try {
+  //     if (isEditMode) {
+  //       await updateProduct({ sku: sku!, product: payload }).unwrap();
+  //     } else {
+  //       await createProduct(payload).unwrap();
+  //     }
+  //     navigate("/MagentoProducts");
+  //   } catch (error) {
+  //     console.error("Error saving product:", error);
+  //   }
+  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const payload = {
-      sku: formData.sku,
-      name: formData.name,
-      attribute_set_id: formData.attribute_set_id,
-      price: formData.price,
-      status: formData.status ? 1 : 0,
-      visibility: formData.visibility,
-      type_id: formData.type_id,
-      extension_attributes: {
-        website_ids: [1],
-        stock_item: {
-          qty: formData.stock_qty,
-          is_in_stock: formData.is_in_stock,
+      product: {  // ← Yahan se shuru kar – pura object product key ke andar daal do
+        sku: formData.sku.trim(),
+        name: formData.name.trim(),
+        attribute_set_id: Number(formData.attribute_set_id),
+        price: Number(formData.price),
+        status: formData.status ? 1 : 0,
+        visibility: Number(formData.visibility),
+        type_id: formData.type_id,
+        extension_attributes: {
+          website_ids: [1],
+          stock_item: {
+            qty: Number(formData.stock_qty),
+            is_in_stock: formData.is_in_stock,
+          },
+          category_links: selectedCategories.map(catId => ({
+            position: 0,
+            category_id: String(catId),
+          })),
         },
-        category_links: selectedCategories.map(catId => ({
-          position: 0,
-          category_id: catId.toString(),
-        })),
-      },
-      custom_attributes: customAttributes.filter(attr => attr.attribute_code && attr.value),
+        custom_attributes: customAttributes
+          .filter(attr => attr.attribute_code && attr.value !== "")
+          .map(attr => ({
+            attribute_code: attr.attribute_code.trim(),
+            value: attr.type === "number" ? Number(attr.value) : String(attr.value),
+          })),
+      }
     };
+
+    console.log("Sending payload:", payload); // Check kar lena console mein
 
     try {
       if (isEditMode) {
-        await updateProduct({ sku: sku!, product: payload }).unwrap();
+        await updateProduct({ sku: sku!, product: payload.product }).unwrap(); // update mein bhi product key
       } else {
-        await createProduct(payload).unwrap();
+        await createProduct(payload).unwrap(); // create mein pura { product: {...} }
       }
+      alert("Product saved successfully!");
       navigate("/MagentoProducts");
-    } catch (error) {
-      console.error("Error saving product:", error);
+    } catch (error: any) {
+      console.error("Save failed:", error);
+      alert("Error: " + (error.data?.message || "Check console for details"));
     }
   };
+
 
   const categoryOptions = categories.map(cat => ({
     label: `${"— ".repeat(cat.level || 0)}${cat.name}`,
@@ -151,11 +205,13 @@ type FlattenedCategory = MagentoCategory & { level: number };
   }));
 
   return (
-    <div className="max-w-5xl mx-auto bg-gray-50 p-8 rounded-2xl shadow-md">
+    <div className="w-full bg-white p-8 rounded-2xl shadow-md">
+
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
         {isEditMode ? "Update Product" : "Create Product"}
-      </h2>
 
+      </h2>
+      <AddButton label="Add Attribute" onClick={() => { setShowAttributeSelector(true) }} />
       <form onSubmit={handleSubmit} className="space-y-8">
 
         {/* ===== Basic Info Card ===== */}
@@ -256,6 +312,12 @@ type FlattenedCategory = MagentoCategory & { level: number };
           />
         </div>
       </form>
+      <AttributeSelector
+        isOpen={showAttributeSelector}
+        onClose={() => setShowAttributeSelector(false)}
+        onAddSelected={(attrs) => setSelectedAttributes(prev => [...prev, ...attrs])}
+        alreadySelected={selectedAttributes.map(a => a.attribute_code)}
+      />
     </div>
   );
 };

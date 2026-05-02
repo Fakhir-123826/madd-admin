@@ -45,10 +45,10 @@ const TopSellingCategoriesChart = () => {
         <h3 className="text-lg font-semibold">Top Selling Categories</h3>
 
         <div className="flex gap-2">
-          <button className="px-3 py-1 border rounded-md text-sm text-gray-500">
+          <button className="px-3 py-1 border rounded-md text-sm text-gray-500 cursor-pointer">
             Category
           </button>
-          <button className="px-4 py-1 rounded-md bg-green-500 text-white text-sm">
+          <button className="px-4 py-1 rounded-md bg-green-500 text-white text-sm cursor-pointer">
             Yearly
           </button>
         </div>

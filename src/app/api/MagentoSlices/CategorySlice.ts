@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "../baseQueryWithAuth";
 
 export interface MagentoCategory {
   id?: number;
@@ -7,23 +8,29 @@ export interface MagentoCategory {
   is_active?: boolean;
   position?: number;
   level?: number;
-    children_data?: MagentoCategory[];
+  children_data?: MagentoCategory[];
 }
 
 
 export const magentoCategoryApi = createApi({
   reducerPath: "magentoCategoryApi",
 
-  baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000/api/",
-  }),
+  baseQuery: baseQueryWithAuth,
 
   tagTypes: ["Categories"],
 
   endpoints: (builder) => ({
     // ✅ Get All Categories
-    getCategories: builder.query<MagentoCategory[], void>({
-      query: () => "categories",
+    // In CategorySlice.ts
+    getCategories: builder.query<MagentoCategory[], { page: number; pageSize: number }>({
+      query: ({ page, pageSize }) => ({
+        url: "categories/search",
+        params: {
+          page_size: pageSize,
+          current_page: page,
+          // optional: field: "is_active", value: "1", condition_type: "eq"
+        },
+      }),
       providesTags: ["Categories"],
     }),
 

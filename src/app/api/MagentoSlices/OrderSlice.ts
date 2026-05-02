@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "../baseQueryWithAuth";
 
 export interface MagentoOrder {
   entity_id: number;
@@ -100,9 +101,7 @@ const flattenParams = (obj: Record<string, any>, parentPrefix = ""): [string, st
 
 export const orderApi = createApi({
   reducerPath: "orderApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000/api/",
-  }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ["Orders"],
   endpoints: (builder) => ({
 
@@ -114,43 +113,35 @@ export const orderApi = createApi({
       query: (params) => {
         const { filters = {}, page = 1, pageSize = 10 } = params || {};
 
-        const paramsObj: Record<string, any> = { page, pageSize };
-        const filterObj: Record<string, any> = {};
+        // ✅ Simple aur clean query string banao
+        const queryParams = new URLSearchParams();
 
-        // Range filters
-        if (filters.purchaseDateFrom || filters.purchaseDateTo) {
-          filterObj.purchase_date = {};
-          if (filters.purchaseDateFrom) filterObj.purchase_date.from = filters.purchaseDateFrom;
-          if (filters.purchaseDateTo) filterObj.purchase_date.to = filters.purchaseDateTo;
-        }
-        if (filters.grandTotalBaseFrom || filters.grandTotalBaseTo) {
-          filterObj.base_grand_total = {};
-          if (filters.grandTotalBaseFrom) filterObj.base_grand_total.from = filters.grandTotalBaseFrom;
-          if (filters.grandTotalBaseTo) filterObj.base_grand_total.to = filters.grandTotalBaseTo;
-        }
-        if (filters.grandTotalPurchasedFrom || filters.grandTotalPurchasedTo) {
-          filterObj.grand_total = {};
-          if (filters.grandTotalPurchasedFrom) filterObj.grand_total.from = filters.grandTotalPurchasedFrom;
-          if (filters.grandTotalPurchasedTo) filterObj.grand_total.to = filters.grandTotalPurchasedTo;
-        }
+        queryParams.set("page", String(page));
+        queryParams.set("pageSize", String(pageSize));
 
-        // Exact filters
-       if (filters.id) filterObj.increment_id = filters.id;
-        if (filters.status) filterObj.status = filters.status;
-        if (filters.billToName) filterObj.billing_name = filters.billToName;
-        if (filters.shipToName) filterObj.shipping_name = filters.shipToName;
+        // ✅ Exact filters
+        if (filters.id) queryParams.set("filters[increment_id]", filters.id);
+        if (filters.status) queryParams.set("filters[status]", filters.status);
+        if (filters.billToName) queryParams.set("filters[billing_name]", filters.billToName);
+        if (filters.shipToName) queryParams.set("filters[shipping_name]", filters.shipToName);
+
+        // ✅ Range filters
+        if (filters.purchaseDateFrom) queryParams.set("filters[purchase_date][from]", filters.purchaseDateFrom);
+        if (filters.purchaseDateTo) queryParams.set("filters[purchase_date][to]", filters.purchaseDateTo);
+
+        if (filters.grandTotalBaseFrom) queryParams.set("filters[base_grand_total][from]", filters.grandTotalBaseFrom);
+        if (filters.grandTotalBaseTo) queryParams.set("filters[base_grand_total][to]", filters.grandTotalBaseTo);
+
+        if (filters.grandTotalPurchasedFrom) queryParams.set("filters[grand_total][from]", filters.grandTotalPurchasedFrom);
+        if (filters.grandTotalPurchasedTo) queryParams.set("filters[grand_total][to]", filters.grandTotalPurchasedTo);
+
         if (filters.purchasePoint && filters.purchasePoint !== "All Store Views") {
-          filterObj.store_view = filters.purchasePoint;
-        }
-        if (filters.braintreeTransactionSource) filterObj.braintree_transaction_source = filters.braintreeTransactionSource;
-        if (filters.disputeState) filterObj.dispute_state = filters.disputeState;
-
-        if (Object.keys(filterObj).length > 0) {
-          paramsObj.filters = filterObj;
+          queryParams.set("filters[store_view]", filters.purchasePoint);
         }
 
-        const queryString = new URLSearchParams(flattenParams(paramsObj)).toString();
-        return `orders?${queryString}`;
+        console.log("🔍 API URL:", `orders?${queryParams.toString()}`); // ✅ debug ke liye
+
+        return `orders?${queryParams.toString()}`;
       },
       providesTags: ["Orders"],
     }),

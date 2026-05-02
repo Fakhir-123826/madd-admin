@@ -1,72 +1,121 @@
+import { useState, useRef } from 'react';
 
-
-import logo from "../../public/madd-admin.png"
 function EnterOTP() {
-    return (
-        <div>
+    const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-            <div className="lg:min-h-screen lg:flex lg:flex-col lg:gap-6">
-                <div className=" lg:flex lg:items-center lg:justify-between px-6 py-4">
-                    <h3 className="text-blue-500 pl-15 pr-15 pt-2.5 pb-2.5 text-2xl font-semibold tracking-wide shadow-xl">
-                        Enter OTP
-                    </h3>
+    const handleChange = (index: number, value: string) => {
+        if (!/^\d*$/.test(value)) return;
+
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
+
+        if (value && index < 5) {
+            inputRefs.current[index + 1]?.focus();
+        }
+    };
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace' && !otp[index] && index > 0) {
+            inputRefs.current[index - 1]?.focus();
+        }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pasted = e.clipboardData.getData('text').slice(0, 6);
+        const newOtp = [...otp];
+        for (let i = 0; i < pasted.length; i++) {
+            if (/^\d$/.test(pasted[i])) newOtp[i] = pasted[i];
+        }
+        setOtp(newOtp);
+    };
+
+    return (
+        <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6 relative overflow-hidden">
+
+            {/* Very Soft & Clean Background Accents */}
+            <div className="absolute inset-0 pointer-events-none">
+                {/* Light Top Right Accent */}
+                <div className="absolute top-[-10%] right-[-10%] w-[650px] h-[650px] 
+                        bg-gradient-to-br from-teal-100/30 to-cyan-100/20 
+                        rounded-full blur-[120px]" />
+
+                {/* Light Bottom Left Accent */}
+                <div className="absolute bottom-[-15%] left-[-15%] w-[550px] h-[550px] 
+                        bg-gradient-to-br from-emerald-100/25 to-blue-100/15 
+                        rounded-full blur-[100px]" />
+            </div>
+
+            <div className="relative w-full max-w-md z-10">
+
+                {/* Logo */}
+                <div className="flex justify-end mb-10">
                     <img
-                        src={logo}
-                        alt="main logo"
-                        className="h-16 object-contain pr-30"
+                        src="madd-admin.png"
+                        alt="MarketAdd"
+                        className="h-10 object-contain"
                     />
                 </div>
 
+                {/* OTP Card */}
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
 
+                    {/* Close Button */}
+                    <button className="absolute right-6 top-6 text-gray-400 hover:text-gray-600 text-xl">
+                        ✕
+                    </button>
 
-                <div className="fixed inset-0 z-50 flex items-center justify-center /*bg-black/40*/">
-                    <div className="relative w-[420px] rounded-2xl bg-white p-6 shadow-xl">
+                    {/* Title */}
+                    <h2 className="text-center text-xl font-semibold text-gray-800 mb-1">
+                        Entre 6 digit OTP
+                    </h2>
+                    <p className="text-center text-gray-600 text-[15px] mb-8">
+                        that have been sent to your email
+                    </p>
 
-                        {/* Close button */}
-                        <button
-                            className="absolute right-4 top-4 text-xl text-gray-500 hover:text-gray-700"
-                        >
-                            ✕
-                        </button>
-
-                        {/* Title */}
-                        <h2 className="mb-6 text-center text-lg font-medium text-gray-800">
-                            Entre 6 digit OTP that have been sent <br />
-                            to your email
-                        </h2>
-
-                        {/* OTP inputs */}
-                        <div className="mb-6 flex justify-between">
-                            {[1, 2, 3, 4, 5, 6].map((_, i) => (
-                                <input
-                                    key={i}
-                                    type="text"
-                                    maxLength={1}
-                                    className="h-12 w-12 rounded-lg border border-gray-300 text-center text-lg font-semibold
-                     focus:outline-none focus:ring-2 focus:ring-green-400"
-                                />
-                            ))}
-                        </div>
-
-                        {/* Button */}
-                        <button
-                            className="h-12 w-full rounded-xl bg-gradient-to-r from-cyan-400 to-green-400
-                 text-lg font-semibold text-white hover:opacity-90 transition"
-                        >
-                            Send OTP
-                        </button>
-
+                    {/* OTP Inputs */}
+                    <div className="flex justify-center gap-3 mb-10">
+                        {otp.map((digit, index) => (
+                            <input
+                                key={index}
+                                // ref={(el) => (inputRefs.current[index] = el)}
+                                type="text"
+                                maxLength={1}
+                                value={digit}
+                                onChange={(e) => handleChange(index, e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(index, e)}
+                                onPaste={handlePaste}
+                                className="w-12 h-14 text-center text-2xl font-medium bg-gray-50 
+                           border border-gray-200 rounded-2xl focus:outline-none 
+                           focus:border-teal-400 focus:ring-2 focus:ring-teal-200/50 
+                           transition-all"
+                            />
+                        ))}
                     </div>
+
+                    {/* Send OTP Button */}
+                    <button
+                        className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-500 
+                       text-white font-semibold text-base shadow-sm 
+                       hover:brightness-105 transition-all active:scale-[0.985]"
+                    >
+                        Send OTP
+                    </button>
+
                 </div>
 
-
-
+                {/* Resend Text */}
+                <p className="text-center text-gray-500 text-sm mt-6">
+                    Didn't receive the code?{' '}
+                    <span className="text-teal-600 font-medium hover:underline cursor-pointer">
+                        Resend
+                    </span>
+                </p>
             </div>
-
-
-
         </div>
-    )
+    );
 }
 
-export default EnterOTP
+export default EnterOTP;
