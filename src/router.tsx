@@ -698,7 +698,7 @@ const protectedRoutes = [
     element: <MLM />,
     children: [
       { index: true, element: <Navigate to="dashboard" replace /> },
-      { path: "dashboard", element: <Dashboard /> },
+      { path: "dashboard", element: <MlmDashboard /> },
       { path: "agents", element: <Agents /> },
       { path: "agents/add", element: <AgentForm /> },
       { path: "agents/:id", element: <AgentDetail /> },

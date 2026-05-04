@@ -131,7 +131,7 @@ const Dashboard = () => {
     const navigate  = useNavigate();
     const [period, setPeriod] = useState<ChartPeriod>("30_days");
 
-    const { data, isLoading, isError, refetch } = useGetDashboardQuery();
+    const { data, isLoading, isFetching, isError, refetch } = useGetDashboardQuery();
     const { data: chartData, isFetching: chartDataLoading } = useGetDashboardStatisticsQuery(period);
 
     const stats   = data?.data?.statistics;
@@ -151,9 +151,10 @@ const Dashboard = () => {
                 </div>
                 <button
                     onClick={() => refetch()}
-                    className="h-9 w-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:text-teal-600 hover:border-teal-300 transition"
+                    disabled={isFetching}
+                    className="h-9 w-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:text-teal-600 hover:border-teal-300 transition disabled:opacity-50"
                 >
-                    <FaSync className="text-xs" />
+                    <FaSync className={`text-xs ${isFetching ? 'animate-spin text-teal-600' : ''}`} />
                 </button>
             </div>
 
@@ -308,7 +309,7 @@ const Dashboard = () => {
                 <SectionHeader
                     title="Recent Orders"
                     action="View All"
-                    onAction={() => navigate("/orders")}
+                    onAction={() => navigate("/orderlist")}
                 />
 
                 {isLoading ? (
@@ -367,7 +368,7 @@ const Dashboard = () => {
                                             </td>
                                             <td className="px-3 py-3 rounded-r-xl text-right">
                                                 <button
-                                                    onClick={() => navigate(`/orders/${order.uuid}`)}
+                                                    onClick={() => navigate(`/order/${order.id}`, { state: { order } })}
                                                     className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-400 to-green-400 text-white text-xs font-medium hover:shadow-md transition opacity-0 group-hover:opacity-100"
                                                 >
                                                     View

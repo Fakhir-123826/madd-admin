@@ -276,18 +276,18 @@ const Agents = () => {
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className="px-2 py-1 rounded-md bg-teal-100 text-teal-700 text-xs font-medium">Level {agent.level}</span>
+                                            <span className="inline-block whitespace-nowrap px-2 py-1 rounded-md bg-teal-100 text-teal-700 text-xs font-medium">Level {agent.level}</span>
                                         </td>
                                         <td className="px-4 py-3 text-gray-600 text-sm">{agent.parent?.user?.full_name || "—"}</td>
                                         <td className="px-4 py-3 text-gray-600 text-sm">{agent.territory_code} ({agent.territory_type})</td>
                                         <td className="px-4 py-3 text-gray-600 text-sm">{agent.commission_rate}%</td>
                                         <td className="px-4 py-3">
-                                            <span className={`px-2 py-1 rounded-md text-xs font-medium ${agent.status === "active" ? "bg-emerald-100 text-emerald-700" : agent.status === "inactive" ? "bg-gray-100 text-gray-500" : "bg-red-100 text-red-700"}`}>
+                                            <span className={`inline-block whitespace-nowrap px-2 py-1 rounded-md text-xs font-medium ${agent.status === "active" ? "bg-emerald-100 text-emerald-700" : agent.status === "inactive" ? "bg-gray-100 text-gray-500" : "bg-red-100 text-red-700"}`}>
                                                 {agent.status}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className={`px-2 py-1 rounded-md text-xs font-medium ${agent.kyc_status === "verified" ? "bg-emerald-100 text-emerald-700" : agent.kyc_status === "pending" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}>
+                                            <span className={`inline-block whitespace-nowrap px-2 py-1 rounded-md text-xs font-medium ${agent.kyc_status === "verified" ? "bg-emerald-100 text-emerald-700" : agent.kyc_status === "pending" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}>
                                                 {agent.kyc_status}
                                             </span>
                                         </td>

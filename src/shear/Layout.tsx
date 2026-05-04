@@ -1369,7 +1369,7 @@ const Layout = () => {
         `}
       >
         {/* LOGO */}
-        <div className="h-20 flex items-center justify-center">
+        <div className="h-20 flex items-center justify-center mb-2">
           <img
             src="/madd-admin.png"
             alt="Logo"

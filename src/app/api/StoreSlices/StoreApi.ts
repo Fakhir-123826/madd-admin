@@ -492,6 +492,7 @@ export const storeListApi = createApi({
             query: () => ({
                 url: "vendors",
                 method: "GET",
+                params: { paginate: 'false' },
             }),
             providesTags: ["VendorsForStores"],
         }),

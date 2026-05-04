@@ -131,7 +131,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaLock, FaUser, FaArrowRight, FaBuilding, FaMapMarkerAlt, FaCity, FaEnvelope, FaPhone, FaSpinner } from "react-icons/fa";
+import { FaLock, FaUser, FaArrowRight, FaBuilding, FaMapMarkerAlt, FaCity, FaEnvelope, FaPhone, FaSpinner, FaChartLine, FaBoxes, FaGlobe, FaTags, FaTruck, FaHeart } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { useRegisterMutation, useSocialLoginMutation } from "../app/api/AuthSlices/AuthSlices";
@@ -419,14 +419,14 @@ const Signup = () => {
                         <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest mb-4">
                             {userType === "vendor" ? "Vendor Portal" : "Customer Portal"}
                         </span>
-                        <h1 className="text-5xl font-extrabold leading-tight mb-6 drop-shadow-lg">
+                        <h1 className="text-5xl font-extrabold leading-tight mb-6 drop-shadow-lg text-blue-900">
                             {userType === "vendor" ? (
                                 <>Grow Your <br /><span className="text-blue-900/40">Business Faster</span></>
                             ) : (
                                 <>Start Your <br /><span className="text-blue-900/40">Shopping Journey</span></>
                             )}
                         </h1>
-                        <p className="text-white/90 text-xl font-medium leading-relaxed">
+                        <p className="text-blue-900/80 text-xl font-medium leading-relaxed">
                             {userType === "vendor" 
                                 ? "Join thousands of successful sellers and scale your business with ease."
                                 : "Join our community to browse, buy, and track your orders in one place."}
@@ -437,60 +437,60 @@ const Signup = () => {
                         {userType === "vendor" ? (
                             <>
                                 <div className="flex items-start gap-5 group">
-                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
-                                        📈
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all text-blue-900">
+                                        <FaChartLine />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold mb-1">Sales Tracking</h3>
-                                        <p className="text-white/70 text-sm leading-snug">Monitor your sales performance with real-time data and insights.</p>
+                                        <h3 className="text-lg font-bold mb-1 text-blue-900">Sales Tracking</h3>
+                                        <p className="text-blue-900/60 text-sm leading-snug">Monitor your sales performance with real-time data and insights.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-5 group">
-                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
-                                        📦
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all text-blue-900">
+                                        <FaBoxes />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold mb-1">Inventory Control</h3>
-                                        <p className="text-white/70 text-sm leading-snug">Manage your products and stock effortlessly across all regions.</p>
+                                        <h3 className="text-lg font-bold mb-1 text-blue-900">Inventory Control</h3>
+                                        <p className="text-blue-900/60 text-sm leading-snug">Manage your products and stock effortlessly across all regions.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-5 group">
-                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
-                                        🌍
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all text-blue-900">
+                                        <FaGlobe />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold mb-1">Global Reach</h3>
-                                        <p className="text-white/70 text-sm leading-snug">Expand your business to international markets with zero friction.</p>
+                                        <h3 className="text-lg font-bold mb-1 text-blue-900">Global Reach</h3>
+                                        <p className="text-blue-900/60 text-sm leading-snug">Expand your business to international markets with zero friction.</p>
                                     </div>
                                 </div>
                             </>
                         ) : (
                             <>
                                 <div className="flex items-start gap-5 group">
-                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
-                                        🛍️
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all text-blue-900">
+                                        <FaTags />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold mb-1">Best Deals</h3>
-                                        <p className="text-white/70 text-sm leading-snug">Get access to exclusive discounts and the best prices online.</p>
+                                        <h3 className="text-lg font-bold mb-1 text-blue-900">Best Deals</h3>
+                                        <p className="text-blue-900/60 text-sm leading-snug">Get access to exclusive discounts and the best prices online.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-5 group">
-                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
-                                        🚚
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all text-blue-900">
+                                        <FaTruck />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold mb-1">Fast Delivery</h3>
-                                        <p className="text-white/70 text-sm leading-snug">Track your orders in real-time and enjoy blazing fast shipping.</p>
+                                        <h3 className="text-lg font-bold mb-1 text-blue-900">Fast Delivery</h3>
+                                        <p className="text-blue-900/60 text-sm leading-snug">Track your orders in real-time and enjoy blazing fast shipping.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-5 group">
-                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all">
-                                        💖
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl group-hover:bg-white/30 transition-all text-blue-900">
+                                        <FaHeart />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold mb-1">Wishlist Sync</h3>
-                                        <p className="text-white/70 text-sm leading-snug">Save your favorite items and sync them across all your devices.</p>
+                                        <h3 className="text-lg font-bold mb-1 text-blue-900">Wishlist Sync</h3>
+                                        <p className="text-blue-900/60 text-sm leading-snug">Save your favorite items and sync them across all your devices.</p>
                                     </div>
                                 </div>
                             </>
