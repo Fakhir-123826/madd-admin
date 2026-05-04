@@ -132,7 +132,7 @@ const Dashboard = () => {
     const [period, setPeriod] = useState<ChartPeriod>("30_days");
 
     const { data, isLoading, isError, refetch } = useGetDashboardQuery();
-    const { data: chartData } = useGetDashboardStatisticsQuery(period);
+    const { data: chartData, isFetching: chartDataLoading } = useGetDashboardStatisticsQuery(period);
 
     const stats   = data?.data?.statistics;
     const orders  = data?.data?.recent_orders  ?? [];
@@ -294,7 +294,11 @@ const Dashboard = () => {
                     </div>
                 </div>
                 {/* Your existing chart component — passes chartData if needed */}
-                <SalesOrdersChart data={chartData?.data} />
+                {chartDataLoading ? (
+                    <Skeleton className="h-[320px] w-full" />
+                ) : (
+                    <SalesOrdersChart data={chartData?.data} />
+                )}
             </div>
 
             {/* ══════════════════════════════════════
@@ -472,7 +476,11 @@ const Dashboard = () => {
             ══════════════════════════════════════ */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <SectionHeader title="Top Selling Categories" />
-                <TopSellingCategoriesChart data={chartData?.data?.top_products} />
+                {chartDataLoading ? (
+                    <Skeleton className="h-[320px] w-full" />
+                ) : (
+                    <TopSellingCategoriesChart data={chartData?.data?.top_products} />
+                )}
             </div>
 
         </div>
