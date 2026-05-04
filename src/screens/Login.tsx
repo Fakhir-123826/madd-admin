@@ -146,10 +146,10 @@ const Login = () => {
                     }}
                 />
                 <div className="relative z-10 text-center px-12">
-                    <h1 className="text-4xl font-bold text-white drop-shadow-md mb-3">
+                    <h1 className="text-4xl font-bold drop-shadow-md mb-3 text-blue-900">
                         Welcome Back
                     </h1>
-                    <p className="text-white/80 text-lg">Sign in to manage your store</p>
+                    <p className="text-blue-900/80 text-lg">Sign in to manage your store</p>
                 </div>
             </div>
 

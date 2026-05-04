@@ -275,8 +275,8 @@ const CreateStore = () => {
     const preparePayload = () => {
         return {
             vendor_id: formData.vendor_id,
-            name: formData.name,
-            slug: formData.slug,
+            store_name: formData.name,
+            store_slug: formData.slug,
             description: formData.description,
             address: formData.address,
             city: formData.city,

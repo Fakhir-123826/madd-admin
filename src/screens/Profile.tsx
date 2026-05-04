@@ -26,6 +26,7 @@ const Profile = () => {
   const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [isPassModalOpen, setIsPassModalOpen] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormData>();
   const { 
@@ -69,6 +70,7 @@ const Profile = () => {
       }).unwrap();
       showToast("success", "Password changed successfully!");
       resetPass();
+      setIsPassModalOpen(false);
     } catch (err: any) {
       showToast("error", err?.data?.message || "Failed to change password.");
     }
@@ -237,14 +239,61 @@ const Profile = () => {
               </div>
             </div>
 
-            <form onSubmit={handleSubmitPass(onChangePassword)} className="space-y-5">
+            <div className="space-y-4">
+              <p className="text-sm text-gray-500 leading-relaxed">
+                For your security, we recommend using a strong password that you don't use elsewhere.
+              </p>
+              <button
+                onClick={() => setIsPassModalOpen(true)}
+                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-100 group"
+              >
+                <FaKey className="text-lg group-hover:rotate-12 transition-transform" />
+                Change Password
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Password Change Modal */}
+      {isPassModalOpen && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => !isChangingPassword && setIsPassModalOpen(false)}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
+                    <FaLock className="text-xl" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Update Password</h2>
+                    <p className="text-indigo-100 text-xs mt-0.5 font-medium">Secure your account</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsPassModalOpen(false)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitPass(onChangePassword)} className="p-8 space-y-5">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Current Password</label>
                 <input
                   type="password"
                   {...registerPass("current_password", { required: "Current password is required" })}
-                  className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
-                  placeholder="••••••••"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+                  placeholder="Enter current password"
                 />
                 {passErrors.current_password && <p className="text-xs text-rose-500 ml-1">{passErrors.current_password.message}</p>}
               </div>
@@ -257,37 +306,45 @@ const Profile = () => {
                     required: "New password is required",
                     minLength: { value: 8, message: "Min 8 characters" }
                   })}
-                  className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
-                  placeholder="••••••••"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+                  placeholder="Min. 8 characters"
                 />
                 {passErrors.new_password && <p className="text-xs text-rose-500 ml-1">{passErrors.new_password.message}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Confirm Password</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Confirm New Password</label>
                 <input
                   type="password"
-                  {...registerPass("new_password_confirmation", { required: "Please confirm" })}
-                  className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
-                  placeholder="••••••••"
+                  {...registerPass("new_password_confirmation", { required: "Please confirm password" })}
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium"
+                  placeholder="Re-enter new password"
                 />
                 {passErrors.new_password_confirmation && <p className="text-xs text-rose-500 ml-1">{passErrors.new_password_confirmation.message}</p>}
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPassModalOpen(false)}
+                  disabled={isChangingPassword}
+                  className="flex-1 px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-2xl transition-all disabled:opacity-50"
+                >
+                  Cancel
+                </button>
                 <button
                   type="submit"
                   disabled={isChangingPassword}
-                  className="w-full px-6 py-3.5 bg-gray-900 hover:bg-black text-white font-bold rounded-xl transition-all shadow-lg shadow-gray-200 flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="flex-[2] px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  {isChangingPassword ? <FaSpinner className="animate-spin" /> : <FaKey className="text-lg" />}
-                  Update Security
+                  {isChangingPassword ? <FaSpinner className="animate-spin" /> : <FaSave />}
+                  Update Now
                 </button>
               </div>
             </form>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
