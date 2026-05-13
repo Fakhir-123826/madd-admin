@@ -274,6 +274,23 @@ export const productApi = createApi({
             }),
             invalidatesTags: ["Products"],
         }),
+        // Add to your ProductApi.ts endpoints
+        updateProduct: builder.mutation<{ success: boolean; message: string; data: Product }, { uuid: string; data: any }>({
+            query: ({ uuid, data }) => ({
+                url: `admin/products/${uuid}`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["Products", "ProductStats"],
+        }),
+        createProduct: builder.mutation<{ success: boolean; message: string; data: Product }, any>({
+            query: (productData) => ({
+                url: "admin/products",
+                method: "POST",
+                body: productData,
+            }),
+            invalidatesTags: ["Products", "ProductStats"],
+        }),
     }),
 });
 
@@ -288,6 +305,8 @@ export const {
     useDeleteProductMutation,
     useFeatureProductMutation,
     useUnfeatureProductMutation,
+    useCreateProductMutation,
+    useUpdateProductMutation,
 } = productApi;
 
 export default productApi;
