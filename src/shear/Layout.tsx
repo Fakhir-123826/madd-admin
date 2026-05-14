@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { PiCodeBlockFill } from "react-icons/pi";
+import { GiPapers } from "react-icons/gi";
 import {
   FaBars,
   FaHome,
@@ -1072,6 +1074,22 @@ const Layout = () => {
         // { label: "Inventory Management", path: "/InventoryManagementList" },
         // { label: "Product Sharing", path: "/ProductSharingList" },
         // { label: "Legality Control", path: "/LegalityControlList" }
+      ]
+    },
+    {
+      label: "CMS Block",
+      icon: PiCodeBlockFill,
+      children: [
+        { label: "All CMS Blocks", path: "/CmsBlockList" },
+        { label: "Add CMS Block", path: "/AddCmsBlock" },
+      ]
+    },
+    {
+      label: "CMS Pages",
+      icon: GiPapers,
+      children: [
+        { label: "All CMS Pages", path: "/CmsPageList" },
+        { label: "Add CMS Page", path: "/AddCmsPage" },
       ]
     },
 

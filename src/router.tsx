@@ -227,6 +227,12 @@ import VendorPerformanceReport from "./screens/Reports/VendorPerformanceReport";
 import ProductPerformanceReport from "./screens/Reports/ProductPerformanceReport";
 import ExportReport from "./screens/Reports/ExportReport";
 
+// CMS
+import CmsBlockList from "./screens/CMS/CmsBlockList.tsx";
+import AddCmsBlock from "./screens/CMS/AddCmsBlock.tsx";
+import CmsPageList from "./screens/CMS/CmsPageList.tsx";
+import AddCmsPage from "./screens/CMS/AddCmsPage.tsx";
+
 // ==================== ROUTE CONSTANTS ====================
 export const ROUTES = {
   // Public Routes
@@ -549,8 +555,15 @@ export const ROUTES = {
   MAGENTO_SETTLEMENT_DETAIL: (id: string | number = ":id") => `/settlements/${id}`,
   MAGENTO_SETTLEMENT_GENERATE: "/settlements/generate",
 
+  // CMS Blocks
+  CMS_BLOCK_LIST: "/CmsBlockList",
+  ADD_CMS_BLOCK: "/AddCmsBlock",
+  EDIT_CMS_BLOCK: (id: string | number = ":id") => `/EditCmsBlock/${id}`,
 
-
+  // CMS Pages
+  CMS_PAGE_LIST: "/CmsPageList",
+  ADD_CMS_PAGE: "/AddCmsPage",
+  EDIT_CMS_PAGE: (id: string | number = ":id") => `/EditCmsPage/${id}`,
 
 } as const;
 
@@ -875,6 +888,16 @@ const protectedRoutes = [
   { path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
   { path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
   { path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
+
+  // CMS Blocks
+  { path: ROUTES.CMS_BLOCK_LIST, element: <CmsBlockList /> },
+  { path: ROUTES.ADD_CMS_BLOCK, element: <AddCmsBlock /> },
+  { path: ROUTES.EDIT_CMS_BLOCK(), element: <AddCmsBlock /> },
+
+  // CMS Pages
+  { path: ROUTES.CMS_PAGE_LIST, element: <CmsPageList /> },
+  { path: ROUTES.ADD_CMS_PAGE, element: <AddCmsPage /> },
+  { path: ROUTES.EDIT_CMS_PAGE(), element: <AddCmsPage /> },
 ];
 
 // ==================== CREATE ROUTER ====================
