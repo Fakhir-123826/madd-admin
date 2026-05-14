@@ -1509,8 +1509,8 @@ const Layout = () => {
         </div>
 
         {/* OUTLET CONTENT */}
-        <div className="flex-1 p-6 overflow-y-auto">
-          <div className="space-y-6 max-w-full pb-10">
+        <div className="flex-1 overflow-y-auto">
+          <div className="space-y-6 max-w-full">
             <Outlet />
           </div>
         </div>
