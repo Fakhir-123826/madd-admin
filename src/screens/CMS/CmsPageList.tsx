@@ -17,9 +17,10 @@ const CmsPageList = () => {
     const navigate = useNavigate();
 
     const { user } = useSelector((state: RootState) => state.auth);
-    const isAdmin = user?.roles?.includes('admin') || user?.roles?.includes('super_admin');
+    const role = user?.role?.toLowerCase() || (user?.roles?.[0]?.toLowerCase()) || "";
+    const isAdmin = role === "super_admin" || role === "admin";
 
-    const { data: vendorsData } = useGetVendorsQuery({}, { skip: !isAdmin });
+    const { data: vendorsData } = useGetVendorsQuery(undefined, { skip: !isAdmin });
     const vendors = vendorsData?.data || [];
 
     const [selectedVendorUuid, setSelectedVendorUuid] = useState<string>("");
@@ -28,7 +29,10 @@ const CmsPageList = () => {
         if (isAdmin && vendors.length > 0 && !selectedVendorUuid) {
             setSelectedVendorUuid(vendors[0].uuid);
         } else if (!isAdmin && user) {
-            setSelectedVendorUuid(user?.vendor?.uuid || user?.uuid || "");
+            const vendorUuid = user?.vendor?.uuid || user?.vendor_uuid || user?.uuid || "";
+            if (vendorUuid) {
+                setSelectedVendorUuid(vendorUuid);
+            }
         }
     }, [isAdmin, vendors, user, selectedVendorUuid]);
 

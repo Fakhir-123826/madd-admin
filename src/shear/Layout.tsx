@@ -40,6 +40,8 @@ import { RiLogoutBoxLine } from "react-icons/ri";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLogoutUserMutation } from "../app/api/AuthSlices/AuthSlices";
 import { ROUTES } from "../router.tsx";
+import { useSelector } from "react-redux";
+import type { RootState } from "../app/store";
 
 import { router } from "../router";
 
@@ -199,14 +201,14 @@ const Layout = () => {
 
   const navigate = useNavigate();
 
-  // Get user from localStorage
-  const userRaw = localStorage.getItem("user");
-  const user = userRaw ? JSON.parse(userRaw) : null;
+  const { user } = useSelector((state: RootState) => state.auth);
 
   // Check if user has admin or super_admin role
-  const hasAdminAccess = user?.roles?.some(
-    (role: string) => role === "super_admin" || role === "admin"
-  ) || false;
+  const hasAdminAccess = (() => {
+    if (!user) return false;
+    const role = (user.role || (Array.isArray(user.roles) ? user.roles[0] : "") || "").toLowerCase();
+    return role === "admin" || role === "super_admin";
+  })();
 
   // ================= FULL MENU ITEMS (Moved inside component to use user role) =================
   // const getFullMenuItems = (): MenuItem[] => [
@@ -1275,18 +1277,30 @@ const Layout = () => {
   // Filter menu items based on user role
   useEffect(() => {
     const fullMenu = getFullMenuItems();
+    
+    // Determine user role robustly
+    const role = (user?.role || (Array.isArray(user?.roles) ? user?.roles[0] : "") || "").toLowerCase();
+    const isAdmin = role === "super_admin" || role === "admin" || hasAdminAccess;
+    const isVendor = role === "vendor";
 
-    if (hasAdminAccess) {
-      // If user is admin or super_admin, show all menus
+    if (isAdmin) {
+      // Admin gets everything
       setFilteredMenuItems(fullMenu);
+    } else if (isVendor) {
+      // Vendor gets specific modules
+      const vendorAllowedLabels = [
+        "Dashboard", "Magento", "Order Management", "Orders", 
+        "Products", "CMS Block", "CMS Pages", "Settlements", 
+        "Coupons", "Settings", "Reports"
+      ];
+      setFilteredMenuItems(fullMenu.filter(item => vendorAllowedLabels.includes(item.label)));
     } else {
-      // If not admin, only show Dashboard and Magento
-      const allowedMenus = fullMenu.filter(item =>
-        item.label === "Dashboard" || item.label === "Magento"
-      );
-      setFilteredMenuItems(allowedMenus);
+      // Default / Guest view
+      setFilteredMenuItems(fullMenu.filter(item => 
+        ["Dashboard", "Magento"].includes(item.label)
+      ));
     }
-  }, [hasAdminAccess]);
+  }, [user, hasAdminAccess]);
 
   // Auto open parent menus based on current path
   useEffect(() => {

@@ -1,7 +1,6 @@
 // src/app/api/SettingsSlices/SettingsApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -88,31 +87,9 @@ export interface SystemSettings {
     security: SecuritySettings;
 }
 
-// Raw base query with headers configuration
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (args, api, extraOptions) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    }
-    return result;
-};
-
 export const settingsApi = createApi({
     reducerPath: "settingsApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Settings", "SystemSettings", "PaymentSettings", "ShippingSettings", "TaxSettings", "EmailSettings"],
     keepUnusedDataFor: 300, // Keep settings cached for 5 minutes
 
@@ -132,7 +109,7 @@ export const settingsApi = createApi({
             };
         }, void>({
             query: () => ({
-                url: "admin/settings",
+                url: "settings",
                 method: "GET",
             }),
             providesTags: ["Settings"],
@@ -141,7 +118,7 @@ export const settingsApi = createApi({
         // GET /settings/system - Get system settings
         getSystemSettings: builder.query<{ success: boolean; data: SystemSettings }, void>({
             query: () => ({
-                url: "admin/settings/system",
+                url: "settings/system",
                 method: "GET",
             }),
             providesTags: ["SystemSettings"],
@@ -150,7 +127,7 @@ export const settingsApi = createApi({
         // GET /settings/payment - Get payment settings
         getPaymentSettings: builder.query<{ success: boolean; data: PaymentSettings }, void>({
             query: () => ({
-                url: "admin/settings/payment",
+                url: "settings/payment",
                 method: "GET",
             }),
             providesTags: ["PaymentSettings"],
@@ -159,7 +136,7 @@ export const settingsApi = createApi({
         // GET /settings/shipping - Get shipping settings
         getShippingSettings: builder.query<{ success: boolean; data: ShippingSettings }, void>({
             query: () => ({
-                url: "admin/settings/shipping",
+                url: "settings/shipping",
                 method: "GET",
             }),
             providesTags: ["ShippingSettings"],
@@ -168,7 +145,7 @@ export const settingsApi = createApi({
         // GET /settings/tax - Get tax settings
         getTaxSettings: builder.query<{ success: boolean; data: TaxSettings }, void>({
             query: () => ({
-                url: "admin/settings/tax",
+                url: "settings/tax",
                 method: "GET",
             }),
             providesTags: ["TaxSettings"],
@@ -177,7 +154,7 @@ export const settingsApi = createApi({
         // GET /settings/email - Get email settings
         getEmailSettings: builder.query<{ success: boolean; data: EmailSettings }, void>({
             query: () => ({
-                url: "admin/settings/email",
+                url: "settings/email",
                 method: "GET",
             }),
             providesTags: ["EmailSettings"],
@@ -189,7 +166,7 @@ export const settingsApi = createApi({
             settings: Record<string, any>;
         }>({
             query: ({ group, settings }) => ({
-                url: "admin/settings",
+                url: "settings",
                 method: "PUT",
                 body: { group, settings },
             }),

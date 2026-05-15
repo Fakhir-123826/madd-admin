@@ -1,7 +1,6 @@
 // src/app/api/ConfigSlices/ConfigApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,31 +85,9 @@ export interface Courier {
     updated_at: string;
 }
 
-// Raw base query
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (args, api, extraOptions) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    }
-    return result;
-};
-
 export const configApi = createApi({
     reducerPath: "configApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Countries", "SalesPolicies", "Currencies", "Languages", "Themes", "Couriers"],
     keepUnusedDataFor: 300,
 
@@ -148,7 +125,7 @@ export const configApi = createApi({
                         }
                     });
                 }
-                const url = `admin/config/countries${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `config/countries${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Countries"],
@@ -156,7 +133,7 @@ export const configApi = createApi({
 
         getCountry: builder.query<{ success: boolean; data: Country }, string | number>({
             query: (id) => ({
-                url: `admin/config/countries/${id}`,
+                url: `config/countries/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Countries", id }],
@@ -164,7 +141,7 @@ export const configApi = createApi({
 
         createCountry: builder.mutation<{ success: boolean; message: string; data: Country }, Partial<Country>>({
             query: (data) => ({
-                url: "admin/config/countries",
+                url: "config/countries",
                 method: "POST",
                 body: data,
             }),
@@ -173,7 +150,7 @@ export const configApi = createApi({
 
         updateCountry: builder.mutation<{ success: boolean; message: string; data: Country }, { id: string | number; data: Partial<Country> }>({
             query: ({ id, data }) => ({
-                url: `admin/config/countries/${id}`,
+                url: `config/countries/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -182,7 +159,7 @@ export const configApi = createApi({
 
         deleteCountry: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/countries/${id}`,
+                url: `config/countries/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Countries"],
@@ -190,7 +167,7 @@ export const configApi = createApi({
 
         activateCountry: builder.mutation<{ success: boolean; message: string }, string>({
             query: (code) => ({
-                url: `admin/config/countries/${code}/activate`,
+                url: `config/countries/${code}/activate`,
                 method: "POST",
             }),
             invalidatesTags: ["Countries"],
@@ -199,7 +176,7 @@ export const configApi = createApi({
         // ─── Sales Policies ───────────────────────────────────────────────────
         getSalesPolicies: builder.query<{ success: boolean; data: SalesPolicy[] }, void>({
             query: () => ({
-                url: "admin/config/sales-policies",
+                url: "config/sales-policies",
                 method: "GET",
             }),
             providesTags: ["SalesPolicies"],
@@ -207,7 +184,7 @@ export const configApi = createApi({
 
         getSalesPolicy: builder.query<{ success: boolean; data: SalesPolicy }, string | number>({
             query: (id) => ({
-                url: `admin/config/sales-policies/${id}`,
+                url: `config/sales-policies/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "SalesPolicies", id }],
@@ -215,7 +192,7 @@ export const configApi = createApi({
 
         createSalesPolicy: builder.mutation<{ success: boolean; message: string; data: SalesPolicy }, Partial<SalesPolicy>>({
             query: (data) => ({
-                url: "admin/config/sales-policies",
+                url: "config/sales-policies",
                 method: "POST",
                 body: data,
             }),
@@ -224,7 +201,7 @@ export const configApi = createApi({
 
         updateSalesPolicy: builder.mutation<{ success: boolean; message: string; data: SalesPolicy }, { id: string | number; data: Partial<SalesPolicy> }>({
             query: ({ id, data }) => ({
-                url: `admin/config/sales-policies/${id}`,
+                url: `config/sales-policies/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -233,7 +210,7 @@ export const configApi = createApi({
 
         deleteSalesPolicy: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/sales-policies/${id}`,
+                url: `config/sales-policies/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["SalesPolicies"],
@@ -242,7 +219,7 @@ export const configApi = createApi({
         // ─── Currencies ──────────────────────────────────────────────────────
         getCurrencies: builder.query<{ success: boolean; data: Currency[] }, void>({
             query: () => ({
-                url: "admin/config/currencies",
+                url: "config/currencies",
                 method: "GET",
             }),
             providesTags: ["Currencies"],
@@ -250,7 +227,7 @@ export const configApi = createApi({
 
         getCurrency: builder.query<{ success: boolean; data: Currency }, string | number>({
             query: (id) => ({
-                url: `admin/config/currencies/${id}`,
+                url: `config/currencies/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Currencies", id }],
@@ -258,7 +235,7 @@ export const configApi = createApi({
 
         createCurrency: builder.mutation<{ success: boolean; message: string; data: Currency }, Partial<Currency>>({
             query: (data) => ({
-                url: "admin/config/currencies",
+                url: "config/currencies",
                 method: "POST",
                 body: data,
             }),
@@ -267,7 +244,7 @@ export const configApi = createApi({
 
         updateCurrency: builder.mutation<{ success: boolean; message: string; data: Currency }, { id: string | number; data: Partial<Currency> }>({
             query: ({ id, data }) => ({
-                url: `admin/config/currencies/${id}`,
+                url: `config/currencies/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -276,7 +253,7 @@ export const configApi = createApi({
 
         deleteCurrency: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/currencies/${id}`,
+                url: `config/currencies/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Currencies"],
@@ -284,7 +261,7 @@ export const configApi = createApi({
 
         updateExchangeRate: builder.mutation<{ success: boolean; message: string }, { code: string; exchange_rate: number }>({
             query: ({ code, exchange_rate }) => ({
-                url: `admin/config/currencies/${code}/exchange-rate`,
+                url: `config/currencies/${code}/exchange-rate`,
                 method: "POST",
                 body: { exchange_rate },
             }),
@@ -294,7 +271,7 @@ export const configApi = createApi({
         // ─── Languages ───────────────────────────────────────────────────────
         getLanguages: builder.query<{ success: boolean; data: Language[] }, void>({
             query: () => ({
-                url: "admin/config/languages",
+                url: "config/languages",
                 method: "GET",
             }),
             providesTags: ["Languages"],
@@ -302,7 +279,7 @@ export const configApi = createApi({
 
         getLanguage: builder.query<{ success: boolean; data: Language }, string | number>({
             query: (id) => ({
-                url: `admin/config/languages/${id}`,
+                url: `config/languages/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Languages", id }],
@@ -310,7 +287,7 @@ export const configApi = createApi({
 
         createLanguage: builder.mutation<{ success: boolean; message: string; data: Language }, Partial<Language>>({
             query: (data) => ({
-                url: "admin/config/languages",
+                url: "config/languages",
                 method: "POST",
                 body: data,
             }),
@@ -319,7 +296,7 @@ export const configApi = createApi({
 
         updateLanguage: builder.mutation<{ success: boolean; message: string; data: Language }, { id: string | number; data: Partial<Language> }>({
             query: ({ id, data }) => ({
-                url: `admin/config/languages/${id}`,
+                url: `config/languages/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -328,7 +305,7 @@ export const configApi = createApi({
 
         deleteLanguage: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/languages/${id}`,
+                url: `config/languages/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Languages"],
@@ -337,7 +314,7 @@ export const configApi = createApi({
         // ─── Themes ──────────────────────────────────────────────────────────
         getThemes: builder.query<{ success: boolean; data: Theme[] }, void>({
             query: () => ({
-                url: "admin/config/themes",
+                url: "config/themes",
                 method: "GET",
             }),
             providesTags: ["Themes"],
@@ -345,7 +322,7 @@ export const configApi = createApi({
 
         getTheme: builder.query<{ success: boolean; data: Theme }, string | number>({
             query: (id) => ({
-                url: `admin/config/themes/${id}`,
+                url: `config/themes/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Themes", id }],
@@ -353,7 +330,7 @@ export const configApi = createApi({
 
         createTheme: builder.mutation<{ success: boolean; message: string; data: Theme }, Partial<Theme>>({
             query: (data) => ({
-                url: "admin/config/themes",
+                url: "config/themes",
                 method: "POST",
                 body: data,
             }),
@@ -362,7 +339,7 @@ export const configApi = createApi({
 
         updateTheme: builder.mutation<{ success: boolean; message: string; data: Theme }, { id: string | number; data: Partial<Theme> }>({
             query: ({ id, data }) => ({
-                url: `admin/config/themes/${id}`,
+                url: `config/themes/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -371,7 +348,7 @@ export const configApi = createApi({
 
         deleteTheme: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/themes/${id}`,
+                url: `config/themes/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Themes"],
@@ -379,7 +356,7 @@ export const configApi = createApi({
 
         setDefaultTheme: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/themes/${id}/set-default`,
+                url: `config/themes/${id}/set-default`,
                 method: "POST",
             }),
             invalidatesTags: ["Themes"],
@@ -388,7 +365,7 @@ export const configApi = createApi({
         // ─── Couriers ────────────────────────────────────────────────────────
         getCouriers: builder.query<{ success: boolean; data: Courier[] }, void>({
             query: () => ({
-                url: "admin/config/couriers",
+                url: "config/couriers",
                 method: "GET",
             }),
             providesTags: ["Couriers"],
@@ -396,7 +373,7 @@ export const configApi = createApi({
 
         getCourier: builder.query<{ success: boolean; data: Courier }, string | number>({
             query: (id) => ({
-                url: `admin/config/couriers/${id}`,
+                url: `config/couriers/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Couriers", id }],
@@ -404,7 +381,7 @@ export const configApi = createApi({
 
         createCourier: builder.mutation<{ success: boolean; message: string; data: Courier }, Partial<Courier>>({
             query: (data) => ({
-                url: "admin/config/couriers",
+                url: "config/couriers",
                 method: "POST",
                 body: data,
             }),
@@ -413,7 +390,7 @@ export const configApi = createApi({
 
         updateCourier: builder.mutation<{ success: boolean; message: string; data: Courier }, { id: string | number; data: Partial<Courier> }>({
             query: ({ id, data }) => ({
-                url: `admin/config/couriers/${id}`,
+                url: `config/couriers/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -422,7 +399,7 @@ export const configApi = createApi({
 
         deleteCourier: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/couriers/${id}`,
+                url: `config/couriers/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Couriers"],
@@ -430,7 +407,7 @@ export const configApi = createApi({
 
         testCourierConnection: builder.mutation<{ success: boolean; message: string }, string | number>({
             query: (id) => ({
-                url: `admin/config/couriers/${id}/test`,
+                url: `config/couriers/${id}/test`,
                 method: "POST",
             }),
             invalidatesTags: ["Couriers"],

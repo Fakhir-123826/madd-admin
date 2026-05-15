@@ -18,9 +18,10 @@ const AddCmsPage = () => {
     const isEdit = Boolean(id);
 
     const { user } = useSelector((state: RootState) => state.auth);
-    const isAdmin = user?.roles?.includes('admin') || user?.roles?.includes('super_admin');
+    const role = user?.role?.toLowerCase() || (user?.roles?.[0]?.toLowerCase()) || "";
+    const isAdmin = role === "super_admin" || role === "admin";
 
-    const { data: vendorsData } = useGetVendorsQuery({}, { skip: !isAdmin });
+    const { data: vendorsData } = useGetVendorsQuery(undefined, { skip: !isAdmin });
     const vendors = vendorsData?.data || [];
 
     const [vendorUuid, setVendorUuid] = useState<string>(
@@ -32,7 +33,10 @@ const AddCmsPage = () => {
             if (isAdmin && vendors.length > 0) {
                 setVendorUuid(vendors[0].uuid);
             } else if (!isAdmin && user) {
-                setVendorUuid(user?.vendor?.uuid || user?.uuid || "");
+                const uuid = user?.vendor?.uuid || user?.vendor_uuid || user?.uuid || "";
+                if (uuid) {
+                    setVendorUuid(uuid);
+                }
             }
         }
     }, [isAdmin, vendors, user, vendorUuid]);

@@ -1,6 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -199,24 +198,11 @@ export interface GetOrdersParams {
 
 export const orderApi = createApi({
     reducerPath: "orderApi",
-
-    baseQuery: fetchBaseQuery({
-        baseUrl: baseURL,
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
-
-            if (token) {
-                headers.set("authorization", `Bearer ${token}`);
-            }
-
-            return headers;
-        },
-    }),
-
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Orders"],
 
     endpoints: (builder) => ({
-        // ─── GET /admin/orders ────────────────────────────────────────────────
+        // ─── GET /orders ────────────────────────────────────────────────
         getOrders: builder.query<
             OrderListResponse,
             GetOrdersParams | void
@@ -317,7 +303,7 @@ export const orderApi = createApi({
                     }
                 }
 
-                const url = `admin/orders${
+                const url = `orders${
                     queryParams.toString()
                         ? `?${queryParams.toString()}`
                         : ""
@@ -332,26 +318,26 @@ export const orderApi = createApi({
             providesTags: ["Orders"],
         }),
 
-        // ─── GET /admin/orders/statistics ───────────────────────────────────
+        // ─── GET /orders/statistics ───────────────────────────────────
         getOrderStatistics: builder.query<
             OrderStatisticsResponse,
             void
         >({
             query: () => ({
-                url: "admin/orders/statistics",
+                url: "orders/statistics",
                 method: "GET",
             }),
 
             providesTags: ["Orders"],
         }),
 
-        // ─── GET /admin/orders/{id} ─────────────────────────────────────────
+        // ─── GET /orders/{id} ─────────────────────────────────────────
         getOrder: builder.query<
             OrderSingleResponse,
             number | string
         >({
             query: (id) => ({
-                url: `admin/orders/${id}`,
+                url: `orders/${id}`,
                 method: "GET",
             }),
 
@@ -360,7 +346,7 @@ export const orderApi = createApi({
             ],
         }),
 
-        // ─── PUT /admin/orders/{id}/status ─────────────────────────────────
+        // ─── PUT /orders/{id}/status ─────────────────────────────────
         updateOrderStatus: builder.mutation<
             OrderSingleResponse,
             {
@@ -369,7 +355,7 @@ export const orderApi = createApi({
             }
         >({
             query: ({ id, data }) => ({
-                url: `admin/orders/${id}/status`,
+                url: `orders/${id}/status`,
                 method: "PUT",
                 body: data,
             }),
@@ -380,7 +366,7 @@ export const orderApi = createApi({
             ],
         }),
 
-        // ─── POST /admin/orders/{id}/refund ────────────────────────────────
+        // ─── POST /orders/{id}/refund ────────────────────────────────
         processRefund: builder.mutation<
             OrderSingleResponse,
             {
@@ -389,7 +375,7 @@ export const orderApi = createApi({
             }
         >({
             query: ({ id, data }) => ({
-                url: `admin/orders/${id}/refund`,
+                url: `orders/${id}/refund`,
                 method: "POST",
                 body: data,
             }),
@@ -400,7 +386,7 @@ export const orderApi = createApi({
             ],
         }),
 
-        // ─── POST /admin/orders/{id}/cancel ────────────────────────────────
+        // ─── POST /orders/{id}/cancel ────────────────────────────────
         cancelOrder: builder.mutation<
             OrderSingleResponse,
             {
@@ -409,7 +395,7 @@ export const orderApi = createApi({
             }
         >({
             query: ({ id, data }) => ({
-                url: `admin/orders/${id}/cancel`,
+                url: `orders/${id}/cancel`,
                 method: "POST",
                 body: data,
             }),
@@ -420,7 +406,7 @@ export const orderApi = createApi({
             ],
         }),
 
-        // ─── GET /admin/orders/by-store/{storeId} ──────────────────────────
+        // ─── GET /orders/by-store/{storeId} ──────────────────────────
         getStoreOrders: builder.query<
             OrderListResponse,
             {
@@ -454,7 +440,7 @@ export const orderApi = createApi({
                     );
                 }
 
-                const url = `admin/orders/by-store/${storeId}${
+                const url = `orders/by-store/${storeId}${
                     queryParams.toString()
                         ? `?${queryParams.toString()}`
                         : ""
@@ -469,7 +455,7 @@ export const orderApi = createApi({
             providesTags: ["Orders"],
         }),
 
-        // ─── GET /admin/orders/by-vendor/{vendorId} ────────────────────────
+        // ─── GET /orders/by-vendor/{vendorId} ────────────────────────
         getVendorOrders: builder.query<
             OrderListResponse,
             {
@@ -503,7 +489,7 @@ export const orderApi = createApi({
                     );
                 }
 
-                const url = `admin/orders/by-vendor/${vendorId}${
+                const url = `orders/by-vendor/${vendorId}${
                     queryParams.toString()
                         ? `?${queryParams.toString()}`
                         : ""
@@ -530,3 +516,5 @@ export const {
     useGetStoreOrdersQuery,
     useGetVendorOrdersQuery,
 } = orderApi;
+
+export default orderApi;

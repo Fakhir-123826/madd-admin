@@ -1,56 +1,18 @@
-import {
-  createApi,
-  fetchBaseQuery,
-} from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 import type { Subscription } from "../../../model/susbcription/ISubscription";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
-
-const rawBaseQuery = fetchBaseQuery({
-  baseUrl: baseURL,
-
-  prepareHeaders: (headers) => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
-    }
-
-    headers.set("Accept", "application/json");
-
-    return headers;
-  },
-});
-
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
-  args,
-  api,
-  extraOptions
-) => {
-  const result = await rawBaseQuery(args, api, extraOptions);
-
-  // If token expired / unauthorized
-  if (result.error && result.error.status === 401) {
-    localStorage.removeItem("token");
-
-    // redirect to login page
-    window.location.href = "/login";
-  }
-
-  return result;
-};
 
 export const subscriptionApi = createApi({
   reducerPath: "subscriptionApi",
 
-  baseQuery: baseQueryWithAuthCheck,
+  baseQuery: dynamicBaseQuery,
 
   tagTypes: ["Subscription"],
 
   endpoints: (builder) => ({
     getSubscriptions: builder.query<Subscription[], void>({
       query: () => ({
-        url: "admin/plans",
+        url: "plans",
         method: "GET",
       }),
       providesTags: ["Subscription"],
@@ -58,7 +20,7 @@ export const subscriptionApi = createApi({
 
     getSubscription: builder.query<Subscription, number>({
       query: (id) => ({
-        url: `admin/plans/${id}`,
+        url: `plans/${id}`,
         method: "GET",
       }),
       providesTags: ["Subscription"],
@@ -69,7 +31,7 @@ export const subscriptionApi = createApi({
       Partial<Subscription>
     >({
       query: (data) => ({
-        url: "admin/plans",
+        url: "plans",
         method: "POST",
         body: data,
       }),
@@ -81,7 +43,7 @@ export const subscriptionApi = createApi({
       { id: number; data: Partial<Subscription> }
     >({
       query: ({ id, data }) => ({
-        url: `admin/plans/${id}`,
+        url: `plans/${id}`,
         method: "PUT",
         body: data,
       }),
@@ -90,7 +52,7 @@ export const subscriptionApi = createApi({
 
     deleteSubscription: builder.mutation<void, number>({
       query: (id) => ({
-        url: `admin/plans/${id}`,
+        url: `plans/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Subscription"],
@@ -98,7 +60,7 @@ export const subscriptionApi = createApi({
 
     setDefaultPlan: builder.mutation<void, number>({
       query: (id) => ({
-        url: `admin/plans/${id}/set-default`,
+        url: `plans/${id}/set-default`,
         method: "POST",
       }),
       invalidatesTags: ["Subscription"],

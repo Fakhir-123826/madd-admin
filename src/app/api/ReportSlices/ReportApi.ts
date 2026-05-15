@@ -1,7 +1,6 @@
 // src/app/api/ReportSlices/ReportApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -157,37 +156,15 @@ export interface SalesReport {
     }>;
 }
 
-// Raw base query
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (args, api, extraOptions) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    }
-    return result;
-};
-
 export const reportApi = createApi({
     reducerPath: "reportApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Reports"],
     keepUnusedDataFor: 60, // Reports cached for 60 seconds
 
     endpoints: (builder) => ({
 
-        // GET /admin/reports/platform
+        // GET /reports/platform
         getPlatformReport: builder.query<{ success: boolean; data: PlatformReport; meta: any }, {
             period?: "day" | "week" | "month" | "quarter" | "year";
             date_from?: string;
@@ -198,13 +175,13 @@ export const reportApi = createApi({
                 if (params.period) queryParams.append('period', params.period);
                 if (params.date_from) queryParams.append('date_from', params.date_from);
                 if (params.date_to) queryParams.append('date_to', params.date_to);
-                const url = `admin/reports/platform${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `reports/platform${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Reports"],
         }),
 
-        // GET /admin/reports/financial
+        // GET /reports/financial
         getFinancialReport: builder.query<{ success: boolean; data: FinancialReport }, {
             period?: "day" | "week" | "month" | "quarter" | "year";
             date_from?: string;
@@ -215,13 +192,13 @@ export const reportApi = createApi({
                 if (params.period) queryParams.append('period', params.period);
                 if (params.date_from) queryParams.append('date_from', params.date_from);
                 if (params.date_to) queryParams.append('date_to', params.date_to);
-                const url = `admin/reports/financial${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `reports/financial${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Reports"],
         }),
 
-        // GET /admin/reports/sales
+        // GET /reports/sales
         getSalesReport: builder.query<{ success: boolean; data: SalesReport }, {
             period?: "day" | "week" | "month" | "quarter" | "year";
             date_from?: string;
@@ -232,13 +209,13 @@ export const reportApi = createApi({
                 if (params.period) queryParams.append('period', params.period);
                 if (params.date_from) queryParams.append('date_from', params.date_from);
                 if (params.date_to) queryParams.append('date_to', params.date_to);
-                const url = `admin/reports/sales${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `reports/sales${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Reports"],
         }),
 
-        // GET /admin/reports/vendor-performance
+        // GET /reports/vendor-performance
         getVendorPerformanceReport: builder.query<{ success: boolean; data: VendorPerformance[]; meta: any }, {
             period?: "day" | "week" | "month" | "quarter" | "year";
             date_from?: string;
@@ -251,13 +228,13 @@ export const reportApi = createApi({
                 if (params.date_from) queryParams.append('date_from', params.date_from);
                 if (params.date_to) queryParams.append('date_to', params.date_to);
                 if (params.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
-                const url = `admin/reports/vendor-performance${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `reports/vendor-performance${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Reports"],
         }),
 
-        // GET /admin/reports/product-performance
+        // GET /reports/product-performance
         getProductPerformanceReport: builder.query<{ success: boolean; data: ProductPerformance[]; summary: any; meta: any }, {
             period?: "day" | "week" | "month" | "quarter" | "year";
             date_from?: string;
@@ -272,13 +249,13 @@ export const reportApi = createApi({
                 if (params.date_to) queryParams.append('date_to', params.date_to);
                 if (params.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
                 if (params.limit) queryParams.append('limit', params.limit.toString());
-                const url = `admin/reports/product-performance${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `reports/product-performance${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Reports"],
         }),
 
-        // POST /admin/reports/export - Export report
+        // POST /reports/export - Export report
         exportReport: builder.mutation<{ success: boolean; data: { filename: string; content: string; mime_type: string } }, {
             report_type: "platform" | "financial" | "vendor_performance" | "product_performance" | "customer_report";
             format?: "csv" | "excel";
@@ -286,7 +263,7 @@ export const reportApi = createApi({
             date_to: string;
         }>({
             query: (data) => ({
-                url: "admin/reports/export",
+                url: "reports/export",
                 method: "POST",
                 body: data,
             }),
