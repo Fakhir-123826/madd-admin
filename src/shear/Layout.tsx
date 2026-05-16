@@ -1047,7 +1047,15 @@ const Layout = () => {
         // { label: "Vendor Requests", path: "/vendor/requests" }
       ]
     },
-
+    // Customers
+    {
+      label: "Customers",
+      icon: FaHandshake,
+      children: [
+        { label: "All Customers", path: ROUTES.Customers_List },
+        { label: "Add Customer", path: ROUTES.Add_Customer },
+      ]
+    },
     // Stores
     {
       label: "Stores",
@@ -1353,14 +1361,14 @@ const Layout = () => {
     <div className="h-screen flex bg-gray-100 overflow-hidden">
       {/* MOBILE BACKDROP */}
       {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-20 bg-black/50 lg:hidden" 
-          onClick={() => setMobileMenuOpen(false)} 
+        <div
+          className="fixed inset-0 z-20 bg-black/50 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* SIDEBAR */}
-      <aside 
+      <aside
         className={`
           fixed lg:relative z-40 h-full bg-white flex flex-col transition-all duration-300 border-r border-gray-200
           ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}

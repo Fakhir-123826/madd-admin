@@ -227,6 +227,10 @@ import VendorPerformanceReport from "./screens/Reports/VendorPerformanceReport";
 import ProductPerformanceReport from "./screens/Reports/ProductPerformanceReport";
 import ExportReport from "./screens/Reports/ExportReport";
 
+// Customer
+import { CustomerList } from "./screens/Customer/CustomerList.tsx";
+import { AddCustomer } from './screens/Customer/AddCustomer.tsx';
+
 // ==================== ROUTE CONSTANTS ====================
 export const ROUTES = {
   // Public Routes
@@ -264,6 +268,9 @@ export const ROUTES = {
   CREATE_VENDOR_ONBOARD: "/CreateVerderOnboard",
   VENDOR_ONBOARD: "/VerderOnboard",
   VENDOR_DASHBOARD: "/VendorDashBoard",
+
+  Customers_List: "/CustomerList",
+  Add_Customer: "/Add_Customer",
 
   // Subscription Section
   CREATE_SUBSCRIPTION: "/CreateSubscription",
@@ -580,6 +587,9 @@ const protectedRoutes = [
   { path: ROUTES.VENDOR_ONBOARD, element: <VendorOnboard /> },
   { path: ROUTES.VENDOR_DASHBOARD, element: <VendorDashBoard /> },
 
+  { path: ROUTES.Customers_List, element: <CustomerList /> },
+  { path: ROUTES.Add_Customer, element: <AddCustomer /> },
+  
   // Subscription Section
   { path: ROUTES.CREATE_SUBSCRIPTION, element: <CreateSubscription /> },
   { path: ROUTES.SUBSCRIPTION_LIST, element: <SubscriptionList /> },

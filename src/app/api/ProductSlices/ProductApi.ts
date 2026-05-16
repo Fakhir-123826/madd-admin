@@ -162,6 +162,8 @@ export const productApi = createApi({
             per_page?: number;
             status?: string;
             vendor_id?: number;
+            vendor_store_id?: number;
+            store_uuid?: string;
             search?: string;
             price_min?: number;
             price_max?: number;
@@ -173,6 +175,8 @@ export const productApi = createApi({
                     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
                     if (params.status) queryParams.append('status', params.status);
                     if (params.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
+                    if (params.vendor_store_id) queryParams.append('vendor_store_id', params.vendor_store_id.toString());
+                    if (params.store_uuid) queryParams.append('store_uuid', params.store_uuid);
                     if (params.search) queryParams.append('search', params.search);
                     if (params.price_min) queryParams.append('price_min', params.price_min.toString());
                     if (params.price_max) queryParams.append('price_max', params.price_max.toString());
