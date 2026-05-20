@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
+
 export interface SuspendVendorPayload {
     reason: string;
 }
@@ -61,6 +62,20 @@ export const vendorApi = createApi({
             }),
             providesTags: ["Vendors"],
         }),
+
+        /*
+=========================================
+GET COUNTRIES
+=========================================
+*/
+        getCountries: builder.query<any, void>({
+            query: (id) => ({
+                url: `config/countries`,
+                method: "GET",
+            }),
+            providesTags: ["Vendors"],
+        }),
+
 
         /*
         =========================================
@@ -151,7 +166,35 @@ export const vendorApi = createApi({
             }),
             invalidatesTags: ["Vendors"],
         }),
+        /*
+        =========================================
+        UPDATE VENDOR
+        =========================================
+        */
+        updateVendor: builder.mutation<
+            any,
+            { id: string; data: Partial<CreateVendorPayload> }
+        >({
+            query: ({ id, data }) => ({
+                url: `vendors/${id}`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
 
+        /*
+        =========================================
+        DELETE VENDOR
+        =========================================
+        */
+        deleteVendor: builder.mutation<any, string>({
+            query: (id) => ({
+                url: `vendors/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Vendors"],
+        }),
         /*
         =========================================
         REJECT KYC
@@ -168,12 +211,26 @@ export const vendorApi = createApi({
             }),
             invalidatesTags: ["Vendors"],
         }),
+
+        /*
+        =========================================
+        GET PLANS
+        =========================================
+        */
+
+        getPlans: builder.query<any, void>({
+            query: () => ({
+                url: "plans",
+                method: "GET",
+            }),
+        }),
     }),
 });
 
 export const {
     useGetVendorsQuery,
     useGetSingleVendorQuery,
+    useGetCountriesQuery,
     useCreateVendorMutation,
     useApproveVendorMutation,
     useSuspendVendorMutation,
@@ -181,6 +238,9 @@ export const {
     useUpdateVendorPlanMutation,
     useVerifyVendorKycMutation,
     useRejectVendorKycMutation,
+    useUpdateVendorMutation,
+    useDeleteVendorMutation,
+    useGetPlansQuery,
 } = vendorApi;
 
 export default vendorApi;

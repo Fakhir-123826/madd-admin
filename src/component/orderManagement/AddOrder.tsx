@@ -5,13 +5,15 @@ import { useGetVendorsQuery } from "../../app/api/VendorSlices/VendorApi";
 import { useGetStoresByVendorQuery } from "../../app/api/StoreSlices/StoreApi";
 import { useGetProductsQuery, type Product } from "../../app/api/ProductSlices/ProductApi";
 import { useCreateManualOrderMutation } from "../../app/api/OrderSlices/OrderApi";
+import { useGetCustomersQuery } from "../../app/api/CustomerSlices/CustomerApi";
+import SearchableSelect from "../SearchableSelect";
 
 const fallbackEmail = "naimyaqoob10@gmail.com";
 
-const customers = [
-  { id: 1, name: "Customer ID 1", email: "customer1@example.com" },
-  { id: 2, name: "Customer ID 2", email: "" },
-];
+// const customers = [
+//   { id: 1, name: "Customer ID 1", email: "customer1@example.com" },
+//   { id: 2, name: "Customer ID 2", email: "" },
+// ];
 
 const customerGroups = ["General", "Retailer", "Wholesale"] as const;
 
@@ -111,6 +113,17 @@ function AddOrder() {
   const stores = storesData?.data?.stores || [];
   const selectedStore = stores.find((store) => store.uuid === selectedStoreUuid);
 
+  const { data: customersData, isLoading: customersLoading } =
+    useGetCustomersQuery(
+      {
+        vendor_uuid: selectedVendorUuid,
+      },
+      {
+        skip: !selectedVendorUuid,
+      }
+    );
+  const customers = customersData?.data || [];
+
   const { data: productsData, isFetching: productsLoading } = useGetProductsQuery(
     {
       vendor_id: selectedVendor?.id,
@@ -144,9 +157,32 @@ function AddOrder() {
   }, [billingAddress, sameAsBilling]);
 
   useEffect(() => {
-    const customer = customers.find((item) => item.id === selectedCustomerId);
-    setCustomerEmail(customer ? customer.email || fallbackEmail : "");
-  }, [selectedCustomerId]);
+    const customer = customers.find(
+      (item: any) => item.id === selectedCustomerId
+    );
+
+    setCustomerEmail(
+      customer?.email || fallbackEmail
+    );
+
+    if (customer) {
+      setBillingAddress((prev) => ({
+        ...prev,
+        firstname: customer.first_name || "",
+        lastname: customer.last_name || "",
+        telephone: customer.phone || "",
+      }));
+
+      if (sameAsBilling) {
+        setShippingAddress((prev) => ({
+          ...prev,
+          firstname: customer.first_name || "",
+          lastname: customer.last_name || "",
+          telephone: customer.phone || "",
+        }));
+      }
+    }
+  }, [selectedCustomerId, customers, sameAsBilling]);
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -267,9 +303,8 @@ function AddOrder() {
   return (
     <div className="min-h-screen bg-white p-6">
       {toast && (
-        <div className={`fixed right-5 top-5 z-50 rounded-xl px-5 py-3 text-sm shadow-lg ${
-          toast.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
-        }`}>
+        <div className={`fixed right-5 top-5 z-50 rounded-xl px-5 py-3 text-sm shadow-lg ${toast.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
+          }`}>
           {toast.message}
         </div>
       )}
@@ -291,62 +326,68 @@ function AddOrder() {
           <section className="rounded-xl border border-gray-200 p-5">
             <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">Vendor, Store & Customer</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-              <select
+              <SearchableSelect
+                options={vendors.map((vendor: any) => ({
+                  value: vendor.uuid,
+                  label: vendor.company_name || vendor.name,
+                }))}
                 value={selectedVendorUuid}
-                onChange={(event) => {
-                  setSelectedVendorUuid(event.target.value);
+                onChange={(value: any) => {
+                  setSelectedVendorUuid(value);
                   setSelectedStoreUuid("");
                   setSelectedProducts([]);
+                  setSelectedCustomerId("");
                 }}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm"
-              >
-                <option value="">Select Vendor *</option>
-                {vendors.map((vendor: any) => (
-                  <option key={vendor.uuid} value={vendor.uuid}>
-                    {vendor.company_name || vendor.name}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select Vendor *"
+              />
 
-              <select
+              <SearchableSelect
+                options={stores.map((store: any) => ({
+                  value: store.uuid,
+                  label: store.store_name,
+                }))}
                 value={selectedStoreUuid}
-                onChange={(event) => {
-                  setSelectedStoreUuid(event.target.value);
+                onChange={(value: any) => {
+                  setSelectedStoreUuid(value);
                   setSelectedProducts([]);
                 }}
-                disabled={!selectedVendorUuid || storesLoading}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm disabled:bg-gray-50"
-              >
-                <option value="">Select Store *</option>
-                {stores.map((store) => (
-                  <option key={store.uuid} value={store.uuid}>
-                    {store.store_name}
-                  </option>
-                ))}
-              </select>
+                placeholder={
+                  storesLoading
+                    ? "Loading Stores..."
+                    : "Select Store *"
+                }
+              />
 
-              <select
+              <SearchableSelect
+                options={customers.map((customer: any) => ({
+                  value: customer.id,
+                  label: `${customer.firstname} ${customer.lastname}`,
+                }))}
                 value={selectedCustomerId}
-                onChange={(event) => setSelectedCustomerId(event.target.value ? Number(event.target.value) : "")}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm"
-              >
-                <option value="">Select Customer *</option>
-                {customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value: any) => {
+                  setSelectedCustomerId(value);
+                }}
+                placeholder={
+                  customersLoading
+                    ? "Loading Customers..."
+                    : "Select Customer *"
+                }
+              />
 
-              <select
+              <SearchableSelect
+                options={customerGroups.map((group) => ({
+                  value: group,
+                  label: group,
+                }))}
                 value={customerGroup}
-                onChange={(event) => setCustomerGroup(event.target.value as (typeof customerGroups)[number])}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm"
-              >
-                {customerGroups.map((group) => (
-                  <option key={group}>{group}</option>
-                ))}
-              </select>
+                onChange={(value: any) =>
+                  setCustomerGroup(value as (typeof customerGroups)[number])
+                }
+                placeholder="Select Customer Group"
+              />
+
+
+
             </div>
             <div className="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
               <Mail size={16} className="text-teal-500" />

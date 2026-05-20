@@ -1,6 +1,7 @@
 // src/pages/Customer/CustomerList.tsx
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -29,11 +30,11 @@ import {
   useUpdateCustomerMutation,
   type Customer,
 } from '../../app/api/CustomerSlices/CustomerApi';
-import { ModernDropdown } from '../../component/ui/ModernDropdown';
-
+import SearchableSelect from '../../component/SearchableSelect';
 
 
 export const CustomerList: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [selectedVendorUuid, setSelectedVendorUuid] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,7 +51,7 @@ export const CustomerList: React.FC = () => {
   const perPage = 10;
 
   const { data: vendors, isLoading: vendorsLoading, error: vendorsError } = useGetVendorsQuery();
- 
+
 
   const {
     data: customersData,
@@ -79,6 +80,14 @@ export const CustomerList: React.FC = () => {
   const [deleteCustomer, { isLoading: deleting }] = useDeleteCustomerMutation();
   const [syncCustomers, { isLoading: syncing }] = useSyncCustomersMutation();
 
+  useEffect(() => {
+    const vendorFromUrl = searchParams.get('vendor');
+
+    if (vendorFromUrl) {
+      setSelectedVendorUuid(vendorFromUrl);
+    }
+  }, [searchParams]);
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
@@ -215,17 +224,24 @@ export const CustomerList: React.FC = () => {
         {/* Vendor Selection */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 gap-6">
-            <ModernDropdown
-              label="Select Vendor"
+            <SearchableSelect
               options={vendors?.map(v => ({ value: v.uuid, label: v.company_name })) || []}
               value={selectedVendorUuid}
               onChange={(value) => setSelectedVendorUuid(value)}
-              placeholder="Choose a vendor..."
-              required
-              searchable
-              clearable
-              isLoading={vendorsLoading}
+              placeholder="Select Vendor..."
             />
+            {/* 
+              <ModernDropdown
+                label="Select Vendor"
+                options={vendors?.map(v => ({ value: v.uuid, label: v.company_name })) || []}
+                value={selectedVendorUuid}
+                onChange={(value) => setSelectedVendorUuid(value)}
+                placeholder="Choose a vendor..."
+                required
+                searchable
+                clearable
+                isLoading={vendorsLoading}
+              /> */}
             {vendorsError && (
               <p className="text-sm text-red-500">Failed to load vendors. Please check your API.</p>
             )}
@@ -637,15 +653,14 @@ interface CustomerEditDrawerProps {
   onSuccess: () => void;
 }
 
+// Customer Edit Drawer Component (Updated)
 const CustomerEditDrawer: React.FC<CustomerEditDrawerProps> = ({ customer, vendorUuid, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     firstname: customer.firstname,
     lastname: customer.lastname,
     email: customer.email,
-    password: '',
     dob: customer.dob || '',
     gender: customer.gender || '',
-    is_active: customer.is_active,
     is_subscribed: customer.is_subscribed,
   });
   const [loading, setLoading] = useState(false);
@@ -659,10 +674,8 @@ const CustomerEditDrawer: React.FC<CustomerEditDrawerProps> = ({ customer, vendo
       if (formData.firstname !== customer.firstname) updateData.firstname = formData.firstname;
       if (formData.lastname !== customer.lastname) updateData.lastname = formData.lastname;
       if (formData.email !== customer.email) updateData.email = formData.email;
-      if (formData.password) updateData.password = formData.password;
       if (formData.dob !== customer.dob) updateData.dob = formData.dob;
       if (formData.gender !== customer.gender) updateData.gender = formData.gender;
-      updateData.is_active = formData.is_active;
       updateData.is_subscribed = formData.is_subscribed;
 
       await updateCustomer({
@@ -730,15 +743,6 @@ const CustomerEditDrawer: React.FC<CustomerEditDrawerProps> = ({ customer, vendo
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">New Password (optional)</label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                     <input
@@ -756,23 +760,15 @@ const CustomerEditDrawer: React.FC<CustomerEditDrawerProps> = ({ customer, vendo
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
+                      <option value="1">Male</option>
+                      <option value="2">Female</option>
+                      <option value="3">Other</option>
                     </select>
                   </div>
                 </div>
 
+                {/* Only Newsletter - Removed Active Account */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.is_active}
-                      onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">Active Account</span>
-                  </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"

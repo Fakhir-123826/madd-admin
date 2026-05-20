@@ -37,7 +37,7 @@ import { mlmApi } from "./api/MlmSlices/MlmApi";
 import { reportApi } from "./api/ReportSlices/ReportApi";
 import { systemApi } from "./api/SystemSlices/SystemApi";
 import { cmsApi } from "./api/CmsSlices/CmsApi";
-
+import { customerApi } from "./api/CustomerSlices/CustomerApi";
 
 export const store = configureStore({
   reducer: {
@@ -72,6 +72,7 @@ export const store = configureStore({
     [reportApi.reducerPath]: reportApi.reducer,
     [systemApi.reducerPath]: systemApi.reducer,
     [cmsApi.reducerPath]: cmsApi.reducer,
+    [customerApi.reducerPath]: customerApi.reducer,
 
 
   },
@@ -101,6 +102,7 @@ export const store = configureStore({
       reportApi.middleware,
       systemApi.middleware,
       cmsApi.middleware,
+      customerApi.middleware,
     ),
 });
 

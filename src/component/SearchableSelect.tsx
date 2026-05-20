@@ -35,7 +35,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
     );
 
     return (
-        <div className="relative w-64" ref={dropdownRef}>
+        <div className="relative" ref={dropdownRef}>
             <div 
                 className="px-4 py-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-teal-400 bg-white cursor-pointer flex justify-between items-center"
                 onClick={() => { setIsOpen(!isOpen); setSearch(""); }}

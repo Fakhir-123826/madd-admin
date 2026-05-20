@@ -233,6 +233,12 @@ import AddCmsBlock from "./screens/CMS/AddCmsBlock.tsx";
 import CmsPageList from "./screens/CMS/CmsPageList.tsx";
 import AddCmsPage from "./screens/CMS/AddCmsPage.tsx";
 
+
+// Customer
+import { CustomerList } from "./screens/Customer/CustomerList.tsx";
+import { AddCustomer } from './screens/Customer/AddCustomer.tsx';
+
+
 // ==================== ROUTE CONSTANTS ====================
 export const ROUTES = {
   // Public Routes
@@ -264,11 +270,11 @@ export const ROUTES = {
 
   // Vendor Section
   VENDOR_LIST: "/Vendor",
-  VENDOR_DETAIL: "/Verder1",
-  CREATE_VENDOR: "/CreateVerder",
+  VENDOR_DETAIL: "/Vendor1",
+  CREATE_VENDOR: "/CreateVendor",
   EDIT_VENDOR: "/EditVendor/:id",
-  CREATE_VENDOR_ONBOARD: "/CreateVerderOnboard",
-  VENDOR_ONBOARD: "/VerderOnboard",
+  CREATE_VENDOR_ONBOARD: "/CreateVendorOnboard",
+  VENDOR_ONBOARD: "/VendorOnboard",
   VENDOR_DASHBOARD: "/VendorDashBoard",
 
   Customers_List: "/CustomerList",

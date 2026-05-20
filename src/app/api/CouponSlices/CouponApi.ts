@@ -175,13 +175,17 @@ export const couponApi = createApi({
                 const url = `coupons${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
-            providesTags: (result) =>
-                result
-                    ? [
-                        ...(result.data ?? []).map(({ id }) => ({ type: "Coupons" as const, id })),
-                        { type: "Coupons", id: "LIST" },
-                    ]
-                    : [{ type: "Coupons", id: "LIST" }],
+            providesTags: (result) => {
+                const coupons = Array.isArray(result?.data) ? result.data : [];
+
+                return [
+                    ...coupons.map(({ id }) => ({
+                        type: "Coupons" as const,
+                        id,
+                    })),
+                    { type: "Coupons" as const, id: "LIST" },
+                ];
+            },
         }),
 
         // GET /coupons/statistics - Get coupon statistics

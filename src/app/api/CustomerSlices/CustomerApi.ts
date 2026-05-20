@@ -67,7 +67,7 @@ export interface CustomerResponse {
 export interface Vendor {
   id: number;
   uuid: string;
-  name: string;
+  company_name: string;
   email: string;
   store_slug: string;
   status?: string;
@@ -93,7 +93,6 @@ export const customerApi = createApi({
     getVendors: builder.query<Vendor[], void>({
       query: () => '/vendors',
       transformResponse: (response: any) => {
-        console.log('Vendors API response:', response);
         if (response.success && Array.isArray(response.data)) {
           return response.data;
         }

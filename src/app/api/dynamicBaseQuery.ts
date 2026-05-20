@@ -40,7 +40,7 @@ export const getUserBasePath = () => {
         const userStr = localStorage.getItem("user");
         if (!userStr) return "";
         const user = JSON.parse(userStr);
-        
+
         // Check both user.role (singular) and user.roles (plural array)
         const role = (user.role || (Array.isArray(user.roles) ? user.roles[0] : "") || "").toLowerCase();
 
@@ -115,12 +115,15 @@ export const dynamicBaseQuery = async (args: any, api: any, extraOptions: any) =
 
     // Prepare headers
     const headers = new Headers();
-    const token = localStorage.getItem("token");
-    if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-    }
-    headers.set("Content-Type", "application/json");
 
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    headers.set("Content-Type", "application/json");
+    headers.set("Accept", "application/json");
     // Prepare fetch options
     const fetchOptions: RequestInit = {
         method,
@@ -133,6 +136,7 @@ export const dynamicBaseQuery = async (args: any, api: any, extraOptions: any) =
 
     // Make the request
     try {
+        
         const response = await fetch(finalUrl, fetchOptions);
         let data;
 

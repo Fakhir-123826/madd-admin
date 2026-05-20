@@ -1045,8 +1045,8 @@ const Layout = () => {
       label: "Vendors",
       icon: FaHandshake,
       children: [
-        { label: "All Vendors", path: "/Vendor" },
-        { label: "Add Vendor", path: "/CreateVerder" },
+        { label: "All Vendors", path: ROUTES.VENDOR_LIST },
+        { label: "Add Vendor", path: ROUTES.CREATE_VENDOR },
         // { label: "Vendor Onboarding", path: "/CreateVerderOnboard" },
         // { label: "Vendor Requests", path: "/vendor/requests" }
       ]

@@ -2,7 +2,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types for Basic Product ────────────────────────────────────────────────────
 
 export interface Vendor {
     id: number;
@@ -123,6 +123,317 @@ export interface StatisticsResponse {
     generated_at: string;
 }
 
+// ─── Types for Magento Product ─────────────────────────────────────────────────
+
+export interface TierPrice {
+    customer_group_id: number;
+    qty: number;
+    price: number;
+    price_type?: "fixed" | "percent";
+}
+
+export interface ProductLink {
+    link_type: "related" | "upsell" | "crosssell";
+    linked_product_sku: string;
+    linked_product_type?: string;
+    position?: number;
+}
+
+export interface CustomOptionValue {
+    title: string;
+    sort_order: number;
+    price: number;
+    price_type: "fixed" | "percent";
+    sku?: string;
+}
+
+export interface CustomOption {
+    title: string;
+    type: "field" | "area" | "file" | "drop_down" | "radio" | "checkbox" | "multi" | "date" | "date_time" | "time";
+    is_require: boolean;
+    sort_order: number;
+    price: number;
+    price_type: "fixed" | "percent";
+    sku?: string;
+    max_characters?: number;
+    file_extension?: string;
+    image_size_x?: number;
+    image_size_y?: number;
+    values?: CustomOptionValue[];
+}
+
+export interface MediaContent {
+    base64_encoded_data: string;
+    type: string;
+    name: string;
+}
+
+export interface VideoContent {
+    video_provider: "youtube" | "vimeo";
+    video_url: string;
+    video_title?: string;
+    video_description?: string;
+}
+
+export interface MediaGalleryEntry {
+    media_type: "image" | "external-video";
+    label?: string;
+    position?: number;
+    disabled?: boolean;
+    types?: string[];
+    content?: MediaContent;
+    video_content?: VideoContent;
+}
+
+export interface InventorySourceItem {
+    source_code: string;
+    quantity: number;
+    status?: number;
+}
+
+export interface ConfigurableOptionValue {
+    value_index: number;
+}
+
+export interface ConfigurableOption {
+    attribute_id: number;
+    label: string;
+    position?: number;
+    is_use_default?: boolean;
+    values: ConfigurableOptionValue[];
+}
+
+export interface DownloadableLink {
+    title: string;
+    sort_order: number;
+    is_shareable: number;
+    price: number;
+    number_of_downloads: number;
+    link_type: "file" | "url";
+    link_file?: string;
+    link_url?: string;
+    sample_type: "file" | "url";
+    sample_file?: string;
+    sample_url?: string;
+}
+
+export interface DownloadableSample {
+    title: string;
+    sort_order: number;
+    sample_type: "file" | "url";
+    sample_file?: string;
+    sample_url?: string;
+}
+
+export interface BundleProductLink {
+    sku: string;
+    qty: number;
+    position: number;
+    is_default: boolean;
+    price: number;
+    price_type: number;
+    can_change_quantity: number;
+}
+
+export interface BundleOption {
+    title: string;
+    required: boolean;
+    type: "select" | "multi" | "radio" | "checkbox";
+    position: number;
+    sku: string;
+    product_links: BundleProductLink[];
+}
+
+export interface GiftCardAmount {
+    website_id: number;
+    value: number;
+}
+
+export interface CreateProductPayload {
+    // Vendor & Store Info
+    vendor_id: number;
+    vendor_store_id: number;
+
+    // Core Product Data
+    sku: string;
+    name: string;
+    type_id: "simple" | "configurable" | "bundle" | "grouped" | "virtual" | "downloadable";
+    attribute_set_id: number;
+    price: number;
+    status: number;
+    visibility: number;
+    weight?: number;
+    tax_class_id?: number;
+    quantity: number;
+
+    // Content
+    description?: string;
+    short_description?: string;
+
+    // SEO
+    url_key?: string;
+    meta_title?: string;
+    meta_keyword?: string;
+    meta_description?: string;
+
+    // Advanced Pricing
+    special_price?: number;
+    special_from_date?: string;
+    special_to_date?: string;
+    cost?: number;
+    msrp?: number;
+    msrp_display_actual_price_type?: number;
+
+    // Stock Management
+    manage_stock?: boolean;
+    backorders?: number;
+    notify_stock_qty?: number;
+    min_sale_qty?: number;
+    max_sale_qty?: number;
+    qty_increments?: number;
+    enable_qty_increments?: boolean;
+
+    // Design
+    custom_design?: string;
+    page_layout?: string;
+    custom_layout_update?: string;
+
+    // Gift Options
+    gift_message_available?: boolean;
+
+    // Product Badges & Dates
+    news_from_date?: string;
+    news_to_date?: string;
+    country_of_manufacture?: string;
+
+    // Categories
+    category_ids?: number[];
+
+    // Media
+    media_gallery?: MediaGalleryEntry[];
+
+    // Product Links
+    product_links?: ProductLink[];
+
+    // Custom Options
+    custom_options?: CustomOption[];
+
+    // Tier Prices
+    tier_prices?: TierPrice[];
+
+    // MSI Inventory
+    inventory?: InventorySourceItem;
+
+    // Configurable Product
+    configurable_options?: ConfigurableOption[];
+    configurable_product_links?: string[];
+
+    // Downloadable Product
+    downloadable_links?: DownloadableLink[];
+    downloadable_samples?: DownloadableSample[];
+
+    // Bundle Product
+    bundle_options?: BundleOption[];
+
+    // Gift Card
+    giftcard_amounts?: GiftCardAmount[];
+    giftcard_type?: "virtual" | "physical" | "combined";
+    giftcard_amount_type?: "fixed" | "range";
+    giftcard_open_amount_max?: number;
+    giftcard_open_amount_min?: number;
+
+    // Dynamic Custom Attributes
+    dynamic_attributes?: Record<string, any>;
+
+    // Website IDs
+    website_ids?: number[];
+}
+
+export interface UpdateProductPayload {
+    name?: string;
+    price?: number;
+    quantity?: number;
+    status?: number;
+    visibility?: number;
+    weight?: number;
+    tax_class_id?: number;
+    description?: string;
+    short_description?: string;
+    url_key?: string;
+    meta_title?: string;
+    meta_description?: string;
+    special_price?: number;
+    special_from_date?: string;
+    special_to_date?: string;
+    cost?: number;
+    manage_stock?: boolean;
+    category_ids?: number[];
+    dynamic_attributes?: Record<string, any>;
+}
+
+export interface VendorProduct {
+    id: number;
+    uuid: string;
+    vendor_id: number;
+    vendor_store_id: number | null;
+    magento_product_id: number | null;
+    magento_sku: string | null;
+    sku: string;
+    name: string;
+    type_id: string;
+    attribute_set_id: number;
+    price: number;
+    quantity: number;
+    status: boolean;
+    sync_status: "pending" | "synced" | "failed" | "updating";
+    last_synced_at: string | null;
+    sync_errors: Record<string, any> | null;
+    metadata: Record<string, any> | null;
+    full_product_data: Record<string, any> | null;
+    product_data: Record<string, any> | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
+
+export interface VendorProductListResponse {
+    success: boolean;
+    data: {
+        current_page: number;
+        data: VendorProduct[];
+        first_page_url: string;
+        from: number;
+        last_page: number;
+        last_page_url: string;
+        links: Array<{ url: string | null; label: string; active: boolean }>;
+        next_page_url: string | null;
+        path: string;
+        per_page: number;
+        prev_page_url: string | null;
+        to: number;
+        total: number;
+    };
+    message: string;
+}
+
+export interface VendorProductSingleResponse {
+    success: boolean;
+    data: VendorProduct;
+    message: string;
+}
+
+export interface CreateProductResponse {
+    success: boolean;
+    data: VendorProduct;
+    magento_response: {
+        success: boolean;
+        message: string;
+        product?: any;
+        sku?: string;
+    };
+    message: string;
+}
+
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const productApi = createApi({
@@ -132,14 +443,14 @@ export const productApi = createApi({
 
     endpoints: (builder) => ({
 
+        // ==================== BASIC PRODUCT ENDPOINTS ====================
+
         // GET /products - Get all products
         getProducts: builder.query<ProductListResponse, {
             page?: number;
             per_page?: number;
             status?: string;
             vendor_id?: number;
-            vendor_store_id?: number;
-            store_uuid?: string;
             search?: string;
             price_min?: number;
             price_max?: number;
@@ -151,8 +462,6 @@ export const productApi = createApi({
                     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
                     if (params.status) queryParams.append('status', params.status);
                     if (params.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
-                    if (params.vendor_store_id) queryParams.append('vendor_store_id', params.vendor_store_id.toString());
-                    if (params.store_uuid) queryParams.append('store_uuid', params.store_uuid);
                     if (params.search) queryParams.append('search', params.search);
                     if (params.price_min) queryParams.append('price_min', params.price_min.toString());
                     if (params.price_max) queryParams.append('price_max', params.price_max.toString());
@@ -254,7 +563,8 @@ export const productApi = createApi({
             }),
             invalidatesTags: ["Products"],
         }),
-        // Add to your ProductApi.ts endpoints
+
+        // PUT /products/{id} - Update product
         updateProduct: builder.mutation<{ success: boolean; message: string; data: Product }, { uuid: string; data: any }>({
             query: ({ uuid, data }) => ({
                 url: `products/${uuid}`,
@@ -263,6 +573,8 @@ export const productApi = createApi({
             }),
             invalidatesTags: ["Products", "ProductStats"],
         }),
+
+        // POST /products - Create product
         createProduct: builder.mutation<{ success: boolean; message: string; data: Product }, any>({
             query: (productData) => ({
                 url: "products",
@@ -271,10 +583,119 @@ export const productApi = createApi({
             }),
             invalidatesTags: ["Products", "ProductStats"],
         }),
+
+        // ==================== VENDOR PRODUCT ENDPOINTS (Based on api.php routes) ====================
+
+        // GET /by-vendor/{vendor_uuid}/products - Get vendor products (from local DB)
+        getVendorProducts: builder.query<VendorProductListResponse, {
+            vendor_uuid: string;
+            store_uuid?: string;
+            page?: number;
+            per_page?: number;
+            search?: string;
+            type_id?: string;
+            sync_status?: string;
+            status?: boolean;
+            min_price?: number;
+            max_price?: number;
+            sort_by?: string;
+            sort_order?: "asc" | "desc";
+        }>({
+            query: ({ vendor_uuid, store_uuid, ...params }) => {
+                const queryParams = new URLSearchParams();
+                if (params.page) queryParams.append('page', params.page.toString());
+                if (params.per_page) queryParams.append('per_page', params.per_page.toString());
+                if (params.search) queryParams.append('search', params.search);
+                if (params.type_id) queryParams.append('type_id', params.type_id);
+                if (params.sync_status) queryParams.append('sync_status', params.sync_status);
+                if (params.status !== undefined) queryParams.append('status', params.status.toString());
+                if (params.min_price) queryParams.append('min_price', params.min_price.toString());
+                if (params.max_price) queryParams.append('max_price', params.max_price.toString());
+                if (params.sort_by) queryParams.append('sort_by', params.sort_by);
+                if (params.sort_order) queryParams.append('sort_order', params.sort_order);
+                if (store_uuid) queryParams.append('store_uuid', store_uuid);
+
+                // Route: GET /by-vendor/{vendor_uuid}/products
+                const url = `by-vendor/${vendor_uuid}/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+
+                return { url, method: "GET" };
+            },
+            providesTags: (result) =>
+                result && result.data?.data
+                    ? [
+                        ...result.data.data.map(({ uuid }) => ({ type: "Products" as const, id: uuid })),
+                        { type: "Products", id: "LIST" },
+                    ]
+                    : [{ type: "Products", id: "LIST" }],
+        }),
+
+        // GET /by-vendor/{vendor_uuid}/products/{product_uuid} - Get single vendor product
+        getVendorProduct: builder.query<VendorProductSingleResponse, { vendor_uuid: string; product_uuid: string }>({
+            query: ({ vendor_uuid, product_uuid }) => ({
+                // Route: GET /by-vendor/{vendor_uuid}/products/{product_uuid}
+                url: `by-vendor/${vendor_uuid}/products/${product_uuid}`,
+                method: "GET",
+            }),
+            providesTags: (_result, _error, { product_uuid }) => [{ type: "Products", id: product_uuid }],
+        }),
+
+        // POST /by-vendor/{vendor_uuid}/products - Create vendor product (to Magento API + local DB)
+        createVendorProduct: builder.mutation<CreateProductResponse, { vendor_uuid: string; data: CreateProductPayload }>({
+            query: ({ vendor_uuid, data }) => ({
+                // Route: POST /by-vendor/{vendor_uuid}/products
+                url: `by-vendor/${vendor_uuid}/products`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: [{ type: "Products", id: "LIST" }],
+        }),
+
+        // PUT /by-vendor/{vendor_uuid}/products/{product_uuid} - Update vendor product
+        updateVendorProduct: builder.mutation<VendorProductSingleResponse, { vendor_uuid: string; product_uuid: string; data: UpdateProductPayload }>({
+            query: ({ vendor_uuid, product_uuid, data }) => ({
+                // Route: PUT /by-vendor/{vendor_uuid}/products/{product_uuid}
+                url: `by-vendor/${vendor_uuid}/products/${product_uuid}`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: (_result, _error, { product_uuid }) => [{ type: "Products", id: product_uuid }, { type: "Products", id: "LIST" }],
+        }),
+
+        // DELETE /by-vendor/{vendor_uuid}/products/{product_uuid} - Delete vendor product
+        deleteVendorProduct: builder.mutation<{ success: boolean; message: string }, { vendor_uuid: string; product_uuid: string }>({
+            query: ({ vendor_uuid, product_uuid }) => ({
+                // Route: DELETE /by-vendor/{vendor_uuid}/products/{product_uuid}
+                url: `by-vendor/${vendor_uuid}/products/${product_uuid}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [{ type: "Products", id: "LIST" }],
+        }),
+
+        // POST /by-vendor/{vendor_uuid}/products/sync/{product_uuid} - Force sync vendor product
+        forceSyncProduct: builder.mutation<{ success: boolean; message: string }, { vendor_uuid: string; product_uuid: string }>({
+            query: ({ vendor_uuid, product_uuid }) => ({
+                // Route: POST /by-vendor/{vendor_uuid}/products/sync/{product_uuid}
+                url: `by-vendor/${vendor_uuid}/products/sync/${product_uuid}`,
+                method: "POST",
+            }),
+            invalidatesTags: (_result, _error, { product_uuid }) => [{ type: "Products", id: product_uuid }],
+        }),
+
+        // GET /by-vendor/{vendor_uuid}/products/sync/all - Fetch all products from Magento
+        syncAllVendorProducts: builder.mutation<{ success: boolean; message: string }, { vendor_uuid: string }>({
+            query: ({ vendor_uuid }) => ({
+                url: `by-vendor/${vendor_uuid}/products/sync/all`,
+                method: "POST", // or "GET" depending on your backend implementation
+            }),
+            invalidatesTags: [{ type: "Products", id: "LIST" }],
+        }),
     }),
 });
 
+// ─── Exports for all hooks ────────────────────────────────────────────────────
+
 export const {
+    // Basic product hooks
     useGetProductsQuery,
     useGetPendingProductsQuery,
     useGetProductStatisticsQuery,
@@ -287,6 +708,16 @@ export const {
     useUnfeatureProductMutation,
     useCreateProductMutation,
     useUpdateProductMutation,
+
+    // Vendor product hooks (Magento)
+    useGetVendorProductsQuery,
+    useGetVendorProductQuery,
+    useCreateVendorProductMutation,
+    useUpdateVendorProductMutation,
+    useDeleteVendorProductMutation,
+    useForceSyncProductMutation,
+    useSyncAllVendorProductsMutation,  // New: fetch all products from Magento
+
 } = productApi;
 
 export default productApi;

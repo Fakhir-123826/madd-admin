@@ -1773,6 +1773,8 @@ import { useGetStoresByVendorQuery } from "../../app/api/StoreSlices/StoreApi";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../component/PageHeader/Pageheaderfilterbar";
 
+import SearchableSelect from "../../component/SearchableSelect";
+
 // ─── Types based on actual API response ──────────────────────────────────────
 
 interface Customer {
@@ -2986,7 +2988,7 @@ const OrderList = () => {
   console.log('Should fetch orders:', shouldFetchOrders);
   console.log('Selected Vendor UUID:', selectedVendorUuid);
   console.log('Selected Store UUID:', selectedStoreUuid);
-  
+
   const orders: OrderData[] = data?.data ?? [];
   const summary = data?.summary;
   const meta = data?.meta;
@@ -3273,19 +3275,15 @@ const OrderList = () => {
                 Select Vendor *
               </label>
 
-              <select
+              <SearchableSelect
+                options={vendors.map((vendor: any) => ({
+                  value: vendor.uuid,
+                  label: vendor.company_name || vendor.name,
+                }))}
                 value={selectedVendorUuid}
-                onChange={(e) => handleVendorChange(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white text-gray-700"
-              >
-                <option value="">-- Select Vendor --</option>
-
-                {vendors.map((vendor) => (
-                  <option key={vendor.uuid} value={vendor.uuid}>
-                    {vendor.company_name || vendor.name || vendor.company_name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value: any) => handleVendorChange(value)}
+                placeholder="-- Select Vendor --"
+              />
             </div>
 
             {/* Store Dropdown */}
@@ -3295,20 +3293,19 @@ const OrderList = () => {
                 Select Store *
               </label>
 
-              <select
+              <SearchableSelect
+                options={stores.map((store: any) => ({
+                  value: store.uuid,
+                  label: store.store_name,
+                }))}
                 value={selectedStoreUuid}
-                onChange={(e) => handleStoreChange(e.target.value)}
-                disabled={!selectedVendorUuid || storesLoading}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white text-gray-700 disabled:bg-gray-50 disabled:text-gray-400"
-              >
-                <option value="">-- Select Store --</option>
-
-                {stores.map((store) => (
-                  <option key={store.uuid} value={store.uuid}>
-                    {store.store_name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value: any) => handleStoreChange(value)}
+                placeholder={
+                  storesLoading
+                    ? "Loading Stores..."
+                    : "-- Select Store --"
+                }
+              />
 
               {selectedVendorUuid &&
                 stores.length === 0 &&

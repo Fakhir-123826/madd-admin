@@ -37,8 +37,9 @@ export interface VendorInfo {
 }
 export interface Vendor {
     id: number;
+    uuid: string;
     company_name: string;
-    status: string;
+    status?: string;
 }
 
 export interface VendorsResponse {
@@ -392,6 +393,33 @@ export const storeListApi = createApi({
             }),
             providesTags: ["VendorsForStores"],
         }),
+        // Sync store with Magento
+        syncStore: builder.mutation({
+            query: (uuid: string) => ({
+                url: `/stores/${uuid}/sync`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Stores'],
+        }),
+        // Add this to your storeListApi endpoints
+        syncStoresFromMagento: builder.mutation<{
+            success: boolean;
+            message: string;
+            data: {
+                created: number;
+                updated: number;
+                skipped: number;
+                total_synced: number;
+                synced_store_uuids: string[];
+            };
+        }, { vendor_id: number }>({
+            query: (data) => ({
+                url: "stores/sync-from-magento",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["Stores"],
+        }),
     }),
 });
 
@@ -411,6 +439,8 @@ export const {
     useGetStoreStatsQuery,
     useGetStoresByVendorQuery,
     useBulkStatusUpdateMutation,
+    useSyncStoreMutation,
+    useSyncStoresFromMagentoMutation,
 } = storeListApi;
 
 export default storeListApi;
