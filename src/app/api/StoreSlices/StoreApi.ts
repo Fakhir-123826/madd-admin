@@ -1,6 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types based on actual backend response ───────────────────────────────────
 
@@ -225,109 +224,6 @@ export interface StoresByVendorResponse {
     };
 }
 
-// Helper function to get base route from localStorage
-const getUserBasePath = () => {
-    try {
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const role = user?.roles?.[0] || user?.user_type;
-
-        if (["super_admin", "admin"].includes(role)) return "admin";
-        if (["vendor", "customer"].includes(role)) return role;
-
-        return "admin";
-    } catch {
-        return "admin";
-    }
-};
-
-// Custom dynamic base query that handles role-based routing
-const dynamicBaseQuery = async (args: any, api: any, extraOptions: any) => {
-    const basePath = getUserBasePath();
-    
-    // Handle both string URL and object args
-    let url: string;
-    let method: string = 'GET';
-    let body: any = undefined;
-    let params: any = undefined;
-    
-    if (typeof args === 'string') {
-        url = args;
-    } else {
-        url = args.url;
-        method = args.method || 'GET';
-        body = args.body;
-        params = args.params;
-    }
-    
-    // Remove any existing base path prefix if present
-    const cleanEndpoint = url.replace(/^(admin|vendor|customer)\//, '');
-    
-    // Construct the full URL with dynamic base path
-    let finalUrl = `${baseURL}/${basePath}/${cleanEndpoint}`;
-    
-    // Add query parameters if they exist
-    if (params) {
-        const queryString = new URLSearchParams(params).toString();
-        finalUrl += `?${queryString}`;
-    }
-    
-    // Prepare headers
-    const headers = new Headers();
-    const token = localStorage.getItem("token");
-    if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-    }
-    headers.set("Content-Type", "application/json");
-    
-    // Prepare fetch options
-    const fetchOptions: RequestInit = {
-        method,
-        headers,
-        ...extraOptions,
-    };
-    
-    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-        fetchOptions.body = JSON.stringify(body);
-    }
-    
-    // Make the request
-    try {
-        const response = await fetch(finalUrl, fetchOptions);
-        let data;
-        
-        // Try to parse JSON, but handle non-JSON responses
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
-        
-        // Handle unauthorized
-        if (response.status === 401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            window.location.href = "/login";
-            return { error: { status: 401, data: { message: "Unauthorized" } } };
-        }
-        
-        // Handle other error status codes
-        if (!response.ok) {
-            return { 
-                error: { 
-                    status: response.status, 
-                    data: data,
-                    message: data?.message || `Request failed with status ${response.status}`
-                } 
-            };
-        }
-        
-        return { data };
-    } catch (error) {
-        console.error("API Request Error:", error);
-        return { error: { status: 'FETCH_ERROR', error: String(error) } };
-    }
-};
 
 // ─── API Slice ────────────────────────────────────────────────────────────────
 

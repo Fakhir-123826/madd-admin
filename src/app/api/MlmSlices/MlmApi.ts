@@ -1,7 +1,6 @@
 // src/app/api/MlmSlices/MlmApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -72,30 +71,9 @@ export interface MlmStatistics {
     top_recruiters: MlmAgent[];
 }
 
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (args, api, extraOptions) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    }
-    return result;
-};
-
 export const mlmApi = createApi({
     reducerPath: "mlmApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Agents", "Commissions", "Statistics", "Structure", "Levels"],
     keepUnusedDataFor: 300,
 
@@ -135,7 +113,7 @@ export const mlmApi = createApi({
                     if (params.territory_code) queryParams.append('territory_code', params.territory_code);
                     if (params.search) queryParams.append('search', params.search);
                 }
-                const url = `admin/mlm/agents${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `mlm/agents${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Agents"],
@@ -143,7 +121,7 @@ export const mlmApi = createApi({
 
         getAgent: builder.query<{ success: boolean; data: any }, number>({
             query: (id) => ({
-                url: `admin/mlm/agents/${id}`,
+                url: `mlm/agents/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Agents", id: id.toString() }],
@@ -151,7 +129,7 @@ export const mlmApi = createApi({
 
         createAgent: builder.mutation<{ success: boolean; message: string; data: MlmAgent }, any>({
             query: (data) => ({
-                url: "admin/mlm/agents",
+                url: "mlm/agents",
                 method: "POST",
                 body: data,
             }),
@@ -160,7 +138,7 @@ export const mlmApi = createApi({
 
         updateAgent: builder.mutation<{ success: boolean; message: string; data: MlmAgent }, { id: number; data: any }>({
             query: ({ id, data }) => ({
-                url: `admin/mlm/agents/${id}`,
+                url: `mlm/agents/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -173,7 +151,7 @@ export const mlmApi = createApi({
 
         deleteAgent: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/mlm/agents/${id}`,
+                url: `mlm/agents/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Agents", "Statistics"],
@@ -181,7 +159,7 @@ export const mlmApi = createApi({
 
         verifyAgent: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/mlm/agents/${id}/verify`,
+                url: `mlm/agents/${id}/verify`,
                 method: "POST",
             }),
             invalidatesTags: (_result, _error, id) => [
@@ -229,7 +207,7 @@ export const mlmApi = createApi({
                     if (params.date_from) queryParams.append('date_from', params.date_from);
                     if (params.date_to) queryParams.append('date_to', params.date_to);
                 }
-                const url = `admin/mlm/commissions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `mlm/commissions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: ["Commissions"],
@@ -246,7 +224,7 @@ export const mlmApi = createApi({
             };
         }, { period_start: string; period_end: string }>({
             query: (data) => ({
-                url: "admin/mlm/commissions/process",
+                url: "mlm/commissions/process",
                 method: "POST",
                 body: data,
             }),
@@ -255,7 +233,7 @@ export const mlmApi = createApi({
 
         payCommission: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/mlm/commissions/${id}/pay`,
+                url: `mlm/commissions/${id}/pay`,
                 method: "POST",
             }),
             invalidatesTags: ["Commissions", "Agents", "Statistics"],
@@ -263,7 +241,7 @@ export const mlmApi = createApi({
 
         approveCommission: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/mlm/commissions/${id}/approve`,
+                url: `mlm/commissions/${id}/approve`,
                 method: "POST",
             }),
             invalidatesTags: ["Commissions"],
@@ -271,7 +249,7 @@ export const mlmApi = createApi({
 
         rejectCommission: builder.mutation<{ success: boolean; message: string }, { id: number; reason: string }>({
             query: ({ id, reason }) => ({
-                url: `admin/mlm/commissions/${id}/reject`,
+                url: `mlm/commissions/${id}/reject`,
                 method: "POST",
                 body: { reason },
             }),
@@ -281,7 +259,7 @@ export const mlmApi = createApi({
         // ─── Statistics ───────────────────────────────────────────────────────
         getMlmStatistics: builder.query<{ success: boolean; data: MlmStatistics }, void>({
             query: () => ({
-                url: "admin/mlm/statistics",
+                url: "mlm/statistics",
                 method: "GET",
             }),
             providesTags: ["Statistics"],
@@ -290,7 +268,7 @@ export const mlmApi = createApi({
         // ─── Structure ────────────────────────────────────────────────────────
         getMlmStructure: builder.query<{ success: boolean; data: any[] }, void>({
             query: () => ({
-                url: "admin/mlm/structure",
+                url: "mlm/structure",
                 method: "GET",
             }),
             providesTags: ["Structure"],
@@ -299,7 +277,7 @@ export const mlmApi = createApi({
         // ─── Levels ───────────────────────────────────────────────────────────
         getMlmLevels: builder.query<{ success: boolean; data: MlmLevel[] }, void>({
             query: () => ({
-                url: "admin/mlm/levels",
+                url: "mlm/levels",
                 method: "GET",
             }),
             providesTags: ["Levels"],
@@ -307,7 +285,7 @@ export const mlmApi = createApi({
 
         updateMlmLevels: builder.mutation<{ success: boolean; message: string }, MlmLevel[]>({
             query: (data) => ({
-                url: "admin/mlm/levels",
+                url: "mlm/levels",
                 method: "PUT",
                 body: { levels: data },
             }),

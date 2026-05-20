@@ -1,6 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -69,31 +68,9 @@ export interface PlanStats {
     most_popular_plan: Plan | null;
 }
 
-// Raw base query
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (args, api, extraOptions) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    }
-    return result;
-};
-
 export const planApi = createApi({
     reducerPath: "planApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Plans", "PlanStats"],
     keepUnusedDataFor: 300,
 
@@ -102,7 +79,7 @@ export const planApi = createApi({
         // GET /plans - Get all plans
         getPlans: builder.query<Plan[], void>({
             query: () => ({
-                url: "admin/plans",
+                url: "plans",
                 method: "GET",
             }),
             providesTags: ["Plans"],
@@ -111,7 +88,7 @@ export const planApi = createApi({
         // GET /plans/stats - Get plan statistics
         getPlanStats: builder.query<PlanStats, void>({
             query: () => ({
-                url: "admin/plans/stats",
+                url: "plans/stats",
                 method: "GET",
             }),
             providesTags: ["PlanStats"],
@@ -120,7 +97,7 @@ export const planApi = createApi({
         // GET /plans/{id} - Get single plan
         getPlan: builder.query<Plan, string>({
             query: (id) => ({
-                url: `admin/plans/${id}`,
+                url: `plans/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Plans", id }],
@@ -129,7 +106,7 @@ export const planApi = createApi({
         // POST /plans - Create plan
         createPlan: builder.mutation<Plan, CreatePlanPayload>({
             query: (data) => ({
-                url: "admin/plans",
+                url: "plans",
                 method: "POST",
                 body: data,
             }),
@@ -139,7 +116,7 @@ export const planApi = createApi({
         // PUT /plans/{id} - Update plan
         updatePlan: builder.mutation<Plan, { id: number; data: UpdatePlanPayload }>({
             query: ({ id, data }) => ({
-                url: `admin/plans/${id}`,
+                url: `plans/${id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -153,7 +130,7 @@ export const planApi = createApi({
         // DELETE /plans/{id} - Delete plan
         deletePlan: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/plans/${id}`,
+                url: `plans/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Plans", "PlanStats"],
@@ -162,7 +139,7 @@ export const planApi = createApi({
         // POST /plans/{id}/set-default - Set default plan
         setDefaultPlan: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/plans/${id}/set-default`,
+                url: `plans/${id}/set-default`,
                 method: "POST",
             }),
             invalidatesTags: ["Plans", "PlanStats"],
@@ -171,7 +148,7 @@ export const planApi = createApi({
         // POST /plans/{id}/toggle-active - Toggle plan status
         togglePlanActive: builder.mutation<{ success: boolean; message: string; data: { is_active: boolean } }, number>({
             query: (id) => ({
-                url: `admin/plans/${id}/toggle-active`,
+                url: `plans/${id}/toggle-active`,
                 method: "POST",
             }),
             invalidatesTags: ["Plans", "PlanStats"],
@@ -180,7 +157,7 @@ export const planApi = createApi({
         // POST /plans/sort-order - Update sort order
         updateSortOrder: builder.mutation<{ success: boolean; message: string }, { orders: { id: number; sort_order: number }[] }>({
             query: (data) => ({
-                url: "admin/plans/sort-order",
+                url: "plans/sort-order",
                 method: "POST",
                 body: data,
             }),

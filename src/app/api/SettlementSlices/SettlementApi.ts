@@ -1,7 +1,6 @@
 // SettlementApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -164,63 +163,52 @@ export interface StatementUrlResponse {
 
 export const settlementApi = createApi({
     reducerPath: "settlementApi",
-    
-    baseQuery: fetchBaseQuery({
-        baseUrl: baseURL,
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
-            if (token) {
-                headers.set("authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
-    }),
-    
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Settlements", "Settlement"],
     
     endpoints: (builder) => ({
         
-        // GET /admin/settlements
+        // GET /settlements
         getSettlements: builder.query<SettlementListResponse, SettlementListParams>({
             query: (params = {}) => ({
-                url: "admin/settlements",
+                url: "settlements",
                 method: "GET",
                 params,
             }),
             providesTags: ["Settlements"],
         }),
         
-        // GET /admin/settlements/{id}
+        // GET /settlements/{id}
         getSettlement: builder.query<SettlementSingleResponse, number | string>({
             query: (id) => ({
-                url: `admin/settlements/${id}`,
+                url: `settlements/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Settlement", id }],
         }),
         
-        // GET /admin/settlements/{id}/statement-url
+        // GET /settlements/{id}/statement-url
         getStatementUrl: builder.query<StatementUrlResponse, number | string>({
             query: (id) => ({
-                url: `admin/settlements/${id}/statement-url`,
+                url: `settlements/${id}/statement-url`,
                 method: "GET",
             }),
         }),
         
-        // POST /admin/settlements/generate
+        // POST /settlements/generate
         generateSettlement: builder.mutation<GenerateSettlementResponse, GenerateSettlementPayload>({
             query: (data) => ({
-                url: "admin/settlements/generate",
+                url: "settlements/generate",
                 method: "POST",
                 body: data,
             }),
             invalidatesTags: ["Settlements"],
         }),
         
-        // POST /admin/settlements/{id}/approve
+        // POST /settlements/{id}/approve
         approveSettlement: builder.mutation<SettlementSingleResponse, { id: number | string }>({
             query: ({ id }) => ({
-                url: `admin/settlements/${id}/approve`,
+                url: `settlements/${id}/approve`,
                 method: "POST",
             }),
             invalidatesTags: (_result, _error, { id }) => [
@@ -229,13 +217,13 @@ export const settlementApi = createApi({
             ],
         }),
         
-        // POST /admin/settlements/{id}/mark-as-paid (or /pay)
+        // POST /settlements/{id}/mark-as-paid (or /pay)
         markAsPaid: builder.mutation<SettlementSingleResponse, { 
             id: number | string; 
             data: MarkAsPaidPayload;
         }>({
             query: ({ id, data }) => ({
-                url: `admin/settlements/${id}/mark-as-paid`,
+                url: `settlements/${id}/mark-as-paid`,
                 method: "POST",
                 body: data,
             }),
@@ -245,14 +233,14 @@ export const settlementApi = createApi({
             ],
         }),
         
-        // PUT /admin/settlements/{id}/status
+        // PUT /settlements/{id}/status
         updateSettlementStatus: builder.mutation<SettlementSingleResponse, { 
             id: number | string; 
             status: SettlementStatus;
             notes?: string;
         }>({
             query: ({ id, status, notes }) => ({
-                url: `admin/settlements/${id}/status`,
+                url: `settlements/${id}/status`,
                 method: "PUT",
                 body: { status, notes },
             }),
@@ -262,13 +250,13 @@ export const settlementApi = createApi({
             ],
         }),
         
-        // POST /admin/settlements/{id}/dispute
+        // POST /settlements/{id}/dispute
         disputeSettlement: builder.mutation<SettlementSingleResponse, { 
             id: number | string; 
             data: DisputeSettlementPayload;
         }>({
             query: ({ id, data }) => ({
-                url: `admin/settlements/${id}/dispute`,
+                url: `settlements/${id}/dispute`,
                 method: "POST",
                 body: data,
             }),
@@ -293,3 +281,5 @@ export const {
     useUpdateSettlementStatusMutation,
     useDisputeSettlementMutation,
 } = settlementApi;
+
+export default settlementApi;

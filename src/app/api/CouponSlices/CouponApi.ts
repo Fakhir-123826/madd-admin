@@ -1,7 +1,6 @@
 // src/app/api/CouponSlices/CouponApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -140,43 +139,17 @@ export interface CouponStatisticsResponse {
     data: CouponStatistics;
 }
 
-// Raw base query with headers configuration
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-// Base query with authentication check
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (args, api, extraOptions) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-
-    // If token expired / unauthorized
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-    }
-
-    return result;
-};
-
 // ─── API Slice ────────────────────────────────────────────────────────────────
 
 export const couponApi = createApi({
     reducerPath: "couponApi",
-    baseQuery: baseQueryWithAuthCheck,
-    tagTypes: ["Coupons", "CouponStats", "CouponDetail"],
+    baseQuery: dynamicBaseQuery,
+    tagTypes: ["Coupons", "CouponStats"],
     keepUnusedDataFor: 60, // Keep unused data for 60 seconds
 
     endpoints: (builder) => ({
 
-        // GET /admin/coupons - Get all coupons with filters
+        // GET /coupons - Get all coupons with filters
         getCoupons: builder.query<CouponListResponse, {
             page?: number;
             per_page?: number;
@@ -199,104 +172,104 @@ export const couponApi = createApi({
                     if (params.search) queryParams.append('search', params.search);
                     if (params.valid !== undefined) queryParams.append('valid', params.valid.toString());
                 }
-                const url = `admin/coupons${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `coupons${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             providesTags: (result) =>
                 result
                     ? [
-                        ...(result.data?.data ?? []).map(({ id }) => ({ type: "Coupon" as const, id })),
-                        { type: "Coupon", id: "LIST" },
+                        ...(result.data ?? []).map(({ id }) => ({ type: "Coupons" as const, id })),
+                        { type: "Coupons", id: "LIST" },
                     ]
-                    : [{ type: "Coupon", id: "LIST" }],
+                    : [{ type: "Coupons", id: "LIST" }],
         }),
 
-        // GET /admin/coupons/statistics - Get coupon statistics
+        // GET /coupons/statistics - Get coupon statistics
         getCouponStatistics: builder.query<CouponStatisticsResponse, void>({
             query: () => ({
-                url: "admin/coupons/statistics",
+                url: "coupons/statistics",
                 method: "GET",
             }),
             providesTags: ["CouponStats"],
         }),
 
-        // GET /admin/coupons/{id} - Get single coupon
+        // GET /coupons/{id} - Get single coupon
         getCoupon: builder.query<CouponSingleResponse, number>({
             query: (id) => ({
-                url: `admin/coupons/${id}`,
+                url: `coupons/${id}`,
                 method: "GET",
             }),
-            providesTags: (_result, _error, id) => [{ type: "CouponDetail", id }],
+            providesTags: (_result, _error, id) => [{ type: "Coupons", id }],
         }),
 
-        // POST /admin/coupons - Create new coupon
+        // POST /coupons - Create new coupon
         createCoupon: builder.mutation<{ success: boolean; message: string; data: Coupon }, CreateCouponPayload>({
             query: (data) => ({
-                url: "admin/coupons",
+                url: "coupons",
                 method: "POST",
                 body: data,
             }),
             invalidatesTags: [{ type: "Coupons", id: "LIST" }, "CouponStats"],
         }),
 
-        // PUT /admin/coupons/{id} - Update coupon
+        // PUT /coupons/{id} - Update coupon
         updateCoupon: builder.mutation<{ success: boolean; message: string; data: Coupon }, { id: number; data: UpdateCouponPayload }>({
             query: ({ id, data }) => ({
-                url: `admin/coupons/${id}`,
+                url: `coupons/${id}`,
                 method: "PUT",
                 body: data,
             }),
             invalidatesTags: (_result, _error, { id }) => [
                 { type: "Coupons", id: "LIST" },
-                { type: "CouponDetail", id },
+                { type: "Coupons", id },
                 "CouponStats",
             ],
         }),
 
-        // DELETE /admin/coupons/{id} - Delete coupon
+        // DELETE /coupons/{id} - Delete coupon
         deleteCoupon: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/coupons/${id}`,
+                url: `coupons/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: [{ type: "Coupons", id: "LIST" }, "CouponStats"],
         }),
 
-        // POST /admin/coupons/{id}/duplicate - Duplicate coupon
+        // POST /coupons/{id}/duplicate - Duplicate coupon
         duplicateCoupon: builder.mutation<{ success: boolean; message: string; data: Coupon }, number>({
             query: (id) => ({
-                url: `admin/coupons/${id}/duplicate`,
+                url: `coupons/${id}/duplicate`,
                 method: "POST",
             }),
             invalidatesTags: [{ type: "Coupons", id: "LIST" }, "CouponStats"],
         }),
 
-        // POST /admin/coupons/{id}/toggle-status - Toggle coupon status
+        // POST /coupons/{id}/toggle-status - Toggle coupon status
         toggleCouponStatus: builder.mutation<{ success: boolean; message: string; data: { is_active: boolean } }, number>({
             query: (id) => ({
-                url: `admin/coupons/${id}/toggle-status`,
+                url: `coupons/${id}/toggle-status`,
                 method: "POST",
             }),
             invalidatesTags: (_result, _error, id) => [
                 { type: "Coupons", id: "LIST" },
-                { type: "CouponDetail", id },
+                { type: "Coupons", id },
                 "CouponStats",
             ],
         }),
 
-        // POST /admin/coupons/{id}/sync - Sync coupon to Magento
+        // POST /coupons/{id}/sync - Sync coupon to Magento
         syncCouponToMagento: builder.mutation<{ success: boolean; message: string }, number>({
             query: (id) => ({
-                url: `admin/coupons/${id}/sync`,
+                url: `coupons/${id}/sync`,
                 method: "POST",
             }),
             invalidatesTags: (_result, _error, id) => [
                 { type: "Coupons", id: "LIST" },
-                { type: "CouponDetail", id },
+                { type: "Coupons", id },
             ],
         }),
 
-        // GET /admin/coupons/export - Export coupons to CSV
+        // GET /coupons/export - Export coupons to CSV
         exportCoupons: builder.query<{ success: boolean; data: { filename: string; content: string; mime_type: string } }, {
             type?: string;
             is_active?: boolean;
@@ -311,7 +284,7 @@ export const couponApi = createApi({
                     if (params.date_from) queryParams.append('date_from', params.date_from);
                     if (params.date_to) queryParams.append('date_to', params.date_to);
                 }
-                const url = `admin/coupons/export${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+                const url = `coupons/export${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
                 return { url, method: "GET" };
             },
             keepUnusedDataFor: 0, // Don't cache export data

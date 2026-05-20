@@ -1,6 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { dynamicBaseQuery } from "../dynamicBaseQuery";
 
 export interface SuspendVendorPayload {
     reason: string;
@@ -30,40 +29,9 @@ export interface CreateVendorPayload {
     status?: string;
 }
 
-// Raw base query with headers configuration
-const rawBaseQuery = fetchBaseQuery({
-    baseUrl: baseURL,
-    prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            headers.set("authorization", `Bearer ${token}`);
-        }
-        headers.set("Content-Type", "application/json");
-        return headers;
-    },
-});
-
-// Base query with authentication check
-const baseQueryWithAuthCheck: typeof rawBaseQuery = async (
-    args,
-    api,
-    extraOptions
-) => {
-    const result = await rawBaseQuery(args, api, extraOptions);
-
-    // If token expired / unauthorized
-    if (result.error && result.error.status === 401) {
-        localStorage.removeItem("token");
-        // redirect to login page
-        window.location.href = "/login";
-    }
-
-    return result;
-};
-
 export const vendorApi = createApi({
     reducerPath: "vendorApi",
-    baseQuery: baseQueryWithAuthCheck,
+    baseQuery: dynamicBaseQuery,
     tagTypes: ["Vendors"],
 
     endpoints: (builder) => ({
@@ -75,7 +43,7 @@ export const vendorApi = createApi({
         */
         getVendors: builder.query<any, void>({
             query: () => ({
-                url: "admin/vendors",
+                url: "vendors",
                 method: "GET",
             }),
             providesTags: ["Vendors"],
@@ -88,7 +56,7 @@ export const vendorApi = createApi({
         */
         getSingleVendor: builder.query<any, string>({
             query: (id) => ({
-                url: `admin/vendors/${id}`,
+                url: `vendors/${id}`,
                 method: "GET",
             }),
             providesTags: ["Vendors"],
@@ -101,7 +69,7 @@ export const vendorApi = createApi({
         */
         approveVendor: builder.mutation<any, string>({
             query: (id) => ({
-                url: `admin/vendors/${id}/approve`,
+                url: `vendors/${id}/approve`,
                 method: "POST",
                 body: {},
             }),
@@ -118,7 +86,7 @@ export const vendorApi = createApi({
             { id: string; data: SuspendVendorPayload }
         >({
             query: ({ id, data }) => ({
-                url: `admin/vendors/${id}/suspend`,
+                url: `vendors/${id}/suspend`,
                 method: "POST",
                 body: data,
             }),
@@ -132,7 +100,7 @@ export const vendorApi = createApi({
         */
         activateVendor: builder.mutation<any, string>({
             query: (id) => ({
-                url: `admin/vendors/${id}/activate`,
+                url: `vendors/${id}/activate`,
                 method: "POST",
                 body: {},
             }),
@@ -149,7 +117,7 @@ export const vendorApi = createApi({
             { id: string; data: UpdateVendorPlanPayload }
         >({
             query: ({ id, data }) => ({
-                url: `admin/vendors/${id}/plan`,
+                url: `vendors/${id}/plan`,
                 method: "PUT",
                 body: data,
             }),
@@ -163,7 +131,7 @@ export const vendorApi = createApi({
         */
         verifyVendorKyc: builder.mutation<any, string>({
             query: (id) => ({
-                url: `admin/vendors/${id}/kyc-verify`,
+                url: `vendors/${id}/kyc-verify`,
                 method: "POST",
                 body: {},
             }),
@@ -177,7 +145,7 @@ export const vendorApi = createApi({
         */
         createVendor: builder.mutation<any, CreateVendorPayload>({
             query: (data) => ({
-                url: "admin/vendors",
+                url: "vendors",
                 method: "POST",
                 body: data,
             }),
@@ -194,7 +162,7 @@ export const vendorApi = createApi({
             { id: string; data: RejectKycPayload }
         >({
             query: ({ id, data }) => ({
-                url: `admin/vendors/${id}/kyc-reject`,
+                url: `vendors/${id}/kyc-reject`,
                 method: "POST",
                 body: data,
             }),
