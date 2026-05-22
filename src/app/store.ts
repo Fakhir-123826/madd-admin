@@ -5,7 +5,7 @@ import { subscriptionApi } from "./api/SubscriptionSclices/SubscriptionSclices";
 import { magentoApi } from "./api/MagentoSlices/magentoApi";
 import { magentoCategoryApi } from "./api/MagentoSlices/CategorySlice"; // ✅ import the category API
 import { magentoCustomerApi } from "./api/MagentoSlices/CustomerSlice";
-import { productApi } from "./api/MagentoSlices/ProductSlice"
+import { productApi } from "./api/ProductSlices/ProductApi.ts"
 import authReducer from "./api/AuthSlices/authSlice";
 import { storeApi } from "./api/MagentoSlices/StoreSlice";
 import { inventoryApi } from "./api/MagentoSlices/InventoryApi";

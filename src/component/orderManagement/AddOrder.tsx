@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, Minus, Package, Plus, Search, Trash2, User } from "lucide-react";
 import { useGetVendorsQuery } from "../../app/api/VendorSlices/VendorApi";
 import { useGetStoresByVendorQuery } from "../../app/api/StoreSlices/StoreApi";
-import { useGetProductsQuery, type Product } from "../../app/api/ProductSlices/ProductApi";
+import { useGetVendorProductsQuery, type VendorProduct } from "../../app/api/ProductSlices/ProductApi";
 import { useCreateManualOrderMutation } from "../../app/api/OrderSlices/OrderApi";
 import { useGetCustomersQuery } from "../../app/api/CustomerSlices/CustomerApi";
 import SearchableSelect from "../SearchableSelect";
@@ -124,18 +124,17 @@ function AddOrder() {
     );
   const customers = customersData?.data || [];
 
-  const { data: productsData, isFetching: productsLoading } = useGetProductsQuery(
+  const { data: productsData, isFetching: productsLoading } = useGetVendorProductsQuery(
     {
-      vendor_id: selectedVendor?.id,
-      vendor_store_id: selectedStore?.id,
-      store_uuid: selectedStoreUuid,
+      vendor_uuid: selectedVendorUuid,
+      store_uuid: selectedStoreUuid || undefined,
       search: productSearch.length >= 2 ? productSearch : undefined,
-      status: "active",
+      status: true,
       per_page: 20,
     },
-    { skip: !selectedVendor?.id || !selectedStore?.id }
+    { skip: !selectedVendorUuid }
   );
-  const products = productsData?.data || [];
+  const products = productsData?.data?.data || [];
 
   const [createManualOrder, { isLoading: isCreating }] = useCreateManualOrderMutation();
 
@@ -189,7 +188,7 @@ function AddOrder() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const addProduct = (product: Product) => {
+  const addProduct = (product: VendorProduct) => {
     const sku = product.magento_sku || product.sku;
     setSelectedProducts((current) => {
       const existing = current.find((item) => item.uuid === product.uuid);

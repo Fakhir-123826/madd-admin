@@ -1068,6 +1068,7 @@ const Layout = () => {
         { label: "All Stores", path: "/storeList" },
         // { label: "Store Cards", path: "/storeCardList" },
         { label: "Add Store", path: "/CreateStore" },
+        { label: "Attribute Sets", path: ROUTES.ATTRIBUTE_SET_LISTS },
         // { label: "Subscriptions", path: "/SubscriptionList" }
       ]
     },
