@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { FaEllipsisV, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { FiShield, FiAlertCircle, FiUserCheck, FiEye } from "react-icons/fi";
@@ -68,11 +69,11 @@ const userTypeStyle = (type: string) => {
 
 // ─── Tabs config ──────────────────────────────────────────────────────────────
 
-const TABS = [
-  { key: "list", label: "Users List" },
-  { key: "type", label: "User Types" },
-  { key: "status", label: "Status" },
-];
+// const TABS = [
+//   { key: "list", label: "Users List" },
+//   { key: "type", label: "User Types" },
+//   { key: "status", label: "Status" },
+// ];
 
 // ─── Status Management Modal ──────────────────────────────────────────────────
 
@@ -521,7 +522,7 @@ const UserList = () => {
         title="User Management"
         addButtonLabel="Add New User"
         onAdd={() => navigate(ROUTES.ADD_USER)}   // ← separate route
-        tabs={TABS}
+        // tabs={TABS}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         filters={filters}
@@ -536,113 +537,173 @@ const UserList = () => {
       <div className="rounded-2xl shadow-sm border border-gray-100 overflow-hidden ">
         <div className="overflow-x-auto min-h-[500px]">
           <table className="w-full table-auto">
-            <thead>
-              <tr className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
+            <thead className="bg-white">
+              <tr className="border-b border-gray-100">
                 {["User", "Email", "Phone", "Type", "Country", "Email ✓", "Phone ✓", "KYC", "Vendor", "Status", "Joined", ""].map((col, i) => (
-                  <th key={i} className="px-4 py-4 text-left font-semibold text-sm whitespace-nowrap">{col}</th>
+                  <th
+                    key={i}
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  >
+                    {col}
+                  </th>
                 ))}
               </tr>
             </thead>
 
-            <tbody className="bg-white">
-  {isLoading ? (
-    <tr>
-      <td colSpan={12} className="text-center py-16">
-        <div className="flex items-center justify-center gap-3 text-gray-400">
-          <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
-          <span className="text-sm">Loading users…</span>
-        </div>
-      </td>
-    </tr>
-  ) : error ? (
-    <tr>
-      <td colSpan={12} className="text-center py-16 text-red-400 text-sm">
-        Error loading users. Please try again.
-      </td>
-    </tr>
-  ) : paginated.length === 0 ? (
-    <tr>
-      <td colSpan={12} className="text-center py-16 text-gray-300 text-sm">
-        No users found.
-      </td>
-    </tr>
-  ) : (
-    paginated.map((user, idx) => (
-      <tr
-        key={user.id}
-        className="hover:bg-gray-50/60 transition"
-        style={{
-          borderBottom: idx < paginated.length - 1 ? "1px solid #f3f4f6" : "none",
-          marginBottom: "10px",
-        }}
-      >
-        {/* User — left teal accent */}
-        <td className="relative pl-5 pr-4 py-3">
-          <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-teal-400 to-teal-300" />
-          <div className="flex items-center gap-2.5">
-            <img
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=14B8A6&color=ffffff&bold=true`}
-              className="w-8 h-8 rounded-full shrink-0"
-              alt={user.full_name}
-            />
-            <span className="font-semibold text-gray-800 whitespace-nowrap">{user.full_name}</span>
-          </div>
-        </td>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={12} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="animate-spin h-8 w-8 rounded-full border-b-2 border-teal-500" />
+                      <p className="text-sm text-gray-500">Loading users...</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={12} className="px-6 py-12 text-center">
+                    <p className="text-sm text-red-500">
+                      Error loading users. Please try again.
+                    </p>
+                  </td>
+                </tr>
+              ) : paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={12} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <p className="text-gray-500">No users found</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                paginated.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    {/* User */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            user.full_name
+                          )}&background=14B8A6&color=ffffff&bold=true`}
+                          className="w-10 h-10 rounded-full"
+                          alt={user.full_name}
+                        />
 
-        <td className="px-4 py-3 text-gray-600 text-xs">{user.email}</td>
-        <td className="px-4 py-3 text-gray-600 text-xs">{user.phone ?? "—"}</td>
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {user.full_name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {user.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
 
-        <td className="px-4 py-3 whitespace-nowrap">
-          <span className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize ${userTypeStyle(user.user_type)}`}>
-            {user.user_type.replace(/_/g, " ")}
-          </span>
-        </td>
+                    {/* Email */}
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {user.email}
+                    </td>
 
-        <td className="px-4 py-3 text-gray-500 text-xs">{user.country_code ?? "—"}</td>
+                    {/* Phone */}
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {user.phone || "No phone"}
+                    </td>
 
-        {/* Verification checks */}
-        <td className="px-4 py-3 text-center">
-          {user.is_email_verified
-            ? <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
-            : <FaTimesCircle className="text-gray-300 text-base mx-auto" />}
-        </td>
-        <td className="px-4 py-3 text-center">
-          {user.is_phone_verified
-            ? <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
-            : <FaTimesCircle className="text-gray-300 text-base mx-auto" />}
-        </td>
-        <td className="px-4 py-3 text-center">
-          {user.is_kyc_verified
-            ? <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
-            : <FaTimesCircle className="text-gray-300 text-base mx-auto" />}
-        </td>
+                    {/* Type */}
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${userTypeStyle(
+                          user.user_type
+                        )}`}
+                      >
+                        {user.user_type.replace(/_/g, " ")}
+                      </span>
+                    </td>
 
-        <td className="px-4 py-3 text-gray-500 text-xs">{user.vendor?.company_name ?? "—"}</td>
+                    {/* Country */}
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {user.country_code ?? "N/A"}
+                    </td>
 
-        {/* Status pill */}
-        <td className="px-4 py-3">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(user.status)}`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-current" />
-            {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-          </span>
-        </td>
+                    {/* Email Verify */}
+                    <td className="px-6 py-4 text-center">
+                      {user.is_email_verified ? (
+                        <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
+                      ) : (
+                        <FaTimesCircle className="text-gray-300 text-base mx-auto" />
+                      )}
+                    </td>
 
-        <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{fmtDate(user.created_at)}</td>
+                    {/* Phone Verify */}
+                    <td className="px-6 py-4 text-center">
+                      {user.is_phone_verified ? (
+                        <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
+                      ) : (
+                        <FaTimesCircle className="text-gray-300 text-base mx-auto" />
+                      )}
+                    </td>
 
-        {/* Actions — right green accent */}
-        <td className="relative pl-4 pr-5 py-3 text-right">
-          <span className="absolute right-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-green-400 to-green-300" />
-          <RowMenu
-            onView={() => { setSelectedUser(user); setIsDrawerOpen(true); }}
-            onEdit={() => { setSelectedUser(user); setIsEditModalOpen(true); }}
-            onDelete={() => handleDelete(user.id)}
-            onStatusManage={() => { setSelectedUser(user); setIsStatusModalOpen(true); }}
-          />
-        </td>
-      </tr>
-    ))
-  )}
-</tbody>
+                    {/* KYC */}
+                    <td className="px-6 py-4 text-center">
+                      {user.is_kyc_verified ? (
+                        <FaCheckCircle className="text-emerald-500 text-base mx-auto" />
+                      ) : (
+                        <FaTimesCircle className="text-gray-300 text-base mx-auto" />
+                      )}
+                    </td>
+
+                    {/* Vendor */}
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {user.vendor?.company_name ?? "N/A"}
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(
+                          user.status
+                        )}`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        {user.status.charAt(0).toUpperCase() +
+                          user.status.slice(1)}
+                      </span>
+                    </td>
+
+                    {/* Joined */}
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-500">
+                        {fmtDate(user.created_at)}
+                      </div>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-6 py-4 text-right">
+                      <RowMenu
+                        onView={() => {
+                          setSelectedUser(user);
+                          setIsDrawerOpen(true);
+                        }}
+                        onEdit={() => {
+                          setSelectedUser(user);
+                          setIsEditModalOpen(true);
+                        }}
+                        onDelete={() => handleDelete(user.id)}
+                        onStatusManage={() => {
+                          setSelectedUser(user);
+                          setIsStatusModalOpen(true);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
           </table>
         </div>
       </div>

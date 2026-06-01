@@ -407,16 +407,30 @@ export const ProductList: React.FC = () => {
                             <button
                                 onClick={() => {
                                     if (selectedVendorUuid) {
-                                        navigate(`/admin/products/add?vendor=${selectedVendorUuid}`);
+                                        navigate(`/CreateProductBase`);
                                     } else {
-                                        toast.error('Please select a vendor first');
+                                        toast.error("Please select a vendor first");
                                     }
                                 }}
                                 disabled={!selectedVendorUuid}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="
+                                  flex items-center
+                                  rounded-full
+                                    bg-[linear-gradient(90deg,#12B5E5_0%,#1D8FEF_50%,#2563EB_100%)]
+                                   text-white text-sm font-medium
+                                   shadow-md
+                                 hover:opacity-90
+                               transition-all
+                                  disabled:opacity-50
+                            disabled:cursor-not-allowed
+                                cursor-pointer
+                             pr-6"
                             >
-                                <Plus className="w-4 h-4" />
-                                Add Product
+                                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white m-1">
+                                    <Plus className="text-blue-500 w-4 h-4" />
+                                </span>
+
+                                <span className="px-2">Add Product</span>
                             </button>
                         </div>
                     </div>
