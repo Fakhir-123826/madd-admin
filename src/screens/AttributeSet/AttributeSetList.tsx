@@ -1,7 +1,7 @@
 // src/pages/AttributeSet/AttributeSetList.tsx
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
     Plus,
     Search,
@@ -42,6 +42,7 @@ import {
 } from '../../app/api/AttributeSetSlices/AttributeSetApi';
 import { useGetVendorsQuery } from '../../app/api/VendorSlices/VendorApi';
 import SearchableSelect from '../../component/SearchableSelect';
+import { ROUTES } from '../../router';
 
 export const AttributeSetList: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -88,7 +89,7 @@ export const AttributeSetList: React.FC = () => {
         { vendor_uuid: selectedVendorUuid, id: selectedAttributeSetId! },
         { skip: !selectedAttributeSetId || !selectedVendorUuid }
     );
-
+    const navigate = useNavigate();
     const [deleteAttributeSet, { isLoading: deleting }] = useDeleteAttributeSetMutation();
     const [syncAttributeSets, { isLoading: syncing }] = useSyncAttributeSetsMutation();
     const [syncSingleAttributeSet, { isLoading: syncingSingle }] = useSyncSingleAttributeSetMutation();
@@ -112,10 +113,10 @@ export const AttributeSetList: React.FC = () => {
         setCurrentPage(1);
     }, [selectedVendorUuid, filterStatus, filterSyncStatus]);
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (uuid: string) => {
         if (!selectedVendorUuid) return;
         try {
-            await deleteAttributeSet({ vendor_uuid: selectedVendorUuid, id }).unwrap();
+            await deleteAttributeSet({ vendor_uuid: selectedVendorUuid, id: uuid }).unwrap();
             toast.success('Attribute set deleted successfully');
             setDeleteConfirm(null);
             refetch();
@@ -157,17 +158,13 @@ export const AttributeSetList: React.FC = () => {
         }
     };
 
-    const handleViewAttributeSet = (id: string) => {
-        setSelectedAttributeSetId(id);
-        setIsViewDrawerOpen(true);
-        refetchAttributeSet();
+    const handleEditAttributeSet = (uuid: string) => {
+        navigate(`${ROUTES.EDIT_ATTRIBUTE_SET.replace(':uuid', uuid)}?vendor=${selectedVendorUuid}`);
     };
 
-    const handleEditAttributeSet = (id: string) => {
-        setSelectedAttributeSetId(id);
-        setIsEditDrawerOpen(true);
-        refetchAttributeSet();
-    };
+const handleViewAttributeSet = (uuid: string) => {
+    navigate(`${ROUTES.VIEW_ATTRIBUTE_SET.replace(':uuid', uuid)}?vendor=${selectedVendorUuid}`);
+};
 
     const getSyncStatusBadge = (status: string) => {
         switch (status) {
@@ -258,10 +255,13 @@ export const AttributeSetList: React.FC = () => {
                                 )}
                                 Bulk Sync
                             </button>
+
                             <button
                                 onClick={() => {
                                     if (selectedVendorUuid) {
-                                        window.location.href = `/admin/attribute-sets/add?vendor=${selectedVendorUuid}`;
+                                        navigate(
+                                            `${ROUTES.CREATE_ATTRIBUTE_SET}?vendor=${selectedVendorUuid}`
+                                        );
                                     } else {
                                         toast.error('Please select a vendor first');
                                     }
@@ -497,21 +497,21 @@ export const AttributeSetList: React.FC = () => {
                                                         <td className="px-6 py-4 text-right">
                                                             <div className="flex justify-end gap-2">
                                                                 <button
-                                                                    onClick={() => handleViewAttributeSet(attributeSet.id)}
-                                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                                    title="View Details"
-                                                                >
-                                                                    <Eye className="w-4 h-4" />
-                                                                </button>
+    onClick={() => handleViewAttributeSet(attributeSet.uuid)}
+    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+    title="View Details"
+>
+    <Eye className="w-4 h-4" />
+</button>
                                                                 <button
-                                                                    onClick={() => handleEditAttributeSet(attributeSet.id)}
+                                                                    onClick={() => handleEditAttributeSet(attributeSet.uuid)}  // Use .uuid instead of .id
                                                                     className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                                                     title="Edit"
                                                                 >
-                                                                    <Edit className="w-4 h-4" />
+                                                                        <Edit className="w-4 h-4" />
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => setDeleteConfirm(attributeSet.id)}
+                                                                    onClick={() => setDeleteConfirm(attributeSet.uuid)}  // Use .uuid instead of .id
                                                                     className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                                     title="Delete"
                                                                 >
@@ -884,8 +884,8 @@ const AttributeSetViewDrawer: React.FC<AttributeSetViewDrawerProps> = ({ attribu
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-gray-500">Sync Status</span>
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${attributeSet.sync_status === 'synced' ? 'bg-green-100 text-green-800' :
-                                                    attributeSet.sync_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                        'bg-red-100 text-red-800'
+                                                attributeSet.sync_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                    'bg-red-100 text-red-800'
                                                 }`}>
                                                 {attributeSet.sync_status}
                                             </span>

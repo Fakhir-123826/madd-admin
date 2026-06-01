@@ -122,10 +122,9 @@ export interface ApiResponse<T = any> {
 export const attributeSetApi = createApi({
     reducerPath: 'attributeSetApi',
     baseQuery: dynamicBaseQuery,
-    tagTypes: ['AttributeSet', 'AttributeSetDetail', 'AttributeSetAttributes', 'AttributeSetGroups'],
-    
+    tagTypes: ['AttributeSet', 'AttributeSetDetail', 'AttributeSetAttributes', 'AttributeSetGroups', 'AttributeSetStructure'],
     endpoints: (builder) => ({
-        
+
         // ─────────────────────────────────────────────────────────────────────
         // GET: List all attribute sets for a vendor
         // URL: /attribute-sets/{vendorUuid}
@@ -140,18 +139,18 @@ export const attributeSetApi = createApi({
                 if (is_active !== undefined) params.append('is_active', is_active.toString());
                 if (sort_by) params.append('sort_by', sort_by);
                 if (sort_order) params.append('sort_order', sort_order);
-                
+
                 return {
                     url: `attribute-sets/${vendor_uuid}?${params.toString()}`,
                     method: 'GET',
                 };
             },
-            providesTags: (result) => 
+            providesTags: (result) =>
                 result?.data
                     ? [
                         ...result.data.map(({ id }) => ({ type: 'AttributeSet' as const, id })),
                         { type: 'AttributeSet', id: 'LIST' },
-                      ]
+                    ]
                     : [{ type: 'AttributeSet', id: 'LIST' }],
         }),
 
@@ -193,6 +192,18 @@ export const attributeSetApi = createApi({
                 method: 'GET',
             }),
             providesTags: (result, error, { id }) => [{ type: 'AttributeSetAttributes', id }],
+        }),
+
+        // ─────────────────────────────────────────────────────────────────────
+        // GET: Get attribute set structure
+        // URL: /attribute-sets/{vendorUuid}/{id}/structure
+        // ─────────────────────────────────────────────────────────────────────        
+        getAttributeSetStructure: builder.query<ApiResponse<any>, { vendor_uuid: string; id: string }>({
+            query: ({ vendor_uuid, id }) => ({
+                url: `attribute-sets/${vendor_uuid}/${id}/structure`,
+                method: 'GET',
+            }),
+            providesTags: (result, error, { id }) => [{ type: 'AttributeSetStructure', id }],
         }),
 
         // ─────────────────────────────────────────────────────────────────────
@@ -299,7 +310,7 @@ export const attributeSetApi = createApi({
         // URL: /attribute-sets/{vendorUuid}/{id}/assign-attribute
         // ─────────────────────────────────────────────────────────────────────
         assignAttributeToSet: builder.mutation<
-            ApiResponse<AssignedAttribute>, 
+            ApiResponse<AssignedAttribute>,
             { vendor_uuid: string; id: string; data: AssignAttributeData }
         >({
             query: ({ vendor_uuid, id, data }) => ({
@@ -318,7 +329,7 @@ export const attributeSetApi = createApi({
         // URL: /attribute-sets/{vendorUuid}/{id}/remove-attribute/{attributeId}
         // ─────────────────────────────────────────────────────────────────────
         removeAttributeFromSet: builder.mutation<
-            ApiResponse<void>, 
+            ApiResponse<void>,
             { vendor_uuid: string; id: string; attributeId: number }
         >({
             query: ({ vendor_uuid, id, attributeId }) => ({
@@ -400,7 +411,7 @@ export const {
     useGetAttributeSetDetailsQuery,
     useGetAttributeSetAttributesQuery,
     useGetAttributeSetGroupsQuery,
-    
+
     // Mutations
     useCreateAttributeSetMutation,
     useUpdateAttributeSetMutation,
@@ -413,6 +424,7 @@ export const {
     useUpdateAttributeGroupMutation,
     useDeleteAttributeGroupMutation,
     usePushToMagentoMutation,
+    useGetAttributeSetStructureQuery,
 } = attributeSetApi;
 
 export default attributeSetApi;

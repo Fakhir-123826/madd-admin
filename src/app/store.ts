@@ -3,14 +3,15 @@ import counterReducer from "./Slices/counterSlice";
 import { authApi } from "./api/AuthSlices/AuthSlices";
 import { subscriptionApi } from "./api/SubscriptionSclices/SubscriptionSclices";
 import { magentoApi } from "./api/MagentoSlices/magentoApi";
-import { magentoCategoryApi } from "./api/MagentoSlices/CategorySlice"; // ✅ import the category API
+import { categoryApi } from "./api/CategorySlices/CategoryApi.ts";
+
 import { magentoCustomerApi } from "./api/MagentoSlices/CustomerSlice";
 import { productApi } from "./api/ProductSlices/ProductApi.ts"
 import authReducer from "./api/AuthSlices/authSlice";
 import { storeApi } from "./api/MagentoSlices/StoreSlice";
 import { inventoryApi } from "./api/MagentoSlices/InventoryApi";
 import { attributeApi } from "./api/MagentoSlices/Attributes";
-import { attributeSetApi } from "./api/MagentoSlices/AttributeSetApi";
+import { attributeSetApi } from "./api/AttributeSetSlices/AttributeSetApi";
 
 import { vendorApi } from "./api/VendorSlices/VendorApi";
 import vendorReducer from "./api/VendorSlices/VendorSlice";
@@ -46,7 +47,7 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [subscriptionApi.reducerPath]: subscriptionApi.reducer,
     [magentoApi.reducerPath]: magentoApi.reducer,
-    [magentoCategoryApi.reducerPath]: magentoCategoryApi.reducer,
+    [categoryApi.reducerPath]: categoryApi.reducer,
     [magentoCustomerApi.reducerPath]: magentoCustomerApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
     [storeApi.reducerPath]: storeApi.reducer,
@@ -81,7 +82,7 @@ export const store = configureStore({
       authApi.middleware,
       subscriptionApi.middleware,
       magentoApi.middleware,
-      magentoCategoryApi.middleware,
+      categoryApi.middleware,
       magentoCustomerApi.middleware,
       productApi.middleware,
       storeApi.middleware,

@@ -1060,16 +1060,16 @@ const Layout = () => {
         { label: "Add Customer", path: ROUTES.Add_Customer },
       ]
     },
+    
     // Stores
     {
       label: "Stores",
       icon: FaStore,
       children: [
         { label: "All Stores", path: "/storeList" },
-        // { label: "Store Cards", path: "/storeCardList" },
         { label: "Add Store", path: "/CreateStore" },
-        { label: "Attribute Sets", path: ROUTES.ATTRIBUTE_SET_LISTS },
-        // { label: "Subscriptions", path: "/SubscriptionList" }
+        { label: "Attribute Sets", path: ROUTES.ATTRIBUTE_SET_LISTS },  // Uses the constant
+        { label: "Add Attribute Set", path: ROUTES.CREATE_ATTRIBUTE_SET },  // Uses the constant
       ]
     },
 
@@ -1080,6 +1080,8 @@ const Layout = () => {
       children: [
         { label: "All Products", path: "/ProductBaseList" },
         { label: "Add Product", path: "/CreateProductBase" },
+        { label: "Categories", path: ROUTES.CATEGORY_LIST },
+
         // { label: "Categories", path: "/CategoryList" },
         // { label: "Add Category", path: "/CreateCategory" },
         // { label: "Inventory Management", path: "/InventoryManagementList" },
@@ -1286,7 +1288,7 @@ const Layout = () => {
   // Filter menu items based on user role
   useEffect(() => {
     const fullMenu = getFullMenuItems();
-    
+
     // Determine user role robustly
     const role = (user?.role || (Array.isArray(user?.roles) ? user?.roles[0] : "") || "").toLowerCase();
     const isAdmin = role === "super_admin" || role === "admin" || hasAdminAccess;
@@ -1298,14 +1300,14 @@ const Layout = () => {
     } else if (isVendor) {
       // Vendor gets specific modules
       const vendorAllowedLabels = [
-        "Dashboard", "Magento", "Order Management", "Orders", 
-        "Products", "CMS Block", "CMS Pages", "Settlements", 
+        "Dashboard", "Magento", "Order Management", "Orders",
+        "Products", "CMS Block", "CMS Pages", "Settlements",
         "Coupons", "Settings", "Reports"
       ];
       setFilteredMenuItems(fullMenu.filter(item => vendorAllowedLabels.includes(item.label)));
     } else {
       // Default / Guest view
-      setFilteredMenuItems(fullMenu.filter(item => 
+      setFilteredMenuItems(fullMenu.filter(item =>
         ["Dashboard", "Magento"].includes(item.label)
       ));
     }

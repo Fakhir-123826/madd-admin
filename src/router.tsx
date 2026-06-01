@@ -22,8 +22,7 @@ import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
 import OrderList from './screens/OrdersManagement/OrderList.tsx'
 import OrderStatistics from './screens/OrdersManagement/OrderStatistics.tsx'
 
-import CategoryList from './screens/Catalog/Category/CategoryList.tsx'
-import CreateCategory from './screens/Catalog/Category/CreateCategory.tsx'
+import { CategoryList } from "./screens/Category/CategoryList.tsx";
 import InventoryManagementList from './screens/Catalog/InventoryManagement/InventoryManagementList.tsx'
 import CreateInventoryManagement from './screens/Catalog/InventoryManagement/CreateInventoryManagement.tsx'
 import LegalityControlList from './screens/Catalog/legalityControl/LegalityControlList.tsx'
@@ -58,7 +57,6 @@ import Backups from "./screens/Setting/Backups.tsx";
 import AddBackup from "./component/Setting/Backup/AddBackup.tsx";
 
 import ProductBase from "./screens/Catalog/ProductBase/ProductBase.tsx";
-import Category from "./screens/Catalog/Category/Category.tsx";
 import CouponManagement from "./screens/Return/Coupon management/CouponManagement.tsx";
 import CouponManagementList from "./screens/Return/Coupon management/CouponManagementList.tsx";
 import CreateCouponManagement from "./screens/Return/Coupon management/CreateCouponManagement.tsx";
@@ -241,6 +239,11 @@ import { AddCustomer } from './screens/Customer/AddCustomer.tsx';
 // Attribute Sets
 
 import { AttributeSetList } from "./screens/AttributeSet/AttributeSetList.tsx";
+import { CreateAttributeSet } from "./screens/AttributeSet/CreateAttributeSet.tsx";
+import { EditAttributeSet } from "./screens/AttributeSet/EditAttributeSet.tsx";
+import { ViewAttributeSet } from './screens/AttributeSet/ViewAttributeSet';
+
+
 
 // ==================== ROUTE CONSTANTS ====================
 export const ROUTES = {
@@ -266,6 +269,11 @@ export const ROUTES = {
   EDIT_STORE: (id: string | number = ":id") => `/UpdateStore/${id}`,
 
   ATTRIBUTE_SET_LISTS: "/attribute-set-lists",
+  CREATE_ATTRIBUTE_SET: "/attribute-sets/add",
+  EDIT_ATTRIBUTE_SET: "/attribute-sets/edit/:uuid",
+  VIEW_ATTRIBUTE_SET: "/attribute-sets/view/:uuid",
+
+
   // Order Section
   ORDER_LIST: "/orderlist",
   ORDER_STATISTICS: "/OrderStatistics",
@@ -290,10 +298,7 @@ export const ROUTES = {
   EDIT_SUBSCRIPTION: (id: string | number = ":id") => `/CreateSubscription/${id}`,
 
   // Catalog - Category
-  CATEGORY_LIST: "/CategoryList",
-  CATEGORY_DETAIL: "/Category",
-  CREATE_CATEGORY: "/CreateCategory",
-  EDIT_CATEGORY: (id: string | number = ":id") => `/CreateCategory/${id}`,
+  CATEGORY_LIST: "/categories",
 
   // Catalog - Inventory
   INVENTORY_LIST: "/InventoryManagementList",
@@ -591,331 +596,329 @@ const protectedRoutes = [
   { path: ROUTES.STORE, element: <Store /> },
   { path: ROUTES.CREATE_STORE, element: <CreateStore /> },
   { path: ROUTES.ATTRIBUTE_SET_LISTS, element: <AttributeSetList /> },
-  
-// add attr
-// Order Section
-{ path: ROUTES.ORDER_LIST, element: <OrderList /> },
-{ path: ROUTES.ORDER_STATISTICS, element: <OrderStatistics /> },
-{ path: ROUTES.ADD_ORDER, element: <AddOrder /> },
-{ path: ROUTES.ORDER_DETAILS(), element: <OrderDetails /> },
+  { path: ROUTES.ATTRIBUTE_SET_LISTS, element: <AttributeSetList /> },
+  { path: ROUTES.CREATE_ATTRIBUTE_SET, element: <CreateAttributeSet /> },
+  { path: ROUTES.EDIT_ATTRIBUTE_SET, element: <EditAttributeSet /> },
+  { path: ROUTES.VIEW_ATTRIBUTE_SET, element: <ViewAttributeSet /> },
+  // add attr
+  // Order Section
+  { path: ROUTES.ORDER_LIST, element: <OrderList /> },
+  { path: ROUTES.ORDER_STATISTICS, element: <OrderStatistics /> },
+  { path: ROUTES.ADD_ORDER, element: <AddOrder /> },
+  { path: ROUTES.ORDER_DETAILS(), element: <OrderDetails /> },
 
-// Vendor Section
-{ path: ROUTES.VENDOR_LIST, element: <VendorList /> },
-{ path: ROUTES.VENDOR_DETAIL, element: <Vendor /> },
-{ path: ROUTES.CREATE_VENDOR, element: <CreateVendor /> },
-{ path: ROUTES.EDIT_VENDOR, element: <CreateVendor /> },
-{ path: ROUTES.CREATE_VENDOR_ONBOARD, element: <CreateVendoronBoard /> },
-{ path: ROUTES.VENDOR_ONBOARD, element: <VendorOnboard /> },
-{ path: ROUTES.VENDOR_DASHBOARD, element: <VendorDashBoard /> },
+  // Vendor Section
+  { path: ROUTES.VENDOR_LIST, element: <VendorList /> },
+  { path: ROUTES.VENDOR_DETAIL, element: <Vendor /> },
+  { path: ROUTES.CREATE_VENDOR, element: <CreateVendor /> },
+  { path: ROUTES.EDIT_VENDOR, element: <CreateVendor /> },
+  { path: ROUTES.CREATE_VENDOR_ONBOARD, element: <CreateVendoronBoard /> },
+  { path: ROUTES.VENDOR_ONBOARD, element: <VendorOnboard /> },
+  { path: ROUTES.VENDOR_DASHBOARD, element: <VendorDashBoard /> },
 
-{ path: ROUTES.Customers_List, element: <CustomerList /> },
-{ path: ROUTES.Add_Customer, element: <AddCustomer /> },
+  { path: ROUTES.Customers_List, element: <CustomerList /> },
+  { path: ROUTES.Add_Customer, element: <AddCustomer /> },
 
-// Subscription Section
-{ path: ROUTES.CREATE_SUBSCRIPTION, element: <CreateSubscription /> },
-{ path: ROUTES.SUBSCRIPTION_LIST, element: <SubscriptionList /> },
-{ path: ROUTES.EDIT_SUBSCRIPTION(), element: <CreateSubscription /> },
+  // Subscription Section
+  // { path: ROUTES.CREATE_SUBSCRIPTION, element: <CategoryList /> },
 
-// Catalog - Category
-{ path: ROUTES.CATEGORY_LIST, element: <CategoryList /> },
-{ path: ROUTES.CATEGORY_DETAIL, element: <Category /> },
-{ path: ROUTES.CREATE_CATEGORY, element: <CreateCategory /> },
-{ path: ROUTES.EDIT_CATEGORY(), element: <CreateCategory /> },
+  // Catalog - Category
+  { path: ROUTES.CATEGORY_LIST, element: <CategoryList /> },
 
-// Catalog - Inventory
-{ path: ROUTES.INVENTORY_LIST, element: <InventoryManagementList /> },
-{ path: ROUTES.CREATE_INVENTORY, element: <CreateInventoryManagement /> },
-{ path: ROUTES.EDIT_INVENTORY(), element: <CreateInventoryManagement /> },
+  // Catalog - Inventory
+  { path: ROUTES.INVENTORY_LIST, element: <InventoryManagementList /> },
+  { path: ROUTES.CREATE_INVENTORY, element: <CreateInventoryManagement /> },
+  { path: ROUTES.EDIT_INVENTORY(), element: <CreateInventoryManagement /> },
 
-// Catalog - Legality Control
-{ path: ROUTES.LEGALITY_CONTROL_LIST, element: <LegalityControlList /> },
-{ path: ROUTES.CREATE_LEGALITY_CONTROL, element: <CreatelegalityControl /> },
-{ path: ROUTES.EDIT_LEGALITY_CONTROL(), element: <CreatelegalityControl /> },
+  // Catalog - Legality Control
+  { path: ROUTES.LEGALITY_CONTROL_LIST, element: <LegalityControlList /> },
+  { path: ROUTES.CREATE_LEGALITY_CONTROL, element: <CreatelegalityControl /> },
+  { path: ROUTES.EDIT_LEGALITY_CONTROL(), element: <CreatelegalityControl /> },
 
-// Catalog - Product Base
-{ path: ROUTES.PRODUCT_BASE_LIST, element: <ProductBaseList /> },
-{ path: ROUTES.PRODUCT_BASE_DETAIL, element: <ProductBase /> },
-{ path: ROUTES.CREATE_PRODUCT_BASE, element: <CreateProductBase /> },
-{ path: ROUTES.EDIT_PRODUCT_BASE(), element: <CreateProductBase /> },
+  // Catalog - Product Base
+  { path: ROUTES.PRODUCT_BASE_LIST, element: <ProductBaseList /> },
+  { path: ROUTES.PRODUCT_BASE_DETAIL, element: <ProductBase /> },
+  { path: ROUTES.CREATE_PRODUCT_BASE, element: <CreateProductBase /> },
+  { path: ROUTES.EDIT_PRODUCT_BASE(), element: <CreateProductBase /> },
 
-// Catalog - Product Sharing
-{ path: ROUTES.PRODUCT_SHARING_LIST, element: <ProductSharingList /> },
-{ path: ROUTES.CREATE_PRODUCT_SHARING, element: <CreateProductSharing /> },
-{ path: ROUTES.EDIT_PRODUCT_SHARING(), element: <CreateProductSharing /> },
+  // Catalog - Product Sharing
+  { path: ROUTES.PRODUCT_SHARING_LIST, element: <ProductSharingList /> },
+  { path: ROUTES.CREATE_PRODUCT_SHARING, element: <CreateProductSharing /> },
+  { path: ROUTES.EDIT_PRODUCT_SHARING(), element: <CreateProductSharing /> },
 
-// Coupon Management
-{ path: ROUTES.COUPON_MANAGEMENT, element: <CouponManagement /> },
-{ path: ROUTES.COUPON_LIST, element: <CouponManagementList /> },
-{ path: ROUTES.CREATE_COUPON, element: <CreateCouponManagement /> },
-{ path: ROUTES.EDIT_COUPON(), element: <CreateCouponManagement /> },
+  // Coupon Management
+  { path: ROUTES.COUPON_MANAGEMENT, element: <CouponManagement /> },
+  { path: ROUTES.COUPON_LIST, element: <CouponManagementList /> },
+  { path: ROUTES.CREATE_COUPON, element: <CreateCouponManagement /> },
+  { path: ROUTES.EDIT_COUPON(), element: <CreateCouponManagement /> },
 
-// Email Marketing
-{ path: ROUTES.CREATE_EMAIL_MARKETING, element: <CreateEmailMarketing /> },
-{ path: ROUTES.EMAIL_MARKETING_LIST, element: <EmailMarketingList /> },
+  // Email Marketing
+  { path: ROUTES.CREATE_EMAIL_MARKETING, element: <CreateEmailMarketing /> },
+  { path: ROUTES.EMAIL_MARKETING_LIST, element: <EmailMarketingList /> },
 
-// SEO Settings
-{ path: ROUTES.CREATE_SEO_SETTING, element: <CreateSEOSetting /> },
-{ path: ROUTES.SEO_SETTING_LIST, element: <SEOSettingList /> },
-{ path: ROUTES.SEO_SETTING_DETAIL, element: <SEOSEtting /> },
+  // SEO Settings
+  { path: ROUTES.CREATE_SEO_SETTING, element: <CreateSEOSetting /> },
+  { path: ROUTES.SEO_SETTING_LIST, element: <SEOSettingList /> },
+  { path: ROUTES.SEO_SETTING_DETAIL, element: <SEOSEtting /> },
 
-// Users
-{ path: ROUTES.USER_LIST, element: <UserList /> },
-{ path: ROUTES.ADD_USER, element: <UserCreate /> },
-{ path: ROUTES.USER_DETAILS(), element: <UserCreate /> },
+  // Users
+  { path: ROUTES.USER_LIST, element: <UserList /> },
+  { path: ROUTES.ADD_USER, element: <UserCreate /> },
+  { path: ROUTES.USER_DETAILS(), element: <UserCreate /> },
 
-// User Roles
-{ path: ROUTES.USER_ROLES, element: <UsersRoles /> },
-{ path: ROUTES.ADD_ROLE, element: <AddRole /> },
-{ path: ROUTES.ROLE_DETAILS(), element: <RoleDetails /> },
+  // User Roles
+  { path: ROUTES.USER_ROLES, element: <UsersRoles /> },
+  { path: ROUTES.ADD_ROLE, element: <AddRole /> },
+  { path: ROUTES.ROLE_DETAILS(), element: <RoleDetails /> },
 
-// User Groups
-{ path: ROUTES.USER_GROUPS, element: <UsersGroup /> },
-{ path: ROUTES.ADD_GROUP, element: <AddGroup /> },
-{ path: ROUTES.GROUP_DETAILS(), element: <GroupDetails /> },
+  // User Groups
+  { path: ROUTES.USER_GROUPS, element: <UsersGroup /> },
+  { path: ROUTES.ADD_GROUP, element: <AddGroup /> },
+  { path: ROUTES.GROUP_DETAILS(), element: <GroupDetails /> },
 
-// Local Companies
-{ path: ROUTES.COUNTRY_MANAGEMENT, element: <CountryManagement /> },
-{ path: ROUTES.ADD_COUNTRY, element: <AddCountry /> },
-{ path: ROUTES.CURRENCY_MANAGEMENT, element: <CurrencyManagement /> },
-{ path: ROUTES.ADD_CURRENCY, element: <AddCurrency /> },
-{ path: ROUTES.LANGUAGE_MANAGEMENT, element: <LanguageManagement /> },
-{ path: ROUTES.ADD_LANGUAGE, element: <AddLanguage /> },
+  // Local Companies
+  { path: ROUTES.COUNTRY_MANAGEMENT, element: <CountryManagement /> },
+  { path: ROUTES.ADD_COUNTRY, element: <AddCountry /> },
+  { path: ROUTES.CURRENCY_MANAGEMENT, element: <CurrencyManagement /> },
+  { path: ROUTES.ADD_CURRENCY, element: <AddCurrency /> },
+  { path: ROUTES.LANGUAGE_MANAGEMENT, element: <LanguageManagement /> },
+  { path: ROUTES.ADD_LANGUAGE, element: <AddLanguage /> },
 
-// Taxes
-{ path: ROUTES.TAXES, element: <Taxes /> },
-{ path: ROUTES.ADD_RULE, element: <AddRule /> },
-{ path: ROUTES.INVOICE_MANAGEMENT, element: <InvoiceManagement /> },
+  // Taxes
+  { path: ROUTES.TAXES, element: <Taxes /> },
+  { path: ROUTES.ADD_RULE, element: <AddRule /> },
+  { path: ROUTES.INVOICE_MANAGEMENT, element: <InvoiceManagement /> },
 
-// Settings - Traditional Routes (keeping for backward compatibility)
-{ path: ROUTES.TRANSLATION, element: <Translation /> },
-{ path: ROUTES.UPDATES, element: <Updates /> },
-{ path: ROUTES.BACKUPS, element: <Backups /> },
-{ path: ROUTES.ADD_BACKUP, element: <AddBackup /> },
+  // Settings - Traditional Routes (keeping for backward compatibility)
+  { path: ROUTES.TRANSLATION, element: <Translation /> },
+  { path: ROUTES.UPDATES, element: <Updates /> },
+  { path: ROUTES.BACKUPS, element: <Backups /> },
+  { path: ROUTES.ADD_BACKUP, element: <AddBackup /> },
 
 
-// Settings - New Nested Routes
-{
-  path: ROUTES.SETTINGS,
+  // Settings - New Nested Routes
+  {
+    path: ROUTES.SETTINGS,
     element: <Settings />,
-      children: [
-        { index: true, element: <Navigate to="system" replace /> },
-        { path: "system", element: <SystemSettings /> },
-        { path: "payment", element: <PaymentSettings /> },
-        { path: "shipping", element: <ShippingSettings /> },
-        { path: "tax", element: <TaxSettings /> },
-        { path: "email", element: <EmailSettings /> },
-      ],
+    children: [
+      { index: true, element: <Navigate to="system" replace /> },
+      { path: "system", element: <SystemSettings /> },
+      { path: "payment", element: <PaymentSettings /> },
+      { path: "shipping", element: <ShippingSettings /> },
+      { path: "tax", element: <TaxSettings /> },
+      { path: "email", element: <EmailSettings /> },
+    ],
   },
-{
-  path: ROUTES.CONFIG,
+  {
+    path: ROUTES.CONFIG,
     element: <Config />,
-      children: [
-        { index: true, element: <Navigate to="countries" replace /> },
-        { path: "countries", element: <Countries /> },
-        { path: "sales-policies", element: <SalesPolicies /> },
-        { path: "currencies", element: <Currencies /> },
-        { path: "languages", element: <Languages /> },
-        { path: "themes", element: <Themes /> },
-        { path: "couriers", element: <Couriers /> },
-      ],
+    children: [
+      { index: true, element: <Navigate to="countries" replace /> },
+      { path: "countries", element: <Countries /> },
+      { path: "sales-policies", element: <SalesPolicies /> },
+      { path: "currencies", element: <Currencies /> },
+      { path: "languages", element: <Languages /> },
+      { path: "themes", element: <Themes /> },
+      { path: "couriers", element: <Couriers /> },
+    ],
   },
 
-{ path: ROUTES.PLANS, element: <PlanList /> },
-{ path: ROUTES.CREATE_PLAN, element: <PlanForm /> },
-{ path: ROUTES.EDIT_PLAN(), element: <PlanForm /> },
+  { path: ROUTES.PLANS, element: <PlanList /> },
+  { path: ROUTES.CREATE_PLAN, element: <PlanForm /> },
+  { path: ROUTES.EDIT_PLAN(), element: <PlanForm /> },
 
-{
-  path: "/mlm",
+  {
+    path: "/mlm",
     element: <MLM />,
-      children: [
-        { index: true, element: <Navigate to="dashboard" replace /> },
-        { path: "dashboard", element: <MlmDashboard /> },
-        { path: "agents", element: <Agents /> },
-        { path: "agents/add", element: <AgentForm /> },
-        { path: "agents/:id", element: <AgentDetail /> },
-        { path: "agents/edit/:id", element: <AgentForm /> },
-        { path: "commissions", element: <Commissions /> },
-        { path: "structure", element: <Structure /> },
-        { path: "levels", element: <Levels /> },
-      ],
+    children: [
+      { index: true, element: <Navigate to="dashboard" replace /> },
+      { path: "dashboard", element: <MlmDashboard /> },
+      { path: "agents", element: <Agents /> },
+      { path: "agents/add", element: <AgentForm /> },
+      { path: "agents/:id", element: <AgentDetail /> },
+      { path: "agents/edit/:id", element: <AgentForm /> },
+      { path: "commissions", element: <Commissions /> },
+      { path: "structure", element: <Structure /> },
+      { path: "levels", element: <Levels /> },
+    ],
   },
-{
-  path: ROUTES.REPORTS,
+  {
+    path: ROUTES.REPORTS,
     element: <Reports />,
-      children: [
-        { index: true, element: <Navigate to="platform" replace /> },
-        { path: "platform", element: <PlatformReport /> },
-        { path: "financial", element: <FinancialReport /> },
-        { path: "sales", element: <SalesReport /> },
-        { path: "vendor-performance", element: <VendorPerformanceReport /> },
-        { path: "product-performance", element: <ProductPerformanceReport /> },
-        { path: "export", element: <ExportReport /> },
-      ],
+    children: [
+      { index: true, element: <Navigate to="platform" replace /> },
+      { path: "platform", element: <PlatformReport /> },
+      { path: "financial", element: <FinancialReport /> },
+      { path: "sales", element: <SalesReport /> },
+      { path: "vendor-performance", element: <VendorPerformanceReport /> },
+      { path: "product-performance", element: <ProductPerformanceReport /> },
+      { path: "export", element: <ExportReport /> },
+    ],
   },
-// Alternative flat routes (can be used alongside nested for direct access)
-{ path: ROUTES.SETTINGS_SYSTEM, element: <SystemSettings /> },
-{ path: ROUTES.SETTINGS_PAYMENT, element: <PaymentSettings /> },
-{ path: ROUTES.SETTINGS_SHIPPING, element: <ShippingSettings /> },
-{ path: ROUTES.SETTINGS_TAX, element: <TaxSettings /> },
-{ path: ROUTES.SETTINGS_EMAIL, element: <EmailSettings /> },
+  // Alternative flat routes (can be used alongside nested for direct access)
+  { path: ROUTES.SETTINGS_SYSTEM, element: <SystemSettings /> },
+  { path: ROUTES.SETTINGS_PAYMENT, element: <PaymentSettings /> },
+  { path: ROUTES.SETTINGS_SHIPPING, element: <ShippingSettings /> },
+  { path: ROUTES.SETTINGS_TAX, element: <TaxSettings /> },
+  { path: ROUTES.SETTINGS_EMAIL, element: <EmailSettings /> },
 
-// MLM Dashboard
-// { path: ROUTES.MLM_DASHBOARD, element: <MlmDashboard /> },
-// { path: ROUTES.USER_TREE, element: <UserTree /> },
-// { path: ROUTES.EARNINGS_REPORT, element: <Earning /> },
-// { path: ROUTES.LEVEL_WISE, element: <LevelWise /> },
-// { path: ROUTES.MEMBER_GROWTH, element: <MemberGrowth /> },
+  // MLM Dashboard
+  // { path: ROUTES.MLM_DASHBOARD, element: <MlmDashboard /> },
+  // { path: ROUTES.USER_TREE, element: <UserTree /> },
+  // { path: ROUTES.EARNINGS_REPORT, element: <Earning /> },
+  // { path: ROUTES.LEVEL_WISE, element: <LevelWise /> },
+  // { path: ROUTES.MEMBER_GROWTH, element: <MemberGrowth /> },
 
-// Payment Providers
-{ path: ROUTES.PAYMENT_PROVIDERS, element: <PaymentProviderManagement /> },
-{ path: ROUTES.PAYMENT_PROVIDER_DETAILS(), element: <PaymentProviderDetails /> },
-{ path: ROUTES.ADD_STRIPE, element: <AddStripe /> },
-{ path: ROUTES.ADD_PROVIDER, element: <AddProvider /> },
+  // Payment Providers
+  { path: ROUTES.PAYMENT_PROVIDERS, element: <PaymentProviderManagement /> },
+  { path: ROUTES.PAYMENT_PROVIDER_DETAILS(), element: <PaymentProviderDetails /> },
+  { path: ROUTES.ADD_STRIPE, element: <AddStripe /> },
+  { path: ROUTES.ADD_PROVIDER, element: <AddProvider /> },
 
-// Shipping Providers
-{ path: ROUTES.SHIPPING_MANAGEMENT, element: <ShippingProviderManagement /> },
-{ path: ROUTES.ADD_SHIPPING_PROVIDER, element: <AddShipping /> },
-{ path: ROUTES.ADD_SHIPROCKET, element: <AddShipRocket /> },
-{ path: ROUTES.SHIPPING_PROVIDER_DETAILS(), element: <ShippingProviderDetail /> },
+  // Shipping Providers
+  { path: ROUTES.SHIPPING_MANAGEMENT, element: <ShippingProviderManagement /> },
+  { path: ROUTES.ADD_SHIPPING_PROVIDER, element: <AddShipping /> },
+  { path: ROUTES.ADD_SHIPROCKET, element: <AddShipRocket /> },
+  { path: ROUTES.SHIPPING_PROVIDER_DETAILS(), element: <ShippingProviderDetail /> },
 
-// Domain Management
-{ path: ROUTES.DOMAINS, element: <Domain /> },
-{ path: ROUTES.SSL, element: <Ssl /> },
-{ path: ROUTES.DNS, element: <Dns /> },
-{ path: ROUTES.SUBDOMAINS, element: <SubDomain /> },
-{ path: ROUTES.ADD_DNS_RECORD, element: <AddDnsRecord /> },
-{ path: ROUTES.ADD_SUBDOMAIN, element: <AddSubdomain /> },
-{ path: ROUTES.ADD_SSL_CERTIFICATE, element: <AddSslCertificate /> },
+  // Domain Management
+  { path: ROUTES.DOMAINS, element: <Domain /> },
+  { path: ROUTES.SSL, element: <Ssl /> },
+  { path: ROUTES.DNS, element: <Dns /> },
+  { path: ROUTES.SUBDOMAINS, element: <SubDomain /> },
+  { path: ROUTES.ADD_DNS_RECORD, element: <AddDnsRecord /> },
+  { path: ROUTES.ADD_SUBDOMAIN, element: <AddSubdomain /> },
+  { path: ROUTES.ADD_SSL_CERTIFICATE, element: <AddSslCertificate /> },
 
-// Magento Routes
-{ path: ROUTES.MAGENTO_ORDERS, element: <MagentoOrderList /> },
-{ path: ROUTES.MAGENTO_ORDER_DETAILS(), element: <MogentoOrder /> },
-{ path: ROUTES.MAGENTO_PRODUCTS, element: <MagentoProductList /> },
-{ path: ROUTES.ADD_MAGENTO_PRODUCT, element: <AddMagentoProduct /> },
-{ path: ROUTES.EDIT_MAGENTO_PRODUCT(), element: <AddMagentoProduct /> },
-{ path: ROUTES.ADD_MAGENTO_CATEGORY, element: <AddMagentoCategory /> },
-{ path: ROUTES.EDIT_MAGENTO_CATEGORY(), element: <AddMagentoCategory /> },
-{ path: ROUTES.MAGENTO_CATEGORY_LIST, element: <MagentoCategoryList /> },
-{ path: ROUTES.ADD_MAGENTO_CUSTOMER, element: <AddMagentoCustomer /> },
-{ path: ROUTES.MAGENTO_CUSTOMER_LIST, element: <MagentoCustomerList /> },
-{ path: ROUTES.EDIT_MAGENTO_CUSTOMER(), element: <AddMagentoCustomer /> },
-{ path: ROUTES.CUSTOMER_DETAILS(), element: <AddMagentoCustomer /> },
-{ path: ROUTES.MAGENTO_STORE_LIST, element: <MagentoManageStoresList /> },
-{ path: ROUTES.MAGENTO_INVENTORY_LIST, element: <MagentoInventoryList /> },
-{ path: ROUTES.UPDATE_MAGENTO_INVENTORY(), element: <UpdateMagentoInventory /> },
-{ path: ROUTES.MAGENTO_ATTRIBUTES_LIST, element: <MagentoAttributesLits /> },
-{ path: ROUTES.ADD_MAGENTO_ATTRIBUTE, element: <AddMagentoAttribute /> },
-{ path: ROUTES.EDIT_MAGENTO_ATTRIBUTE(), element: <AddMagentoAttribute /> },
-{ path: ROUTES.MAGENTO_ATTRIBUTE_SETS, element: <MagentoAttributeSetsList /> },
-{ path: ROUTES.ADD_MAGENTO_ATTRIBUTE_SET, element: <AddMagentoAttributeSet /> },
-{ path: ROUTES.MAGENTO_PAYMENT_SERVICE, element: <MagentoPaymentServices /> },
-{ path: ROUTES.MAGENTO_INVOICE_LIST, element: <MagentoInvoiceList /> },
-{ path: ROUTES.MAGENTO_INVOICE_DETAIL, element: <MagentoInvoiceDetail /> },
-{ path: ROUTES.MAGENTO_SHIPMENTS, element: <MagentoShipmentList /> },
-{ path: ROUTES.MAGENTO_SHIPMENT_DETAILS(), element: <MagentoShipmentDetail /> },
-{ path: ROUTES.MAGENTO_CREDIT_MEMOS, element: <MagentoCreditMemoList /> },
-{ path: ROUTES.MAGENTO_CREDIT_MEMO_DETAIL, element: <MagentoCreditMemoDetail /> },
-{ path: ROUTES.ONLINE_CUSTOMERS, element: <MagentoOnlineCustomers /> },
-{ path: ROUTES.MAGENTO_CUSTOMER_GROUPS_LIST, element: <MagentoCustomerGroupsList /> },
-{ path: ROUTES.EDIT_MAGENTO_CUSTOMER_GROUP(), element: <AddMagentoCustomerGroup /> },
-{ path: ROUTES.ADD_MAGENTO_CUSTOMER_GROUP, element: <AddMagentoCustomerGroup /> },
-{ path: ROUTES.ADD_CATALOG_PRICE_RULE, element: <AddMagentoCatalogPriceRule /> },
-{ path: ROUTES.EDIT_CATALOG_PRICE_RULE(), element: <AddMagentoCatalogPriceRule /> },
-{ path: ROUTES.MAGENTO_CATALOG_PRICE_RULE_LIST, element: <MagentoCatalogPriceRuleList /> },
-{ path: ROUTES.MAGENTO_CART_PRICE_RULES_LIST, element: <MagentoCartPriceRulesList /> },
-{ path: ROUTES.ADD_CART_PRICE_RULE, element: <AddMagentoCartPriceRule /> },
-{ path: ROUTES.EDIT_CART_PRICE_RULE(), element: <AddMagentoCartPriceRule /> },
-{ path: ROUTES.MAGENTO_URL_REWRITES_LIST, element: <MagentoUrlRewritesList /> },
-{ path: ROUTES.ADD_MAGENTO_URL_REWRITE, element: <AddMagentoUrlRewrite /> },
-{ path: ROUTES.EDIT_MAGENTO_URL_REWRITE(), element: <AddMagentoUrlRewrite /> },
-{ path: ROUTES.MAGENTO_SEARCH_TERMS_LIST, element: <MagentoSearchTermsList /> },
-{ path: ROUTES.ADD_MAGENTO_SEARCH_TERM, element: <AddMagentoSearchTerm /> },
-{ path: ROUTES.EDIT_MAGENTO_SEARCH_TERM(), element: <AddMagentoSearchTerm /> },
-{ path: ROUTES.EDIT_MAGENTO_SEARCH_SYNONYM(), element: <AddMagentoSearchSynonym /> },
-{ path: ROUTES.ADD_MAGENTO_SEARCH_SYNONYM, element: <AddMagentoSearchSynonym /> },
-{ path: ROUTES.MAGENTO_SEARCH_SYNONYMS_LIST, element: <MagentoSearchSynonymsList /> },
-{ path: ROUTES.MAGENTO_SITEMAP_LIST, element: <MagentoSitemapList /> },
-{ path: ROUTES.ADD_MAGENTO_SITEMAP, element: <AddMagentoSitemap /> },
-{ path: ROUTES.EDIT_MAGENTO_SITEMAP(), element: <AddMagentoSitemap /> },
-{ path: ROUTES.MAGENTO_REVIEWS_LIST, element: <MagentoReviewsList /> },
-{ path: ROUTES.ADD_MAGENTO_REVIEW, element: <AddMagentoReview /> },
-{ path: ROUTES.EDIT_MAGENTO_REVIEW(), element: <AddMagentoReview /> },
-{ path: ROUTES.MAGENTO_EMAIL_TEMPLATES_LIST, element: <MagentoEmailTemplatesList /> },
-{ path: ROUTES.ADD_MAGENTO_EMAIL_TEMPLATE, element: <AddMagentoEmailTemplate /> },
-{ path: ROUTES.MAGENTO_NEWSLETTER_TEMPLATES_LIST, element: <MagentoNewsletterTemplatesList /> },
-{ path: ROUTES.ADD_MAGENTO_NEWSLETTER_TEMPLATE, element: <AddMagentoNewsletterTemplate /> },
-{ path: ROUTES.EDIT_MAGENTO_NEWSLETTER_TEMPLATE(), element: <AddMagentoNewsletterTemplate /> },
-{ path: ROUTES.EDIT_MAGENTO_STORE(), element: <AddMagentoStor /> },
-{ path: ROUTES.ADD_MAGENTO_STORE, element: <AddMagentoStor /> },
-{ path: ROUTES.MAGENTO_CONFIGURATION_LIST, element: <MagentoConfigurationList /> },
-{ path: ROUTES.MAGENTO_TERMS_CONDITIONS_LIST, element: <MagentoTermsConditionsList /> },
-{ path: ROUTES.ADD_MAGENTO_TERMS_CONDITION, element: <AddMagentoTermsCondition /> },
-{ path: ROUTES.EDIT_MAGENTO_TERMS_CONDITION(), element: <AddMagentoTermsCondition /> },
-{ path: ROUTES.MAGENTO_ORDER_STATUS_LIST, element: <MagentoOrderStatusList /> },
-{ path: ROUTES.ADD_MAGENTO_ORDER_STATUS, element: <AddMagentoOrderStatus /> },
-{ path: ROUTES.EDIT_MAGENTO_ORDER_STATUS(), element: <AddMagentoOrderStatus /> },
-{ path: ROUTES.MAGENTO_SOURCES_LIST, element: <MagentoSourcesList /> },
-{ path: ROUTES.ADD_MAGENTO_SOURCE, element: <AddMagentoSource /> },
-{ path: ROUTES.MAGENTO_TAX_RULES_LIST, element: <MagentoTaxRulesList /> },
-{ path: ROUTES.ADD_MAGENTO_TAX_RULE, element: <AddMagentoTaxRule /> },
-{ path: ROUTES.ADD_CURRENCY_SYMBOLS, element: <AddCurrencySymbols /> },
-{ path: ROUTES.ADD_CURRENCY_RATES, element: <AddCurrencyRates /> },
-{ path: ROUTES.MAGENTO_PRODUCT_RATINGS_LIST, element: <MagentoProductRatingsList /> },
-{ path: ROUTES.MAGENTO_TAX_ZONES_LIST, element: <MagentoTaxZonesList /> },
-{ path: ROUTES.ADD_MAGENTO_TAX_ZONE, element: <AddMagentoTaxZone /> },
-{ path: ROUTES.ADD_MAGENTO_RATING, element: <AddMagentoRating /> },
-{ path: ROUTES.MAGENTO_STOCK_LIST, element: <MagentoStockList /> },
-{ path: ROUTES.ADD_MAGENTO_STOCK, element: <AddMagentoStock /> },
-{ path: ROUTES.MAGENTO_BILLING_AGREEMENTS_LIST, element: <MagentoBillingAgreementsList /> },
-{ path: ROUTES.MAGENTO_TRANSACTION_LIST, element: <MagentoTransactionList /> },
-{ path: ROUTES.BRAINTREE_VIRTUAL_TERMINAL, element: <BraintreeVirtualTerminal /> },
+  // Magento Routes
+  { path: ROUTES.MAGENTO_ORDERS, element: <MagentoOrderList /> },
+  { path: ROUTES.MAGENTO_ORDER_DETAILS(), element: <MogentoOrder /> },
+  { path: ROUTES.MAGENTO_PRODUCTS, element: <MagentoProductList /> },
+  { path: ROUTES.ADD_MAGENTO_PRODUCT, element: <AddMagentoProduct /> },
+  { path: ROUTES.EDIT_MAGENTO_PRODUCT(), element: <AddMagentoProduct /> },
+  { path: ROUTES.ADD_MAGENTO_CATEGORY, element: <AddMagentoCategory /> },
+  { path: ROUTES.EDIT_MAGENTO_CATEGORY(), element: <AddMagentoCategory /> },
+  { path: ROUTES.MAGENTO_CATEGORY_LIST, element: <MagentoCategoryList /> },
+  { path: ROUTES.ADD_MAGENTO_CUSTOMER, element: <AddMagentoCustomer /> },
+  { path: ROUTES.MAGENTO_CUSTOMER_LIST, element: <MagentoCustomerList /> },
+  { path: ROUTES.EDIT_MAGENTO_CUSTOMER(), element: <AddMagentoCustomer /> },
+  { path: ROUTES.CUSTOMER_DETAILS(), element: <AddMagentoCustomer /> },
+  { path: ROUTES.MAGENTO_STORE_LIST, element: <MagentoManageStoresList /> },
+  { path: ROUTES.MAGENTO_INVENTORY_LIST, element: <MagentoInventoryList /> },
+  { path: ROUTES.UPDATE_MAGENTO_INVENTORY(), element: <UpdateMagentoInventory /> },
+  { path: ROUTES.MAGENTO_ATTRIBUTES_LIST, element: <MagentoAttributesLits /> },
+  { path: ROUTES.ADD_MAGENTO_ATTRIBUTE, element: <AddMagentoAttribute /> },
+  { path: ROUTES.EDIT_MAGENTO_ATTRIBUTE(), element: <AddMagentoAttribute /> },
+  { path: ROUTES.MAGENTO_ATTRIBUTE_SETS, element: <MagentoAttributeSetsList /> },
+  { path: ROUTES.ADD_MAGENTO_ATTRIBUTE_SET, element: <AddMagentoAttributeSet /> },
+  { path: ROUTES.MAGENTO_PAYMENT_SERVICE, element: <MagentoPaymentServices /> },
+  { path: ROUTES.MAGENTO_INVOICE_LIST, element: <MagentoInvoiceList /> },
+  { path: ROUTES.MAGENTO_INVOICE_DETAIL, element: <MagentoInvoiceDetail /> },
+  { path: ROUTES.MAGENTO_SHIPMENTS, element: <MagentoShipmentList /> },
+  { path: ROUTES.MAGENTO_SHIPMENT_DETAILS(), element: <MagentoShipmentDetail /> },
+  { path: ROUTES.MAGENTO_CREDIT_MEMOS, element: <MagentoCreditMemoList /> },
+  { path: ROUTES.MAGENTO_CREDIT_MEMO_DETAIL, element: <MagentoCreditMemoDetail /> },
+  { path: ROUTES.ONLINE_CUSTOMERS, element: <MagentoOnlineCustomers /> },
+  { path: ROUTES.MAGENTO_CUSTOMER_GROUPS_LIST, element: <MagentoCustomerGroupsList /> },
+  { path: ROUTES.EDIT_MAGENTO_CUSTOMER_GROUP(), element: <AddMagentoCustomerGroup /> },
+  { path: ROUTES.ADD_MAGENTO_CUSTOMER_GROUP, element: <AddMagentoCustomerGroup /> },
+  { path: ROUTES.ADD_CATALOG_PRICE_RULE, element: <AddMagentoCatalogPriceRule /> },
+  { path: ROUTES.EDIT_CATALOG_PRICE_RULE(), element: <AddMagentoCatalogPriceRule /> },
+  { path: ROUTES.MAGENTO_CATALOG_PRICE_RULE_LIST, element: <MagentoCatalogPriceRuleList /> },
+  { path: ROUTES.MAGENTO_CART_PRICE_RULES_LIST, element: <MagentoCartPriceRulesList /> },
+  { path: ROUTES.ADD_CART_PRICE_RULE, element: <AddMagentoCartPriceRule /> },
+  { path: ROUTES.EDIT_CART_PRICE_RULE(), element: <AddMagentoCartPriceRule /> },
+  { path: ROUTES.MAGENTO_URL_REWRITES_LIST, element: <MagentoUrlRewritesList /> },
+  { path: ROUTES.ADD_MAGENTO_URL_REWRITE, element: <AddMagentoUrlRewrite /> },
+  { path: ROUTES.EDIT_MAGENTO_URL_REWRITE(), element: <AddMagentoUrlRewrite /> },
+  { path: ROUTES.MAGENTO_SEARCH_TERMS_LIST, element: <MagentoSearchTermsList /> },
+  { path: ROUTES.ADD_MAGENTO_SEARCH_TERM, element: <AddMagentoSearchTerm /> },
+  { path: ROUTES.EDIT_MAGENTO_SEARCH_TERM(), element: <AddMagentoSearchTerm /> },
+  { path: ROUTES.EDIT_MAGENTO_SEARCH_SYNONYM(), element: <AddMagentoSearchSynonym /> },
+  { path: ROUTES.ADD_MAGENTO_SEARCH_SYNONYM, element: <AddMagentoSearchSynonym /> },
+  { path: ROUTES.MAGENTO_SEARCH_SYNONYMS_LIST, element: <MagentoSearchSynonymsList /> },
+  { path: ROUTES.MAGENTO_SITEMAP_LIST, element: <MagentoSitemapList /> },
+  { path: ROUTES.ADD_MAGENTO_SITEMAP, element: <AddMagentoSitemap /> },
+  { path: ROUTES.EDIT_MAGENTO_SITEMAP(), element: <AddMagentoSitemap /> },
+  { path: ROUTES.MAGENTO_REVIEWS_LIST, element: <MagentoReviewsList /> },
+  { path: ROUTES.ADD_MAGENTO_REVIEW, element: <AddMagentoReview /> },
+  { path: ROUTES.EDIT_MAGENTO_REVIEW(), element: <AddMagentoReview /> },
+  { path: ROUTES.MAGENTO_EMAIL_TEMPLATES_LIST, element: <MagentoEmailTemplatesList /> },
+  { path: ROUTES.ADD_MAGENTO_EMAIL_TEMPLATE, element: <AddMagentoEmailTemplate /> },
+  { path: ROUTES.MAGENTO_NEWSLETTER_TEMPLATES_LIST, element: <MagentoNewsletterTemplatesList /> },
+  { path: ROUTES.ADD_MAGENTO_NEWSLETTER_TEMPLATE, element: <AddMagentoNewsletterTemplate /> },
+  { path: ROUTES.EDIT_MAGENTO_NEWSLETTER_TEMPLATE(), element: <AddMagentoNewsletterTemplate /> },
+  { path: ROUTES.EDIT_MAGENTO_STORE(), element: <AddMagentoStor /> },
+  { path: ROUTES.ADD_MAGENTO_STORE, element: <AddMagentoStor /> },
+  { path: ROUTES.MAGENTO_CONFIGURATION_LIST, element: <MagentoConfigurationList /> },
+  { path: ROUTES.MAGENTO_TERMS_CONDITIONS_LIST, element: <MagentoTermsConditionsList /> },
+  { path: ROUTES.ADD_MAGENTO_TERMS_CONDITION, element: <AddMagentoTermsCondition /> },
+  { path: ROUTES.EDIT_MAGENTO_TERMS_CONDITION(), element: <AddMagentoTermsCondition /> },
+  { path: ROUTES.MAGENTO_ORDER_STATUS_LIST, element: <MagentoOrderStatusList /> },
+  { path: ROUTES.ADD_MAGENTO_ORDER_STATUS, element: <AddMagentoOrderStatus /> },
+  { path: ROUTES.EDIT_MAGENTO_ORDER_STATUS(), element: <AddMagentoOrderStatus /> },
+  { path: ROUTES.MAGENTO_SOURCES_LIST, element: <MagentoSourcesList /> },
+  { path: ROUTES.ADD_MAGENTO_SOURCE, element: <AddMagentoSource /> },
+  { path: ROUTES.MAGENTO_TAX_RULES_LIST, element: <MagentoTaxRulesList /> },
+  { path: ROUTES.ADD_MAGENTO_TAX_RULE, element: <AddMagentoTaxRule /> },
+  { path: ROUTES.ADD_CURRENCY_SYMBOLS, element: <AddCurrencySymbols /> },
+  { path: ROUTES.ADD_CURRENCY_RATES, element: <AddCurrencyRates /> },
+  { path: ROUTES.MAGENTO_PRODUCT_RATINGS_LIST, element: <MagentoProductRatingsList /> },
+  { path: ROUTES.MAGENTO_TAX_ZONES_LIST, element: <MagentoTaxZonesList /> },
+  { path: ROUTES.ADD_MAGENTO_TAX_ZONE, element: <AddMagentoTaxZone /> },
+  { path: ROUTES.ADD_MAGENTO_RATING, element: <AddMagentoRating /> },
+  { path: ROUTES.MAGENTO_STOCK_LIST, element: <MagentoStockList /> },
+  { path: ROUTES.ADD_MAGENTO_STOCK, element: <AddMagentoStock /> },
+  { path: ROUTES.MAGENTO_BILLING_AGREEMENTS_LIST, element: <MagentoBillingAgreementsList /> },
+  { path: ROUTES.MAGENTO_TRANSACTION_LIST, element: <MagentoTransactionList /> },
+  { path: ROUTES.BRAINTREE_VIRTUAL_TERMINAL, element: <BraintreeVirtualTerminal /> },
 
-// Reports
-{ path: ROUTES.MAGENTO_PRODUCTS_IN_CARTS_LIST, element: <MagentoProductsInCartsList /> },
-{ path: ROUTES.MAGENTO_SEARCH_TERMS_REPORT, element: <MagentoSearchTermsListForReports /> },
-{ path: ROUTES.MAGENTO_ABANDONED_CARTS_LIST, element: <MagentoAbandonedCartsList /> },
-{ path: ROUTES.MAGENTO_NEWSLETTER_PROBLEMS_REPORT, element: <MagentoNewsletterProblemsReportList /> },
-{ path: ROUTES.MAGENTO_CUSTOMER_REVIEWS_REPORT, element: <MagentoCustomerReviewsReportList /> },
-{ path: ROUTES.MAGENTO_PRODUCT_REVIEWS_REPORT, element: <MagentoProductReviewsReportList /> },
-{ path: ROUTES.MAGENTO_ORDER_UPDATED_REPORT, element: <MagentoOrderUpdatedReportList /> },
-{ path: ROUTES.MAGENTO_TAX_REPORT, element: <MagentoTaxReportList /> },
-{ path: ROUTES.MAGENTO_INVOICE_REPORT, element: <MagentoInvoiceReportList /> },
-{ path: ROUTES.MAGENTO_SHIPPING_REPORT, element: <MagentoShippingReportList /> },
-{ path: ROUTES.MAGENTO_REFUNDS_REPORT, element: <MagentoRefundsReportList /> },
-{ path: ROUTES.MAGENTO_COUPONS_REPORT, element: <MagentoCouponsReportList /> },
-{ path: ROUTES.MAGENTO_PAYPAL_SETTLEMENT_REPORT, element: <MagentoPayPalSettlementReportList /> },
-{ path: ROUTES.MAGENTO_BRAINTREE_SETTLEMENT_REPORT, element: <MagentoBraintreeSettlementReportList /> },
-{ path: ROUTES.MAGENTO_ORDER_TOTAL_REPORT, element: <MagentoOrderTotalReportList /> },
-{ path: ROUTES.MAGENTO_ORDER_COUNT_REPORT, element: <MagentoOrderCountReportList /> },
-{ path: ROUTES.MAGENTO_NEW_ACCOUNTS_REPORT, element: <MagentoNewAccountsReportList /> },
-{ path: ROUTES.MAGENTO_PRODUCT_VIEWS_REPORT, element: <MagentoProductViewsReportList /> },
-{ path: ROUTES.MAGENTO_BESTSELLERS_REPORT, element: <MagentoBestsellersReportList /> },
-{ path: ROUTES.MAGENTO_LOW_STOCK_REPORT, element: <MagentoLowStockReportList /> },
-{ path: ROUTES.MAGENTO_ORDERED_PRODUCTS_REPORT, element: <MagentoOrderedProductsReportList /> },
-{ path: ROUTES.MAGENTO_DOWNLOADS_REPORT, element: <MagentoDownloadsReportList /> },
-{ path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
-{ path: ROUTES.VENDOR, element: <VendorList /> },
+  // Reports
+  { path: ROUTES.MAGENTO_PRODUCTS_IN_CARTS_LIST, element: <MagentoProductsInCartsList /> },
+  { path: ROUTES.MAGENTO_SEARCH_TERMS_REPORT, element: <MagentoSearchTermsListForReports /> },
+  { path: ROUTES.MAGENTO_ABANDONED_CARTS_LIST, element: <MagentoAbandonedCartsList /> },
+  { path: ROUTES.MAGENTO_NEWSLETTER_PROBLEMS_REPORT, element: <MagentoNewsletterProblemsReportList /> },
+  { path: ROUTES.MAGENTO_CUSTOMER_REVIEWS_REPORT, element: <MagentoCustomerReviewsReportList /> },
+  { path: ROUTES.MAGENTO_PRODUCT_REVIEWS_REPORT, element: <MagentoProductReviewsReportList /> },
+  { path: ROUTES.MAGENTO_ORDER_UPDATED_REPORT, element: <MagentoOrderUpdatedReportList /> },
+  { path: ROUTES.MAGENTO_TAX_REPORT, element: <MagentoTaxReportList /> },
+  { path: ROUTES.MAGENTO_INVOICE_REPORT, element: <MagentoInvoiceReportList /> },
+  { path: ROUTES.MAGENTO_SHIPPING_REPORT, element: <MagentoShippingReportList /> },
+  { path: ROUTES.MAGENTO_REFUNDS_REPORT, element: <MagentoRefundsReportList /> },
+  { path: ROUTES.MAGENTO_COUPONS_REPORT, element: <MagentoCouponsReportList /> },
+  { path: ROUTES.MAGENTO_PAYPAL_SETTLEMENT_REPORT, element: <MagentoPayPalSettlementReportList /> },
+  { path: ROUTES.MAGENTO_BRAINTREE_SETTLEMENT_REPORT, element: <MagentoBraintreeSettlementReportList /> },
+  { path: ROUTES.MAGENTO_ORDER_TOTAL_REPORT, element: <MagentoOrderTotalReportList /> },
+  { path: ROUTES.MAGENTO_ORDER_COUNT_REPORT, element: <MagentoOrderCountReportList /> },
+  { path: ROUTES.MAGENTO_NEW_ACCOUNTS_REPORT, element: <MagentoNewAccountsReportList /> },
+  { path: ROUTES.MAGENTO_PRODUCT_VIEWS_REPORT, element: <MagentoProductViewsReportList /> },
+  { path: ROUTES.MAGENTO_BESTSELLERS_REPORT, element: <MagentoBestsellersReportList /> },
+  { path: ROUTES.MAGENTO_LOW_STOCK_REPORT, element: <MagentoLowStockReportList /> },
+  { path: ROUTES.MAGENTO_ORDERED_PRODUCTS_REPORT, element: <MagentoOrderedProductsReportList /> },
+  { path: ROUTES.MAGENTO_DOWNLOADS_REPORT, element: <MagentoDownloadsReportList /> },
+  { path: ROUTES.MAGENTO_NOTIFICATIONS_LIST, element: <MagentoNotificationsList /> },
+  { path: ROUTES.VENDOR, element: <VendorList /> },
 
-// System Management
-{ path: ROUTES.SYSTEM_LOGS, element: <SystemLogs /> },
-{ path: ROUTES.SYSTEM_CACHE, element: <SystemCache /> },
-{ path: ROUTES.SYSTEM_QUEUES, element: <SystemQueues /> },
-{ path: ROUTES.SYSTEM_MAINTENANCE, element: <SystemMaintenance /> },
+  // System Management
+  { path: ROUTES.SYSTEM_LOGS, element: <SystemLogs /> },
+  { path: ROUTES.SYSTEM_CACHE, element: <SystemCache /> },
+  { path: ROUTES.SYSTEM_QUEUES, element: <SystemQueues /> },
+  { path: ROUTES.SYSTEM_MAINTENANCE, element: <SystemMaintenance /> },
 
-// Settlements
-{ path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
-{ path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
-{ path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
+  // Settlements
+  { path: ROUTES.MAGENTO_SETTLEMENTS_LIST, element: <SettlementList /> },
+  { path: ROUTES.MAGENTO_SETTLEMENT_DETAIL(), element: <SettlementDetail /> },
+  { path: ROUTES.MAGENTO_SETTLEMENT_GENERATE, element: <GenerateSettlement /> },
 
-// CMS Blocks
-{ path: ROUTES.CMS_BLOCK_LIST, element: <CmsBlockList /> },
-{ path: ROUTES.ADD_CMS_BLOCK, element: <AddCmsBlock /> },
-{ path: ROUTES.EDIT_CMS_BLOCK(), element: <AddCmsBlock /> },
+  // CMS Blocks
+  { path: ROUTES.CMS_BLOCK_LIST, element: <CmsBlockList /> },
+  { path: ROUTES.ADD_CMS_BLOCK, element: <AddCmsBlock /> },
+  { path: ROUTES.EDIT_CMS_BLOCK(), element: <AddCmsBlock /> },
 
-// CMS Pages
-{ path: ROUTES.CMS_PAGE_LIST, element: <CmsPageList /> },
-{ path: ROUTES.ADD_CMS_PAGE, element: <AddCmsPage /> },
-{ path: ROUTES.EDIT_CMS_PAGE(), element: <AddCmsPage /> },
+  // CMS Pages
+  { path: ROUTES.CMS_PAGE_LIST, element: <CmsPageList /> },
+  { path: ROUTES.ADD_CMS_PAGE, element: <AddCmsPage /> },
+  { path: ROUTES.EDIT_CMS_PAGE(), element: <AddCmsPage /> },
 ];
 
 // ==================== CREATE ROUTER ====================
