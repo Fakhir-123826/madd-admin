@@ -7,9 +7,11 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from "./router.tsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster, toast } from "react-hot-toast";
+import TokenExpiryWatcher from './component/TokenExpiryWatcher';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
+      <TokenExpiryWatcher />
       <Toaster
         position="top-center"
         reverseOrder={false}

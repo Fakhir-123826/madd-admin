@@ -78,8 +78,8 @@ const CmsBlockList = () => {
                                 placeholder="Select Vendor..."
                             />
                         )}
-                        <button 
-                            onClick={handleSync} 
+                        <button
+                            onClick={handleSync}
                             disabled={isSyncing || !selectedVendorUuid}
                             className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition disabled:opacity-50"
                         >
@@ -97,66 +97,110 @@ const CmsBlockList = () => {
 
                 {/* TABLE */}
                 <div className="rounded-t-3xl overflow-hidden mt-6">
-                    <table className="w-full text-sm border-separate border-spacing-y-3">
-                        {/* HEADER */}
-                        <thead className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
-                            <tr>
-                                <th className="p-4 text-left">ID</th>
-                                <th className="p-4 text-left">Title</th>
-                                <th className="p-4 text-left">Identifier</th>
-                                <th className="p-4 text-left">Creation Time</th>
-                                <th className="p-4 text-left">Status</th>
-                                <th className="p-4"></th>
+                    <table className="w-full table-auto">
+                        <thead className="bg-white">
+                            <tr className="border-b border-gray-100">
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    ID
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Title
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Identifier
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Creation Time
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th className="px-6 py-4"></th>
                             </tr>
                         </thead>
 
-                        {/* BODY */}
-                        <tbody>
+                        <tbody className="bg-white divide-y divide-gray-200">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center p-4">Loading...</td>
+                                    <td colSpan={6} className="px-6 py-12 text-center">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="animate-spin h-8 w-8 rounded-full border-b-2 border-teal-500" />
+                                            <p className="text-sm text-gray-500">
+                                                Loading CMS Blocks...
+                                            </p>
+                                        </div>
+                                    </td>
                                 </tr>
                             ) : blocks.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center p-4">No CMS Blocks found</td>
+                                    <td colSpan={6} className="px-6 py-12 text-center">
+                                        <p className="text-gray-500">
+                                            No CMS Blocks found
+                                        </p>
+                                    </td>
                                 </tr>
                             ) : (
-                                blocks.map((block: any, i: number) => (
-                                    <tr key={i} className="bg-white shadow-sm hover:shadow-md transition">
-                                        <td className={`${tdBase} font-medium rounded-l-xl text-black`}>
-                                            {block.id || block.block_id}
+                                blocks.map((block: any) => (
+                                    <tr
+                                        key={block.uuid || block.id}
+                                        className="hover:bg-gray-50 transition-colors"
+                                    >
+                                        {/* ID */}
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900">
+                                                {block.id || block.block_id}
+                                            </div>
                                         </td>
 
-                                        <td className={tdBase}>
-                                            {block.title}
+                                        {/* Title */}
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900">
+                                                {block.title}
+                                            </div>
                                         </td>
 
-                                        <td className={tdBase}>
+                                        {/* Identifier */}
+                                        <td className="px-6 py-4 text-sm text-gray-500">
                                             {block.identifier}
                                         </td>
 
-                                        <td className={tdBase}>
-                                            {new Date(block.creation_time || block.created_at).toLocaleDateString()}
+                                        {/* Creation Time */}
+                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                            {new Date(
+                                                block.creation_time || block.created_at
+                                            ).toLocaleDateString()}
                                         </td>
 
-                                        <td className={tdBase}>
+                                        {/* Status */}
+                                        <td className="px-6 py-4">
                                             <span
-                                                className={`px-3 py-1 rounded-md text-xs font-medium ${statusStyle(
-                                                    block.is_active
-                                                )}`}
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${block.is_active
+                                                        ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                                                        : "bg-red-50 text-red-600 border-red-200"
+                                                    }`}
                                             >
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current" />
                                                 {block.is_active ? "Active" : "Inactive"}
                                             </span>
                                         </td>
 
-                                        {/* ACTION */}
-                                        <td className="relative p-4 rounded-r-xl text-right">
-                                            <span className="absolute right-0 top-0 h-full w-1 bg-gradient-to-b from-teal-400 to-green-400 rounded-r-xl" />
-                                            <span className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-400 to-green-400" />
-                                            <FaEllipsisV 
-                                                onClick={() => navigate(`/EditCmsBlock/${block.uuid || block.id}`, { state: { vendorUuid: selectedVendorUuid } })} 
-                                                className="relative text-gray-400 cursor-pointer hover:text-gray-600 inline-block" 
-                                            />
+                                        {/* Action */}
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/EditCmsBlock/${block.uuid || block.id}`,
+                                                        {
+                                                            state: {
+                                                                vendorUuid: selectedVendorUuid,
+                                                            },
+                                                        }
+                                                    )
+                                                }
+                                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                            >
+                                                <FaEllipsisV className="text-sm" />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -179,8 +223,8 @@ const CmsBlockList = () => {
                             key={i}
                             onClick={() => setPage(i + 1)}
                             className={`px-3 py-1 rounded-md ${page === i + 1
-                                    ? "bg-blue-500 text-white"
-                                    : "hover:bg-gray-100"
+                                ? "bg-blue-500 text-white"
+                                : "hover:bg-gray-100"
                                 }`}
                         >
                             {i + 1}

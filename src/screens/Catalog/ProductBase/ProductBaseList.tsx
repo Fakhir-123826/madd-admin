@@ -348,9 +348,8 @@ export const ProductList: React.FC = () => {
     };
 
     const products = getProductsArray(productsData);
-    const total = productsData?.data?.total || productsData?.total || 0;
-    const lastPage = productsData?.data?.last_page || productsData?.last_page || 1;
-
+    const total = (productsData as any)?.data?.total || 0;
+    const lastPage = (productsData as any)?.data?.last_page || 1;
     // Get unique product types from data for filter
     const productTypes = products.length > 0
         ? [...new Set(products.map(p => p.type_id))]
@@ -453,14 +452,17 @@ export const ProductList: React.FC = () => {
                         {selectedVendorUuid && vendors && (
                             <SearchableSelect
                                 options={
-                                    vendors
-                                        .find(v => v.uuid === selectedVendorUuid)
-                                        ?.stores?.map(s => ({ value: s.uuid, label: s.store_name })) || []
+                                    (vendors
+                                        .find(v => v.uuid === selectedVendorUuid) as any)
+                                        ?.stores?.map((s: any) => ({
+                                            value: s.uuid,
+                                            label: s.store_name
+                                        })) || []
                                 }
                                 value={selectedStoreUuid}
                                 onChange={(value) => setSelectedStoreUuid(value)}
                                 placeholder="Filter by Store (Optional)"
-                                clearable
+                                // clearable
                             />
                         )}
                         {vendorsError && (
