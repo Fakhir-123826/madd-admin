@@ -5,7 +5,6 @@ import {
   useGetVendorsQuery,
   useCreateVendorMutation,
   useUpdateVendorPlanMutation,
-//   useDeleteVendorMutation,
   useSuspendVendorMutation,
   useActivateVendorMutation,
   useApproveVendorMutation,
@@ -138,6 +137,290 @@ const TABS = [
   { key: "applications", label: "Applications" },
 ];
 
+// ─── Vendor Detail Drawer (View Details Sidebar) ─────────────────────────────
+
+const VendorDetailDrawer = ({
+  vendor,
+  onClose,
+}: {
+  vendor: Vendor | null;
+  onClose: () => void;
+}) => {
+  if (!vendor) return null;
+
+  // Helper to safely get ID prefix (works for both string and number)
+  const getIdPrefix = (id: string | number) => {
+    const idStr = String(id);
+    return idStr.length > 8 ? idStr.slice(0, 8) + '...' : idStr;
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 z-40 bg-black/30" 
+        onClick={onClose}
+      />
+      
+      {/* Drawer Panel - Slides in from right */}
+      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-lg bg-white shadow-2xl flex flex-col animate-slide-in">
+        {/* Gradient top bar */}
+        <div className="h-1 bg-gradient-to-r from-teal-400 to-green-400" />
+        
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-lg font-bold text-gray-800">Vendor Details</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Detailed information about the vendor</p>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          
+          {/* Header with Logo and Basic Info */}
+          <div className="flex items-center gap-4">
+            <img
+              src={vendor.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.company_name)}&background=14B8A6&color=ffffff&bold=true&size=80`}
+              className="w-16 h-16 rounded-full object-cover border-2 border-teal-100"
+              alt={vendor.company_name}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.company_name)}&background=14B8A6&color=ffffff&bold=true&size=80`;
+              }}
+            />
+            <div>
+              <p className="text-xl font-bold text-gray-800">{vendor.company_name}</p>
+              <p className="text-sm text-gray-500 mt-0.5">{vendor.legal_name || "—"}</p>
+              <div className="flex gap-2 mt-2 flex-wrap">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(vendor.status)}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                  {vendor.status?.charAt(0).toUpperCase() + vendor.status?.slice(1) || "Unknown"}
+                </span>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${kycStatusStyle(vendor.kyc_status)}`}>
+                  KYC: {vendor.kyc_status?.toUpperCase() || "N/A"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Rating */}
+          {vendor.rating && vendor.rating.average && (
+            <div className="flex items-center gap-2 text-sm bg-amber-50 rounded-xl p-3">
+              <div className="flex items-center">
+                <FiStar className="text-yellow-400 fill-yellow-400" />
+                <span className="ml-1 font-semibold text-gray-700">{vendor.rating.average}</span>
+              </div>
+              <span className="text-gray-300">•</span>
+              <span className="text-gray-500 text-xs">{vendor.rating.total || 0} customer reviews</span>
+            </div>
+          )}
+
+          {/* Contact Information */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <FiMail className="text-teal-500" /> Contact Information
+            </h3>
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4">
+              <div>
+                <p className="text-xs text-gray-400">Email</p>
+                <p className="text-sm font-medium text-gray-700 break-all">{vendor.contact?.email || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Phone</p>
+                <p className="text-sm font-medium text-gray-700">{vendor.contact?.phone || "—"}</p>
+              </div>
+              {vendor.contact?.website && (
+                <div className="col-span-2">
+                  <p className="text-xs text-gray-400">Website</p>
+                  <a 
+                    href={vendor.contact.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-teal-600 hover:underline break-all"
+                  >
+                    {vendor.contact.website}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Address */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <FiMapPin className="text-teal-500" /> Address
+            </h3>
+            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-gray-400">Country</p>
+                  <p className="text-sm font-medium text-gray-700">{vendor.country_code || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">City</p>
+                  <p className="text-sm font-medium text-gray-700">{vendor.address?.city || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">Postal Code</p>
+                  <p className="text-sm font-medium text-gray-700">{vendor.address?.postal_code || "—"}</p>
+                </div>
+              </div>
+              {(vendor.address?.line1 || vendor.address?.line2) && (
+                <div>
+                  <p className="text-xs text-gray-400">Address</p>
+                  <p className="text-sm text-gray-700">
+                    {vendor.address.line1}
+                    {vendor.address.line2 && `, ${vendor.address.line2}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Plan Information */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Plan Information</h3>
+            <div className="bg-gradient-to-r from-teal-50 to-green-50 rounded-xl p-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-gray-500">Plan Name</p>
+                  <p className="text-sm font-semibold text-teal-700">{vendor.plan?.name || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Commission Rate</p>
+                  <p className="text-sm font-medium text-gray-700">{vendor.plan?.commission_rate || "0"}%</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Max Products</p>
+                  <p className="text-sm text-gray-700">{vendor.plan?.max_products || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Max Stores</p>
+                  <p className="text-sm text-gray-700">{vendor.plan?.max_stores || "—"}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-xs text-gray-500">Plan Expires</p>
+                  <p className="text-sm text-gray-700">{vendor.plan?.expires_at ? fmtDate(vendor.plan.expires_at) : "—"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Financial Summary */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <FiDollarSign className="text-teal-500" /> Financial Summary
+            </h3>
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4">
+              <div>
+                <p className="text-xs text-gray-400">Current Balance</p>
+                <p className="text-xl font-bold text-teal-600">${vendor.financial?.current_balance || "0"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Pending Balance</p>
+                <p className="text-sm font-medium text-yellow-600">${vendor.financial?.pending_balance || "0"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Total Earned</p>
+                <p className="text-sm font-medium text-gray-700">${vendor.financial?.total_earned || "0"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Total Commission Paid</p>
+                <p className="text-sm font-medium text-gray-700">${vendor.financial?.total_commission_paid || "0"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stores */}
+          {vendor.stores && vendor.stores.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <FaStore className="text-teal-500" /> Stores ({vendor.stores.length})
+              </h3>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {vendor.stores.map((store) => (
+                  <div key={store.id} className="bg-gray-50 rounded-xl p-3 flex items-center justify-between hover:bg-gray-100 transition-colors">
+                    <div>
+                      <p className="font-medium text-gray-800">{store.store_name || "Unnamed Store"}</p>
+                      <p className="text-xs text-gray-400">{store.subdomain || "—"}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded-full ${statusStyle(store.status)}`}>
+                      {store.status || "Unknown"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* VAT & Meta Information */}
+          <div className="pt-2 border-t border-gray-100">
+            <div className="space-y-2 text-xs">
+              {vendor.vat_number && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">VAT Number:</span>
+                  <span className="text-gray-600 font-mono">{vendor.vat_number}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-gray-400">Vendor ID:</span>
+                <span className="text-gray-600 font-mono">{getIdPrefix(vendor.id)}</span>
+              </div>
+              {vendor.company_slug && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Slug:</span>
+                  <span className="text-gray-600">{vendor.company_slug}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-gray-400">Joined:</span>
+                <span className="text-gray-600">{fmtDate(vendor.created_at)}</span>
+              </div>
+              {vendor.description && (
+                <div>
+                  <span className="text-gray-400">Description:</span>
+                  <p className="text-gray-600 mt-1 text-sm leading-relaxed">{vendor.description}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Action Buttons */}
+        <div className="border-t border-gray-100 p-4 bg-gray-50 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-100 transition cursor-pointer"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      {/* Animation styles */}
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.3s ease-out;
+        }
+      `}</style>
+    </>
+  );
+};
+
 // ─── KYC Management Modal ─────────────────────────────────────────────────────
 
 const KYCManagementModal = ({
@@ -192,7 +475,6 @@ const KYCManagementModal = ({
 
   const isPending = vendor.kyc_status === "pending";
   const isVerified = vendor.kyc_status === "verified";
-  const isRejected = vendor.kyc_status === "rejected";
 
   if (isVerified) {
     return (
@@ -300,12 +582,6 @@ const KYCManagementModal = ({
                   )}
                 </div>
               </>
-            )}
-
-            {isRejected && (
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center text-sm text-gray-400">
-                This vendor's KYC has been rejected. You can verify again if they resubmit.
-              </div>
             )}
           </div>
 
@@ -492,7 +768,6 @@ const StatusManagementModal = ({
   const [suspendVendor, { isLoading: isSuspending }] = useSuspendVendorMutation();
   const [activateVendor, { isLoading: isActivating }] = useActivateVendorMutation();
   const [approveVendor, { isLoading: isApproving }] = useApproveVendorMutation();
-// //   const [deleteVendor, { isLoading: isDeleting }] = useDeleteVendorMutation();
 
   const [suspendReason, setSuspendReason] = useState("");
   const [banReason, setBanReason] = useState("");
@@ -519,7 +794,6 @@ const StatusManagementModal = ({
     if (!vendor) return;
     if (!banReason.trim()) { showMsg("error", "Please provide a reason for ban"); return; }
     try {
-      // Using suspend as ban for now (you can add a dedicated ban endpoint)
       await suspendVendor({ id: vendor.id, data: { reason: banReason } }).unwrap();
       showMsg("success", `${vendor.company_name} has been banned`);
       setTimeout(() => { onSuccess(); onClose(); }, 1500);
@@ -562,10 +836,7 @@ const StatusManagementModal = ({
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full">
-          {/* Top gradient bar */}
           <div className="h-1 bg-gradient-to-r from-teal-400 to-green-400 rounded-t-2xl" />
-          
-          {/* Header */}
           <div className="px-6 py-4 border-b border-gray-100 flex items-start justify-between">
             <div>
               <h2 className="text-lg font-bold text-gray-800">Manage Vendor Status</h2>
@@ -574,7 +845,6 @@ const StatusManagementModal = ({
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600 mt-0.5 cursor-pointer">✕</button>
           </div>
 
-          {/* Current status */}
           <div className="px-6 pt-4">
             <div className="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
               <span className="text-sm text-gray-500">Current Status</span>
@@ -586,7 +856,6 @@ const StatusManagementModal = ({
           </div>
 
           <div className="p-6 space-y-3">
-            {/* Approve - for pending applications */}
             {isPending && (
               <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                 <div className="flex items-center gap-3">
@@ -605,7 +874,6 @@ const StatusManagementModal = ({
               </div>
             )}
 
-            {/* Activate — for suspended */}
             {isSuspended && (
               <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                 <div className="flex items-center gap-3">
@@ -624,7 +892,6 @@ const StatusManagementModal = ({
               </div>
             )}
 
-            {/* Suspend — for active */}
             {isActive && (
               <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200 space-y-3">
                 <div className="flex items-center justify-between">
@@ -656,7 +923,6 @@ const StatusManagementModal = ({
               </div>
             )}
 
-            {/* Ban option for active vendors */}
             {isActive && (
               <div className="p-4 bg-red-50 rounded-xl border border-red-200 space-y-3">
                 <div className="flex items-center justify-between">
@@ -760,224 +1026,6 @@ const RowMenu = ({
   );
 };
 
-// ─── Vendor Detail Drawer ─────────────────────────────────────────────────────
-
-const VendorDetailDrawer = ({
-  vendor,
-  onClose,
-}: {
-  vendor: Vendor | null;
-  onClose: () => void;
-}) => {
-  if (!vendor) return null;
-
-  return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-lg bg-white shadow-2xl flex flex-col">
-        <div className="h-1 bg-gradient-to-r from-teal-400 to-green-400" />
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-800">Vendor Details</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg">✕</button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center gap-4">
-            <img
-              src={vendor.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.company_name)}&background=14B8A6&color=ffffff&bold=true&size=80`}
-              className="w-16 h-16 rounded-full object-cover"
-              alt={vendor.company_name}
-            />
-            <div>
-              <p className="text-lg font-bold text-gray-800">{vendor.company_name}</p>
-              <p className="text-sm text-gray-500">{vendor.legal_name}</p>
-              <div className="flex gap-2 mt-2 flex-wrap">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(vendor.status)}`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                  {vendor.status?.charAt(0).toUpperCase() + vendor.status?.slice(1)}
-                </span>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${kycStatusStyle(vendor.kyc_status)}`}>
-                  KYC: {vendor.kyc_status?.toUpperCase()}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Rating */}
-          {vendor.rating && (
-            <div className="flex items-center gap-2 text-sm">
-              <div className="flex items-center">
-                <FiStar className="text-yellow-400 fill-yellow-400" />
-                <span className="ml-1 font-semibold">{vendor.rating.average}</span>
-              </div>
-              <span className="text-gray-400">•</span>
-              <span className="text-gray-500">{vendor.rating.total} reviews</span>
-            </div>
-          )}
-
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FiMail className="text-teal-500" /> Contact Information
-            </h3>
-            <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4">
-              <div>
-                <p className="text-xs text-gray-400">Email</p>
-                <p className="text-sm font-medium text-gray-700">{vendor.contact?.email || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Phone</p>
-                <p className="text-sm font-medium text-gray-700">{vendor.contact?.phone || "—"}</p>
-              </div>
-              {vendor.contact?.website && (
-                <div className="col-span-2">
-                  <p className="text-xs text-gray-400">Website</p>
-                  <p className="text-sm font-medium text-teal-600">{vendor.contact.website}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FiMapPin className="text-teal-500" /> Address
-            </h3>
-            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-400">Country</p>
-                  <p className="text-sm font-medium text-gray-700">{vendor.country_code || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">City</p>
-                  <p className="text-sm font-medium text-gray-700">{vendor.address?.city || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Postal Code</p>
-                  <p className="text-sm font-medium text-gray-700">{vendor.address?.postal_code || "—"}</p>
-                </div>
-              </div>
-              {(vendor.address?.line1 || vendor.address?.line2) && (
-                <div>
-                  <p className="text-xs text-gray-400">Address</p>
-                  <p className="text-sm text-gray-700">
-                    {vendor.address.line1}
-                    {vendor.address.line2 && `, ${vendor.address.line2}`}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Plan Info */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Plan Information</h3>
-            <div className="bg-gradient-to-r from-teal-50 to-green-50 rounded-xl p-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-400">Plan Name</p>
-                  <p className="text-sm font-semibold text-teal-700">{vendor.plan?.name || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Commission Rate</p>
-                  <p className="text-sm font-medium text-gray-700">{vendor.plan?.commission_rate}%</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Max Products</p>
-                  <p className="text-sm text-gray-700">{vendor.plan?.max_products || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Max Stores</p>
-                  <p className="text-sm text-gray-700">{vendor.plan?.max_stores || "—"}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-xs text-gray-400">Plan Expires</p>
-                  <p className="text-sm text-gray-700">{vendor.plan?.expires_at ? fmtDate(vendor.plan.expires_at) : "—"}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Financial Info */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FiDollarSign className="text-teal-500" /> Financial Summary
-            </h3>
-            <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4">
-              <div>
-                <p className="text-xs text-gray-400">Current Balance</p>
-                <p className="text-lg font-bold text-teal-600">${vendor.financial?.current_balance || "0"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Pending Balance</p>
-                <p className="text-sm font-medium text-yellow-600">${vendor.financial?.pending_balance || "0"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Total Earned</p>
-                <p className="text-sm text-gray-700">${vendor.financial?.total_earned || "0"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Total Commission Paid</p>
-                <p className="text-sm text-gray-700">${vendor.financial?.total_commission_paid || "0"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Stores */}
-          {vendor.stores && vendor.stores.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <FaStore className="text-teal-500" /> Stores ({vendor.stores.length})
-              </h3>
-              <div className="space-y-2">
-                {vendor.stores.map((store) => (
-                  <div key={store.id} className="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-800">{store.store_name}</p>
-                      <p className="text-xs text-gray-400">{store.subdomain}</p>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${statusStyle(store.status)}`}>
-                      {store.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* VAT & Meta Info */}
-          <div className="pt-2 border-t border-gray-100">
-            <div className="space-y-2 text-xs">
-              {vendor.vat_number && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">VAT Number:</span>
-                  <span className="text-gray-600">{vendor.vat_number}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-gray-400">Vendor ID:</span>
-                <span className="text-gray-600">{vendor.id?.slice(0, 8)}...</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Joined:</span>
-                <span className="text-gray-600">{fmtDate(vendor.created_at)}</span>
-              </div>
-              {vendor.description && (
-                <div>
-                  <span className="text-gray-400">Description:</span>
-                  <p className="text-gray-600 mt-1">{vendor.description}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const ITEMS_PER_PAGE = 10;
@@ -1034,12 +1082,10 @@ const VendorList = () => {
     setPage(1);
   };
 
-  // Derived values for filters
   const statuses = [...new Set(vendors.map(v => v.status).filter(Boolean))];
   const kycStatuses = [...new Set(vendors.map(v => v.kyc_status).filter(Boolean))];
   const countries = [...new Set(vendors.map(v => v.country_code).filter(Boolean))];
 
-  // Filtering logic
   const filtered = vendors.filter(v => {
     const matchStatus = !filterStatus || v.status === filterStatus;
     const matchKyc = !filterKycStatus || v.kyc_status === filterKycStatus;
@@ -1065,7 +1111,6 @@ const VendorList = () => {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  // Filters config for PageHeader
   const filters = [
     { label: "Status", options: statuses, value: filterStatus, onChange: (v: string) => { setFilterStatus(v); setPage(1); } },
     { label: "KYC Status", options: kycStatuses, value: filterKycStatus, onChange: (v: string) => { setFilterKycStatus(v); setPage(1); } },
@@ -1074,7 +1119,6 @@ const VendorList = () => {
 
   return (
     <div className="bg-white min-h-screen p-6">
-      {/* Toast */}
       {toast && (
         <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
           ${toast.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
@@ -1083,12 +1127,11 @@ const VendorList = () => {
         </div>
       )}
 
-      {/* PageHeader */}
       <PageHeader
         title="Vendor Management"
         addButtonLabel="Add New Vendor"
         onAdd={() => navigate(ROUTES.CREATE_VENDOR)}
-        tabs={TABS}
+        // tabs={TABS}
         activeTab={activeTab}
         onTabChange={(tab) => { setActiveTab(tab); setPage(1); }}
         filters={filters}
@@ -1099,117 +1142,103 @@ const VendorList = () => {
         searchPlaceholder="Search by company name, email, VAT..."
       />
 
-      {/* Table */}
       <div className="rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto min-h-[500px]">
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
+          <table className="w-full">
+            <thead className="bg-white">
+              <tr className="border-b border-gray-100">
                 {["Company", "Contact", "Country", "VAT", "Plan", "Stores", "Status", "KYC", "Joined", ""].map((col, i) => (
-                  <th key={i} className="px-4 py-4 text-left font-semibold text-sm whitespace-nowrap">{col}</th>
+                  <th key={i} className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    {col}
+                  </th>
                 ))}
-               </tr>
+              </tr>
             </thead>
-            <tbody className="bg-white">
+            <tbody className="bg-white divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={10} className="text-center py-16">
-                    <div className="flex items-center justify-center gap-3 text-gray-400">
-                      <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
-                      <span className="text-sm">Loading vendors…</span>
+                  <td colSpan={10} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="animate-spin h-8 w-8 rounded-full border-b-2 border-teal-500" />
+                      <p className="text-sm text-gray-500">Loading vendors...</p>
                     </div>
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={10} className="text-center py-16 text-red-400 text-sm">
+                  <td colSpan={10} className="px-6 py-12 text-center text-red-500 text-sm">
                     Error loading vendors. Please try again.
-                  </td>
+                   </td>
                 </tr>
               ) : paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="text-center py-16 text-gray-300 text-sm">
-                    No vendors found.
-                  </td>
+                  <td colSpan={10} className="px-6 py-12 text-center text-gray-400 text-sm">
+                    No vendors found
+                   </td>
                 </tr>
               ) : (
-                paginated.map((vendor, idx) => (
-                  <tr
-                    key={vendor.id}
-                    className="hover:bg-gray-50/60 transition"
-                    style={{
-                      borderBottom: idx < paginated.length - 1 ? "1px solid #f3f4f6" : "none",
-                    }}
-                  >
-                    {/* Company */}
-                    <td className="relative pl-5 pr-4 py-3">
-                      <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-teal-400 to-teal-300" />
-                      <div className="flex items-center gap-2.5">
+                paginated.map((vendor) => (
+                  <tr key={vendor.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
                         <img
                           src={vendor.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.company_name)}&background=14B8A6&color=ffffff&bold=true`}
-                          className="w-8 h-8 rounded-full shrink-0 object-cover"
+                          className="w-10 h-10 rounded-full object-cover"
                           alt={vendor.company_name}
                         />
                         <div>
-                          <span className="font-semibold text-gray-800 text-sm block">{vendor.company_name}</span>
-                          <span className="text-xs text-gray-400">{vendor.legal_name}</span>
+                          <div className="font-medium text-gray-900">{vendor.company_name}</div>
+                          <div className="text-xs text-gray-400">{vendor.legal_name || "—"}</div>
                         </div>
                       </div>
                     </td>
-
-                    {/* Contact */}
-                    <td className="px-4 py-3">
-                      <div className="text-xs">
-                        <p className="text-gray-600">{vendor.contact?.email || "—"}</p>
-                        <p className="text-gray-400 text-xs mt-0.5">{vendor.contact?.phone || "—"}</p>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <div>{vendor.contact?.email || "—"}</div>
+                      <div className="text-xs text-gray-400">{vendor.contact?.phone || "—"}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{vendor.country_code || "—"}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{vendor.vat_number || "—"}</td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <div className="font-medium text-gray-700">{vendor.plan?.name || "—"}</div>
+                        <div className="text-xs text-gray-400">{vendor.plan?.commission_rate || 0}% commission</div>
                       </div>
                     </td>
-
-                    <td className="px-4 py-3 text-gray-600 text-xs">{vendor.country_code || "—"}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">{vendor.vat_number || "—"}</td>
-
-                    {/* Plan */}
-                    <td className="px-4 py-3">
-                      <div className="text-xs">
-                        <p className="font-medium text-gray-700">{vendor.plan?.name || "—"}</p>
-                        <p className="text-gray-400">{vendor.plan?.commission_rate}% commission</p>
-                      </div>
-                    </td>
-
-                    {/* Stores */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <FaStore className="text-teal-400 text-xs" />
-                        <span className="text-sm font-medium text-gray-700">{vendor.stores?.length || 0}</span>
-                      </div>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-4 py-3">
+                    <td className="px-6 py-4 text-sm text-gray-700">{vendor.stores?.length || 0}</td>
+                    <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusStyle(vendor.status)}`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                        {vendor.status?.charAt(0).toUpperCase() + vendor.status?.slice(1) || "Unknown"}
+                        {vendor.status?.charAt(0).toUpperCase() + vendor.status?.slice(1)}
                       </span>
                     </td>
-
-                    {/* KYC */}
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${kycStatusStyle(vendor.kyc_status)}`}>
-                        {vendor.kyc_status?.toUpperCase() || "N/A"}
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${kycStatusStyle(vendor.kyc_status)}`}>
+                        {vendor.kyc_status || "N/A"}
                       </span>
                     </td>
-
-                    <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{fmtDate(vendor.created_at)}</td>
-
-                    {/* Actions */}
-                    <td className="relative pl-4 pr-5 py-3 text-right">
-                      <span className="absolute right-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-green-400 to-green-300" />
+                    <td className="px-6 py-4 text-xs text-gray-400">{fmtDate(vendor.created_at)}</td>
+                    <td className="px-6 py-4 text-right">
                       <RowMenu
-                        onView={() => { setSelectedVendor(vendor); setIsDrawerOpen(true); }}
-                        onEdit={() => { setSelectedVendor(vendor); setIsEditModalOpen(true); }}
-                        onStatusManage={() => { setSelectedVendor(vendor); setIsStatusModalOpen(true); }}
-                        onKycManage={() => { setSelectedVendor(vendor); setIsKycModalOpen(true); }}
-                        onPlanManage={() => { setSelectedVendor(vendor); setIsPlanModalOpen(true); }}
+                        onView={() => {
+                          setSelectedVendor(vendor);
+                          setIsDrawerOpen(true);
+                        }}
+                        onEdit={() => {
+                          setSelectedVendor(vendor);
+                          setIsEditModalOpen(true);
+                        }}
+                        onStatusManage={() => {
+                          setSelectedVendor(vendor);
+                          setIsStatusModalOpen(true);
+                        }}
+                        onKycManage={() => {
+                          setSelectedVendor(vendor);
+                          setIsKycModalOpen(true);
+                        }}
+                        onPlanManage={() => {
+                          setSelectedVendor(vendor);
+                          setIsPlanModalOpen(true);
+                        }}
                       />
                     </td>
                   </tr>
@@ -1220,7 +1249,6 @@ const VendorList = () => {
         </div>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-600">
           <button disabled={page === 1} onClick={() => setPage(page - 1)}
@@ -1229,9 +1257,7 @@ const VendorList = () => {
           </button>
           {[...Array(totalPages)].map((_, i) => (
             <button key={i} onClick={() => setPage(i + 1)}
-              className={`px-3 py-1 rounded-md cursor-pointer ${page === i + 1
-                ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
-                : "hover:bg-gray-100"}`}>
+              className={`px-3 py-1 rounded-md cursor-pointer ${page === i + 1 ? "bg-gradient-to-r from-teal-400 to-green-400 text-white" : "hover:bg-gray-100"}`}>
               {i + 1}
             </button>
           ))}
@@ -1242,7 +1268,6 @@ const VendorList = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
       <VendorModal
         isOpen={isEditModalOpen}
         onClose={() => { setIsEditModalOpen(false); setSelectedVendor(null); }}
@@ -1250,7 +1275,6 @@ const VendorList = () => {
         onSave={handleSaveVendor}
       />
 
-      {/* Status Management Modal */}
       <StatusManagementModal
         isOpen={isStatusModalOpen}
         onClose={() => { setIsStatusModalOpen(false); setSelectedVendor(null); }}
@@ -1258,7 +1282,6 @@ const VendorList = () => {
         onSuccess={refetch}
       />
 
-      {/* KYC Management Modal */}
       <KYCManagementModal
         isOpen={isKycModalOpen}
         onClose={() => { setIsKycModalOpen(false); setSelectedVendor(null); }}
@@ -1266,7 +1289,6 @@ const VendorList = () => {
         onSuccess={refetch}
       />
 
-      {/* Plan Management Modal */}
       <PlanManagementModal
         isOpen={isPlanModalOpen}
         onClose={() => { setIsPlanModalOpen(false); setSelectedVendor(null); }}
@@ -1274,7 +1296,6 @@ const VendorList = () => {
         onSuccess={refetch}
       />
 
-      {/* View Details Drawer */}
       <VendorDetailDrawer
         vendor={isDrawerOpen ? selectedVendor : null}
         onClose={() => { setIsDrawerOpen(false); setSelectedVendor(null); }}

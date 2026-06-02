@@ -87,7 +87,7 @@ export const CustomerList: React.FC = () => {
       setSelectedVendorUuid(vendorFromUrl);
     }
   }, [searchParams]);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
@@ -208,14 +208,34 @@ export const CustomerList: React.FC = () => {
                   if (selectedVendorUuid) {
                     window.location.href = `/admin/customers/add?vendor=${selectedVendorUuid}`;
                   } else {
-                    toast.error('Please select a vendor first');
+                    toast.error("Please select a vendor first");
                   }
                 }}
                 disabled={!selectedVendorUuid}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="
+    flex items-center
+    rounded-full
+    bg-gradient-to-r
+    from-sky-500
+    via-blue-500
+    to-blue-600
+    text-white text-sm font-medium
+    shadow-md
+    hover:from-sky-600
+    hover:via-blue-600
+    hover:to-blue-700
+    transition-all
+    disabled:opacity-50
+    disabled:cursor-not-allowed
+    cursor-pointer
+    pr-6
+  "
               >
-                <Plus className="w-4 h-4" />
-                Add Customer
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white m-1">
+                  <Plus className="text-blue-500 w-4 h-4" />
+                </span>
+
+                <span className="px-2">Add Customer</span>
               </button>
             </div>
           </div>
