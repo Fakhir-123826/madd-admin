@@ -61,10 +61,7 @@ export default function OrderStatistics() {
   });
   const [activePeriod, setActivePeriod] = useState<string>("30_days");
 
-  const { data, isLoading, isError, refetch } = useGetOrderStatisticsQuery(
-    vendor_uuid: selectedVendorUuid,
-    period: activePeriod,
-  );
+  const { data, isLoading, isError, refetch } = useGetOrderStatisticsQuery();
 
   const stats = data?.data;
 
@@ -113,7 +110,7 @@ export default function OrderStatistics() {
         <div>
           <h2 className="text-lg font-semibold text-gray-800">Order Analytics</h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            {stats?.start_date && stats?.end_date &&
+            {stats?.start_date && stats?.end_date && 
               `${formatDate(stats.start_date)} - ${formatDate(stats.end_date)}`}
           </p>
         </div>
@@ -123,10 +120,11 @@ export default function OrderStatistics() {
               <button
                 key={period}
                 onClick={() => setActivePeriod(period)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${activePeriod === period
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                  activePeriod === period
                     ? "bg-gradient-to-r from-teal-400 to-green-400 text-white"
                     : "text-gray-500 hover:text-gray-700"
-                  }`}
+                }`}
               >
                 {period === "7_days" ? "7D" : period === "30_days" ? "30D" : "90D"}
               </button>
@@ -186,7 +184,7 @@ export default function OrderStatistics() {
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
+        
         {/* Daily Orders Chart */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
@@ -209,7 +207,7 @@ export default function OrderStatistics() {
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
+                    <div 
                       className="h-full bg-gradient-to-r from-teal-400 to-green-400 rounded-full"
                       style={{ width: `${Math.min((day.order_count / Math.max(...stats.daily_stats.map((d: any) => d.order_count))) * 100, 100)}%` }}
                     />
@@ -233,13 +231,14 @@ export default function OrderStatistics() {
                   <span className="text-gray-500 font-medium">{item.count} orders</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${item.status === 'completed' ? 'bg-green-500' :
-                        item.status === 'processing' ? 'bg-blue-500' :
-                          item.status === 'shipped' ? 'bg-purple-500' :
-                            item.status === 'pending' ? 'bg-yellow-500' :
-                              'bg-gray-400'
-                      }`}
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      item.status === 'completed' ? 'bg-green-500' :
+                      item.status === 'processing' ? 'bg-blue-500' :
+                      item.status === 'shipped' ? 'bg-purple-500' :
+                      item.status === 'pending' ? 'bg-yellow-500' :
+                      'bg-gray-400'
+                    }`}
                     style={{ width: `${(item.count / totalOrders) * 100}%` }}
                   />
                 </div>
@@ -263,11 +262,12 @@ export default function OrderStatistics() {
                     <span className="text-gray-500">{item.count} orders ({percentage.toFixed(1)}%)</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${item.payment_status === 'paid' ? 'bg-green-500' :
-                          item.payment_status === 'pending' ? 'bg-yellow-500' :
-                            'bg-gray-400'
-                        }`}
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        item.payment_status === 'paid' ? 'bg-green-500' :
+                        item.payment_status === 'pending' ? 'bg-yellow-500' :
+                        'bg-gray-400'
+                      }`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -289,11 +289,11 @@ export default function OrderStatistics() {
               const count = data?.count || 0;
               const maxCount = Math.max(...(stats?.hourly_distribution?.map((h: any) => h.count) || [1]));
               const height = maxCount > 0 ? (count / maxCount) * 100 : 0;
-
+              
               return (
                 <div key={hour} className="text-center">
                   <div className="h-16 flex items-end mb-1">
-                    <div
+                    <div 
                       className="w-full bg-gradient-to-t from-teal-400 to-green-400 rounded-t transition-all duration-300"
                       style={{ height: `${height}%`, minHeight: count > 0 ? '4px' : '0' }}
                     />

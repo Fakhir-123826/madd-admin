@@ -599,7 +599,7 @@ export const orderApi = createApi({
 
         createManualOrder: builder.mutation<OrderOperationResponse, CreateManualOrderPayload>({
             query: (data) => ({
-                url: "admin/create-order",
+                url: "orders/create-order",
                 method: "POST",
                 body: data,
             }),

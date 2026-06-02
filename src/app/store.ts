@@ -39,6 +39,9 @@ import { reportApi } from "./api/ReportSlices/ReportApi";
 import { systemApi } from "./api/SystemSlices/SystemApi";
 import { cmsApi } from "./api/CmsSlices/CmsApi";
 import { customerApi } from "./api/CustomerSlices/CustomerApi";
+import { cartApi } from "./api/CartSlices/CartApi";
+
+
 
 export const store = configureStore({
   reducer: {
@@ -74,7 +77,7 @@ export const store = configureStore({
     [systemApi.reducerPath]: systemApi.reducer,
     [cmsApi.reducerPath]: cmsApi.reducer,
     [customerApi.reducerPath]: customerApi.reducer,
-
+[cartApi.reducerPath]: cartApi.reducer,
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -104,6 +107,7 @@ export const store = configureStore({
       systemApi.middleware,
       cmsApi.middleware,
       customerApi.middleware,
+      cartApi.middleware,
     ),
 });
 
