@@ -701,7 +701,7 @@ const Layout = () => {
       icon: FaCalendarAlt,
       children: [
         { label: "All Plans", path: "/SubscriptionList" },
-        { label: "Add Plan", path: "/CreateSubscription" }
+        { label: "Add Plan", path: "/SubscriptionList/addSubscription" }
       ]
     },
 

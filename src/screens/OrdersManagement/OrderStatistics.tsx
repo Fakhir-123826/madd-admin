@@ -61,10 +61,9 @@ export default function OrderStatistics() {
   });
   const [activePeriod, setActivePeriod] = useState<string>("30_days");
 
-  const { data, isLoading, isError, refetch } = useGetOrderStatisticsQuery(
-    vendor_uuid: selectedVendorUuid,
+  const { data, isLoading, isError, refetch } = useGetOrderStatisticsQuery({
     period: activePeriod,
-  );
+  });
 
   const stats = data?.data;
 

@@ -19,6 +19,7 @@ import VendorOnboard from './screens/Vender/Vendor Onboarding/VendorOnboard.tsx'
 import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
+import AddSubscription from './screens/Subscription/AddSubscription.tsx'
 import OrderList from './screens/OrdersManagement/OrderList.tsx'
 import OrderStatistics from './screens/OrdersManagement/OrderStatistics.tsx'
 
@@ -726,6 +727,8 @@ const protectedRoutes = [
   { path: ROUTES.PLANS, element: <PlanList /> },
   { path: ROUTES.CREATE_PLAN, element: <PlanForm /> },
   { path: ROUTES.EDIT_PLAN(), element: <PlanForm /> },
+  { path: "/SubscriptionList", element: <SubscriptionList /> },
+  { path: "/SubscriptionList/addSubscription", element: <AddSubscription /> },
 
   {
     path: "/mlm",
