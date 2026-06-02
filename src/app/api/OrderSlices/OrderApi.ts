@@ -383,11 +383,10 @@ export const orderApi = createApi({
                     }
                 }
 
-                const url = `orders${
-                    queryParams.toString()
+                const url = `orders${queryParams.toString()
                         ? `?${queryParams.toString()}`
                         : ""
-                }`;
+                    }`;
 
                 console.log("📦 Order API URL:", url); // Debug log
 
@@ -405,10 +404,13 @@ export const orderApi = createApi({
             OrderStatisticsResponse,
             { vendor_uuid?: string; store_uuid?: string; period?: string }
         >({
-            query: () => ({
-                url: "orders/statistics",
-                method: "GET",
-            }),
+            query: (params: { period?: string; vendor_uuid?: string }) => {
+                const searchParams = new URLSearchParams();
+                if (params?.period) searchParams.append('period', params.period);
+                if (params?.vendor_uuid) searchParams.append('vendor_uuid', params.vendor_uuid);
+
+                return `orders/statistics?${searchParams.toString()}`;
+            },
 
             providesTags: ["Orders"],
         }),
@@ -522,11 +524,10 @@ export const orderApi = createApi({
                     );
                 }
 
-                const url = `orders/by-store/${storeId}${
-                    queryParams.toString()
+                const url = `orders/by-store/${storeId}${queryParams.toString()
                         ? `?${queryParams.toString()}`
                         : ""
-                }`;
+                    }`;
 
                 return {
                     url,
@@ -571,11 +572,10 @@ export const orderApi = createApi({
                     );
                 }
 
-                const url = `orders/by-vendor/${vendorId}${
-                    queryParams.toString()
+                const url = `orders/by-vendor/${vendorId}${queryParams.toString()
                         ? `?${queryParams.toString()}`
                         : ""
-                }`;
+                    }`;
 
                 return {
                     url,
@@ -589,7 +589,7 @@ export const orderApi = createApi({
         // ─── POST /admin/orders/sync ────────────────────────────────────────
         syncOrders: builder.mutation<SyncOrdersResponse, SyncOrdersPayload>({
             query: (data) => ({
-                url: "admin/orders/sync",
+                url: "admin/orders/sync-orders",
                 method: "POST",
                 body: data,
             }),
@@ -599,7 +599,7 @@ export const orderApi = createApi({
 
         createManualOrder: builder.mutation<OrderOperationResponse, CreateManualOrderPayload>({
             query: (data) => ({
-                url: "admin/orders",
+                url: "admin/create-order",
                 method: "POST",
                 body: data,
             }),
