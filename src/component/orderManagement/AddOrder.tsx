@@ -96,7 +96,7 @@ function AddOrder() {
   const [billingAddress, setBillingAddress] = useState<AddressForm>(emptyAddress);
   const [shippingAddress, setShippingAddress] = useState<AddressForm>(emptyAddress);
   const [sameAsBilling, setSameAsBilling] = useState(true);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("checkmo");
   const [selectedShippingMethod, setSelectedShippingMethod] = useState("");
   const [historyComment, setHistoryComment] = useState("");
   const [appendComment, setAppendComment] = useState(true);
@@ -204,11 +204,11 @@ function AddOrder() {
   }, [shippingAddress]);
 
   // Refetch shipping methods when shipping address changes
-  useEffect(() => {
-    if (debouncedShippingAddress.country_id && debouncedShippingAddress.postcode) {
-      refetchShipping();
-    }
-  }, [debouncedShippingAddress, refetchShipping]);
+  // useEffect(() => {
+  //   if (debouncedShippingAddress.country_id && debouncedShippingAddress.postcode) {
+  //     refetchShipping();
+  //   }
+  // }, [debouncedShippingAddress, refetchShipping]);
 
   const getSelectedShippingMethod = () => {
     return shippingMethods.find(

@@ -199,10 +199,15 @@ export const attributeSetApi = createApi({
         // URL: /attribute-sets/{vendorUuid}/{id}/structure
         // ─────────────────────────────────────────────────────────────────────        
         getAttributeSetStructure: builder.query<ApiResponse<any>, { vendor_uuid: string; id: string }>({
-            query: ({ vendor_uuid, id }) => ({
-                url: `attribute-sets/${vendor_uuid}/${id}/structure`,
-                method: 'GET',
-            }),
+            query: ({ vendor_uuid, id }) => {
+                //  Log the variables inside the query function block
+                console.log(`Vendor UUID: ${vendor_uuid}, ID: ${id}`);
+
+                return {
+                    url: `attribute-sets/${vendor_uuid}/${id}/structure`,
+                    method: 'GET',
+                };
+            },
             providesTags: (result, error, { id }) => [{ type: 'AttributeSetStructure', id }],
         }),
 
@@ -411,6 +416,7 @@ export const {
     useGetAttributeSetDetailsQuery,
     useGetAttributeSetAttributesQuery,
     useGetAttributeSetGroupsQuery,
+    useGetAttributeSetStructureQuery,
 
     // Mutations
     useCreateAttributeSetMutation,
@@ -423,8 +429,7 @@ export const {
     useCreateAttributeGroupMutation,
     useUpdateAttributeGroupMutation,
     useDeleteAttributeGroupMutation,
-    usePushToMagentoMutation,
-    useGetAttributeSetStructureQuery,
+    usePushToMagentoMutation
 } = attributeSetApi;
 
 export default attributeSetApi;
