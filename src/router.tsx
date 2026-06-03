@@ -243,6 +243,8 @@ import { AttributeSetList } from "./screens/AttributeSet/AttributeSetList.tsx";
 import { CreateAttributeSet } from "./screens/AttributeSet/CreateAttributeSet.tsx";
 import { EditAttributeSet } from "./screens/AttributeSet/EditAttributeSet.tsx";
 import { ViewAttributeSet } from './screens/AttributeSet/ViewAttributeSet';
+import CommerceConnector from "./screens/Setting/CommerceConnector.tsx";
+import CommerceServicesConfig from "./component/Setting/Backup/Connector/Commerceservicesconfig.tsx";
 
 
 
@@ -700,7 +702,7 @@ const protectedRoutes = [
   // Settings - New Nested Routes
   {
     path: ROUTES.SETTINGS,
-    element: <Settings />,
+    // element: <Settings />,
     children: [
       { index: true, element: <Navigate to="system" replace /> },
       { path: "system", element: <SystemSettings /> },
@@ -708,6 +710,8 @@ const protectedRoutes = [
       { path: "shipping", element: <ShippingSettings /> },
       { path: "tax", element: <TaxSettings /> },
       { path: "email", element: <EmailSettings /> },
+      { path: "commerce-connector", element: <CommerceConnector /> },
+      { path: "commerce-connector-setup", element: <CommerceServicesConfig /> },
     ],
   },
   {
