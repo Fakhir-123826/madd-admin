@@ -6,7 +6,7 @@ import {
   FaSync, FaCalendarAlt, FaStore, FaClock, FaChartBar,
   FaArrowUp, FaArrowDown, FaEye, FaStar
 } from "react-icons/fa";
-import { useGetOrderStatisticsQuery } from "../../app/api/OrderSlices/OrderApi";
+// import { useGetOrderStatisticsQuery } from "../../app/api/OrderSlices/OrderApi";
 
 const formatCurrency = (value: string | number) => {
   const num = typeof value === 'string' ? parseFloat(value) : value;

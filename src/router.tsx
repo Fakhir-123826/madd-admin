@@ -20,6 +20,7 @@ import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
 import OrderList from './screens/OrdersManagement/OrderList.tsx'
+import { OrderDetail } from './screens/OrdersManagement/OrderDetail';
 import OrderStatistics from './screens/OrdersManagement/OrderStatistics.tsx'
 
 import { CategoryList } from "./screens/Category/CategoryList.tsx";
@@ -275,10 +276,11 @@ export const ROUTES = {
 
 
   // Order Section
-  ORDER_LIST: "/orderlist",
-  ORDER_STATISTICS: "/OrderStatistics",
-  ADD_ORDER: "/addorder",
-  ORDER_DETAILS: (id: string | number = ":id") => `/order/${id}`,
+  ORDER_LIST: "/order-lists",
+  ORDER_DETAIL: "/order-lists/:orderUuid",
+  ORDER_STATISTICS: "/order-statistics",
+  ADD_ORDER: "/add-order",
+  // ORDER_DETAILS: (id: string | number = ":id") => `/order/${id}`,
 
   // Vendor Section
   VENDOR_LIST: "/Vendor",
@@ -603,9 +605,9 @@ const protectedRoutes = [
   // add attr
   // Order Section
   { path: ROUTES.ORDER_LIST, element: <OrderList /> },
+  { path: ROUTES.ORDER_DETAIL, element: <OrderDetail /> },
   { path: ROUTES.ORDER_STATISTICS, element: <OrderStatistics /> },
   { path: ROUTES.ADD_ORDER, element: <AddOrder /> },
-  { path: ROUTES.ORDER_DETAILS(), element: <OrderDetails /> },
 
   // Vendor Section
   { path: ROUTES.VENDOR_LIST, element: <VendorList /> },
