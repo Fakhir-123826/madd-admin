@@ -17,6 +17,7 @@ const SETTINGS_TABS = [
     { key: "shipping", label: "Shipping Settings", icon: <FaTruck className="text-sm" /> },
     { key: "tax", label: "Tax Settings", icon: <FaFileInvoiceDollar className="text-sm" /> },
     { key: "email", label: "Email Settings", icon: <FaEnvelope className="text-sm" /> },
+    { key: "email", label: "Email Settings", icon: <FaEnvelope className="text-sm" /> },
 ];
 
 const Settings = () => {

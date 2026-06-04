@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   RefreshCw,
   Search,
@@ -77,6 +78,7 @@ const formatPrice = (price: string | number) => {
 
 export const OrderList: React.FC = () => {
   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [selectedVendorUuid, setSelectedVendorUuid] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -144,6 +146,8 @@ export const OrderList: React.FC = () => {
     }
   };
 
+  const handleViewOrder = (order: Order) => {
+    navigate(`/order/${order.id}`, { state: { order } });
   const handleViewOrder = (orderUuid: string) => {
     // Navigate to order detail page with order UUID and vendor UUID as query params
     navigate(ROUTES.ORDER_DETAIL + `/${orderUuid}?vendor_uuid=${selectedVendorUuid}`);

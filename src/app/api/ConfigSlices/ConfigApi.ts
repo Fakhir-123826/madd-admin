@@ -88,7 +88,7 @@ export interface Courier {
 export const configApi = createApi({
     reducerPath: "configApi",
     baseQuery: dynamicBaseQuery,
-    tagTypes: ["Countries", "SalesPolicies", "Currencies", "Languages", "Themes", "Couriers"],
+    tagTypes: ["Countries", "SalesPolicies", "Currencies", "Languages", "Themes", "Couriers", "CommerceConnector"],
     keepUnusedDataFor: 300,
 
     endpoints: (builder) => ({

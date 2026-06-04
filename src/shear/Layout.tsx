@@ -675,7 +675,8 @@ const Layout = () => {
         { label: "System", path: "/settings/system" },
         { label: "Payment", path: "/settings/payment" },
         { label: "Tax", path: "/settings/tax" },
-        { label: "Email", path: "/settings/email" }
+        { label: "Email", path: "/settings/email" },
+        { label: "Commerce Services Connector Setup", path: "/settings/commerce-connector" }
       ]
     },
 
@@ -701,7 +702,7 @@ const Layout = () => {
       icon: FaCalendarAlt,
       children: [
         { label: "All Plans", path: "/SubscriptionList" },
-        { label: "Add Plan", path: "/CreateSubscription" }
+        { label: "Add Plan", path: "/SubscriptionList/addSubscription" }
       ]
     },
 
@@ -984,13 +985,13 @@ const Layout = () => {
           </div>
           <div className="flex items-center gap-1 sm:gap-4">
             <div className="relative">
-              {/* <button
+              <button
                 onClick={() => setShowSearch(!showSearch)}
                 className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
                 title="Search"
               >
                 <FaSearch className="text-lg sm:text-xl text-gray-600" />
-              </button> */}
+              </button>
 
               {/* Search Input - Slides in */}
               {showSearch && (
@@ -1012,11 +1013,11 @@ const Layout = () => {
 
             {/* Notification Bell */}
             <div className="relative cursor-pointer group">
-              {/* <button className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative">
-                <FaBell className="text-lg sm:text-xl text-gray-600" /> */}
+              <button className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative">
+                <FaBell className="text-lg sm:text-xl text-gray-600" />
                 {/* Notification Dot */}
-                {/* <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-              </button> */}
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+              </button>
             </div>
 
             <div className="relative">

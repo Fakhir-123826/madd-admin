@@ -964,121 +964,175 @@ const SettlementList = () => {
             <div className="rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto min-h-[500px]">
                     <table className="w-full table-auto">
-                        <thead>
-                            <tr className="bg-gradient-to-r from-teal-400 to-green-400 text-white">
-                                {["Settlement #", "Vendor", "Period", "Gross Sales", "Deductions", "Net Payout", "Status", "Period End", ""].map((col, i) => (
-                                    <th key={i} className="px-4 py-4 text-left font-semibold text-sm whitespace-nowrap">{col}</th>
+                        <thead className="bg-white">
+                            <tr className="border-b border-gray-100">
+                                {[
+                                    "Settlement #",
+                                    "Vendor",
+                                    "Period",
+                                    "Gross Sales",
+                                    "Deductions",
+                                    "Net Payout",
+                                    "Status",
+                                    "Period End",
+                                    "",
+                                ].map((col, i) => (
+                                    <th
+                                        key={i}
+                                        className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                                    >
+                                        {col}
+                                    </th>
                                 ))}
                             </tr>
                         </thead>
 
-                        <tbody className="bg-white">
+                        <tbody className="bg-white divide-y divide-gray-100">
                             {isLoading || isFetching ? (
                                 <tr>
-                                    <td colSpan={9} className="text-center py-16">
-                                        <div className="flex items-center justify-center gap-3 text-gray-400">
-                                            <div className="animate-spin h-6 w-6 rounded-full border-b-2 border-teal-500" />
-                                            <span className="text-sm">Loading settlements…</span>
+                                    <td colSpan={9} className="px-6 py-12 text-center">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="animate-spin h-8 w-8 rounded-full border-b-2 border-teal-500" />
+                                            <p className="text-sm text-gray-500">
+                                                Loading settlements...
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : error ? (
                                 <tr>
-                                    <td colSpan={9} className="text-center py-16 text-red-400 text-sm">
+                                    <td
+                                        colSpan={9}
+                                        className="px-6 py-12 text-center text-red-500 text-sm"
+                                    >
                                         Error loading settlements. Please try again.
                                     </td>
                                 </tr>
                             ) : settlements.length === 0 ? (
                                 <tr>
-                                    <td colSpan={9} className="text-center py-16 text-gray-300 text-sm">
-                                        <FaMoneyBillWave className="text-4xl mx-auto mb-3 opacity-30" />
-                                        No settlements found.
+                                    <td
+                                        colSpan={9}
+                                        className="px-6 py-12 text-center text-gray-400 text-sm"
+                                    >
+                                        No settlements found
                                     </td>
                                 </tr>
                             ) : (
-                                settlements.map((settlement, idx) => (
-                                    <tr key={settlement.id} className="hover:bg-gray-50/60 transition"
-                                        style={{ borderBottom: idx < settlements.length - 1 ? "1px solid #f3f4f6" : "none" }}>
-
+                                settlements.map((settlement) => (
+                                    <tr
+                                        key={settlement.id}
+                                        className="hover:bg-gray-50 transition-colors"
+                                    >
                                         {/* Settlement Number */}
-                                        <td className="relative pl-5 pr-4 py-3">
-                                            <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-teal-400 to-teal-300" />
+                                        <td className="px-6 py-4">
                                             <div>
-                                                <span className="font-mono text-teal-600 text-sm font-semibold block">
+                                                <div className="font-medium text-teal-600">
                                                     {settlement.settlement_number}
-                                                </span>
-                                                <span className="text-xs text-gray-400">
+                                                </div>
+                                                <div className="text-xs text-gray-400">
                                                     ID: {settlement.id}
-                                                </span>
+                                                </div>
                                             </div>
                                         </td>
 
                                         {/* Vendor */}
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="h-8 w-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-semibold text-xs">
-                                                    {(settlement.vendor?.company_name ?? "V").charAt(0).toUpperCase()}
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-semibold">
+                                                    {(settlement.vendor?.company_name || "V")
+                                                        .charAt(0)
+                                                        .toUpperCase()}
                                                 </div>
+
                                                 <div>
-                                                    <p className="text-gray-700 text-sm font-medium truncate max-w-[150px]">
-                                                        {settlement.vendor?.company_name || `Vendor #${settlement.vendor_id}`}
-                                                    </p>
-                                                    <p className="text-xs text-gray-400 truncate max-w-[150px]">
+                                                    <div className="font-medium text-gray-900">
+                                                        {settlement.vendor?.company_name ||
+                                                            `Vendor #${settlement.vendor_id}`}
+                                                    </div>
+
+                                                    <div className="text-xs text-gray-400">
                                                         {settlement.vendor?.user?.email || "—"}
-                                                    </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
 
                                         {/* Period */}
-                                        <td className="px-4 py-3">
-                                            <div>
-                                                <p className="text-xs text-gray-500">{fmtDate(settlement.period_start)}</p>
-                                                <p className="text-xs text-gray-400">→ {fmtDate(settlement.period_end)}</p>
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            <div>{fmtDate(settlement.period_start)}</div>
+                                            <div className="text-xs text-gray-400">
+                                                {fmtDate(settlement.period_end)}
                                             </div>
                                         </td>
 
                                         {/* Gross Sales */}
-                                        <td className="px-4 py-3">
-                                            <span className="font-semibold text-gray-800">{fmtPrice(settlement.gross_sales)}</span>
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-700">
+                                            {fmtPrice(settlement.gross_sales)}
                                         </td>
 
                                         {/* Deductions */}
-                                        <td className="px-4 py-3">
-                                            <div className="text-xs">
-                                                <p className="text-red-500">Refunds: {fmtPrice(settlement.total_refunds)}</p>
-                                                <p className="text-gray-500">Fees: {fmtPrice(settlement.gateway_fees)}</p>
-                                                <p className="text-gray-500">Commission: {fmtPrice(settlement.total_commissions)}</p>
+                                        <td className="px-6 py-4">
+                                            <div className="text-xs space-y-1">
+                                                <div className="text-red-500">
+                                                    Refunds: {fmtPrice(settlement.total_refunds)}
+                                                </div>
+
+                                                <div className="text-gray-500">
+                                                    Fees: {fmtPrice(settlement.gateway_fees)}
+                                                </div>
+
+                                                <div className="text-gray-500">
+                                                    Commission: {fmtPrice(
+                                                        settlement.total_commissions
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
 
                                         {/* Net Payout */}
-                                        <td className="px-4 py-3">
-                                            <span className="font-bold text-teal-600">{fmtPrice(settlement.net_payout)}</span>
+                                        <td className="px-6 py-4">
+                                            <span className="font-semibold text-teal-600">
+                                                {fmtPrice(settlement.net_payout)}
+                                            </span>
                                         </td>
 
                                         {/* Status */}
-                                        <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold capitalize ${statusStyle(settlement.status)}`}>
+                                        <td className="px-6 py-4">
+                                            <span
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${statusStyle(
+                                                    settlement.status
+                                                )}`}
+                                            >
                                                 {statusIcon(settlement.status)}
                                                 {settlement.status}
                                             </span>
                                         </td>
 
                                         {/* Period End */}
-                                        <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+                                        <td className="px-6 py-4 text-xs text-gray-400">
                                             {fmtDate(settlement.period_end)}
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="relative pl-4 pr-5 py-3 text-right">
-                                            <span className="absolute right-0 top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-green-400 to-green-300" />
+                                        <td className="px-6 py-4 text-right">
                                             <RowMenu
                                                 settlement={settlement}
-                                                onView={() => { setSelectedSettlement(settlement); setIsDrawerOpen(true); }}
-                                                onApprove={() => { setSelectedSettlement(settlement); setIsApproveModalOpen(true); }}
-                                                onPay={() => { setSelectedSettlement(settlement); setIsPaymentModalOpen(true); }}
-                                                onDispute={() => { setSelectedSettlement(settlement); setIsDisputeModalOpen(true); }}
+                                                onView={() => {
+                                                    setSelectedSettlement(settlement);
+                                                    setIsDrawerOpen(true);
+                                                }}
+                                                onApprove={() => {
+                                                    setSelectedSettlement(settlement);
+                                                    setIsApproveModalOpen(true);
+                                                }}
+                                                onPay={() => {
+                                                    setSelectedSettlement(settlement);
+                                                    setIsPaymentModalOpen(true);
+                                                }}
+                                                onDispute={() => {
+                                                    setSelectedSettlement(settlement);
+                                                    setIsDisputeModalOpen(true);
+                                                }}
                                             />
                                         </td>
                                     </tr>

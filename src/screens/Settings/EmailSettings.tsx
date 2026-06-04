@@ -105,7 +105,11 @@ const EmailSettings = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-5">
+
+            <h1 className="text-2xl font-bold text-gray-800">Mail Setting</h1>
+
+
             {/* Toast */}
             {toast && (
                 <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium

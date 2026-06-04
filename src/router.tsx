@@ -19,6 +19,7 @@ import VendorOnboard from './screens/Vender/Vendor Onboarding/VendorOnboard.tsx'
 import VendorDashBoard from './screens/Vender/VendorDashBoard.tsx'
 import CreateSubscription from './screens/Subscription/CreateSubscription.tsx'
 import SubscriptionList from './screens/Subscription/SubscriptionList.tsx'
+import AddSubscription from './screens/Subscription/AddSubscription.tsx'
 import OrderList from './screens/OrdersManagement/OrderList.tsx'
 import { OrderDetail } from './screens/OrdersManagement/OrderDetail';
 import OrderStatistics from './screens/OrdersManagement/OrderStatistics.tsx'
@@ -243,6 +244,8 @@ import { AttributeSetList } from "./screens/AttributeSet/AttributeSetList.tsx";
 import { CreateAttributeSet } from "./screens/AttributeSet/CreateAttributeSet.tsx";
 import { EditAttributeSet } from "./screens/AttributeSet/EditAttributeSet.tsx";
 import { ViewAttributeSet } from './screens/AttributeSet/ViewAttributeSet';
+import CommerceConnector from "./screens/Setting/CommerceConnector.tsx";
+import CommerceServicesConfig from "./component/Setting/Backup/Connector/Commerceservicesconfig.tsx";
 
 
 
@@ -701,7 +704,7 @@ const protectedRoutes = [
   // Settings - New Nested Routes
   {
     path: ROUTES.SETTINGS,
-    element: <Settings />,
+    // element: <Settings />,
     children: [
       { index: true, element: <Navigate to="system" replace /> },
       { path: "system", element: <SystemSettings /> },
@@ -709,6 +712,8 @@ const protectedRoutes = [
       { path: "shipping", element: <ShippingSettings /> },
       { path: "tax", element: <TaxSettings /> },
       { path: "email", element: <EmailSettings /> },
+      { path: "commerce-connector", element: <CommerceConnector /> },
+      { path: "commerce-connector-setup", element: <CommerceServicesConfig /> },
     ],
   },
   {
@@ -728,6 +733,8 @@ const protectedRoutes = [
   { path: ROUTES.PLANS, element: <PlanList /> },
   { path: ROUTES.CREATE_PLAN, element: <PlanForm /> },
   { path: ROUTES.EDIT_PLAN(), element: <PlanForm /> },
+  { path: "/SubscriptionList", element: <SubscriptionList /> },
+  { path: "/SubscriptionList/addSubscription", element: <AddSubscription /> },
 
   {
     path: "/mlm",
