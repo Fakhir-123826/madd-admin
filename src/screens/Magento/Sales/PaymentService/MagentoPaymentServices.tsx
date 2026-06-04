@@ -2,19 +2,19 @@ import { useState } from "react";
 import {
     FaCog, FaBook, FaRocket, FaChartBar, FaLifeRing,
     FaHeadset, FaExternalLinkAlt, FaExclamationTriangle,
-    FaCreditCard, FaArrowRight, FaCheckCircle
+    FaCreditCard, FaArrowRight, FaCheckCircle,
+    FaFlask
 } from "react-icons/fa";
 
 const MagentoPaymentServices = () => {
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-5">
 
             {/* HEADER */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-xl font-semibold text-gray-800">Payment Services</h1>
-                    <p className="text-sm text-gray-400 mt-0.5">Home</p>
                 </div>
                 <button
                     className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-all"
@@ -25,6 +25,7 @@ const MagentoPaymentServices = () => {
             </div>
 
             {/* WELCOME BANNER */}
+            <p className="text-sm font-bold ml-2 mb-[5px]">Home</p>
             <div className="rounded-xl shadow-sm overflow-hidden"
                 style={{ background: "linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #6366f1 100%)" }}>
                 <div className="flex items-center justify-between px-8 py-7">
@@ -54,47 +55,83 @@ const MagentoPaymentServices = () => {
                 </div>
             </div>
 
-            {/* COMMERCE SERVICE CONNECTOR */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                        <h3 className="text-base font-semibold text-gray-800 mb-1">Commerce Service Connector Setup</h3>
-                        <p className="text-sm text-gray-400 mb-4">
-                            To access Payment Services, you will first need to configure Commerce Services.
-                            Return here after configuring Commerce Services to complete Commerce Payments setup.
-                        </p>
-                        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
-                            <FaExclamationTriangle className="text-amber-500 text-sm flex-shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                                <p className="text-sm font-semibold text-amber-700 mb-0.5">Important API Key Information</p>
-                                <p className="text-xs text-amber-600 leading-relaxed">
-                                    API keys are required to configure the Commerce Services Connector.
-                                    For Payment Services to function in production mode, those API keys must be
-                                    generated from the license-holder's{" "}
-                                    <a href="#" className="underline font-medium">My Account</a> page.
-                                </p>
-                            </div>
-                            <a href="https://experienceleague.adobe.com/en/docs/commerce/payment-services/introduction"
-                                target="_blank" rel="noopener noreferrer"
-                                className="text-xs text-blue-500 font-medium hover:underline flex-shrink-0 flex items-center gap-1">
-                                Learn more <FaExternalLinkAlt className="text-[10px]" />
-                            </a>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                {/* Sandbox Card */}
+                <div className="relative overflow-hidden rounded-2xl border border-sky-100 bg-sky-50/60 p-6">
+                    <div className="flex justify-between items-start h-full">
+                        <div className="max-w-[75%]">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                Process Sandbox Payments
+                            </h3>
+
+                            <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                                Use Payment Services in test mode to validate your setup and
+                                onboarding process before moving to production.
+                            </p>
+
+                            <button
+                                className="px-5 py-2 text-sm font-semibold rounded-lg text-white transition-all hover:opacity-90"
+                                style={{
+                                    background:
+                                        "linear-gradient(to right, #38bdf8, #3b82f6)",
+                                }}
+                            >
+                                Sandbox Onboarding
+                            </button>
                         </div>
-                        <button className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all hover:opacity-90"
-                            style={{ background: "linear-gradient(to right, #38bdf8, #3b82f6)" }}>
-                            Configure Commerce Services Connector
-                        </button>
-                    </div>
-                    <div className="hidden md:flex items-center gap-2 ml-8 flex-shrink-0">
-                        {[1, 2, 3].map((step, i) => (
-                            <div key={i} className="flex items-center gap-2">
-                                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
-                                    ${i === 0 ? "bg-gradient-to-r from-teal-400 to-green-500 text-white" : "bg-gray-100 text-gray-400"}`}>
-                                    {i === 0 ? <FaCheckCircle /> : step}
-                                </div>
-                                {i < 2 && <div className="w-6 h-px bg-gray-200" />}
+
+                        {/* Illustration */}
+                        <div className="hidden md:flex items-center justify-center">
+                            <div
+                                className="w-24 h-24 rounded-2xl flex items-center justify-center"
+                                style={{
+                                    background:
+                                        "linear-gradient(to right, #38bdf8, #3b82f6)",
+                                }}
+                            >
+                                <FaFlask className="text-white text-4xl" />
                             </div>
-                        ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Live Payments Card */}
+                <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/60 p-6">
+                    <div className="flex justify-between items-start h-full">
+                        <div className="max-w-[75%]">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                Process Live Payments
+                            </h3>
+
+                            <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                                Complete your setup and start accepting real customer
+                                payments. No charges until you go live.
+                            </p>
+
+                            <button
+                                className="px-5 py-2 text-sm font-semibold rounded-lg text-white transition-all hover:opacity-90"
+                                style={{
+                                    background:
+                                        "linear-gradient(to right, #38bdf8, #3b82f6)",
+                                }}
+                            >
+                                Get Live Payments
+                            </button>
+                        </div>
+
+                        {/* Illustration */}
+                        <div className="hidden md:flex items-center justify-center">
+                            <div
+                                className="w-24 h-24 rounded-2xl flex items-center justify-center"
+                                style={{
+                                    background:
+                                        "linear-gradient(to right, #38bdf8, #3b82f6)",
+                                }}
+                            >
+                                <FaCreditCard className="text-white text-4xl" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,7 +184,6 @@ const MagentoPaymentServices = () => {
                     ))}
                 </div>
             </div>
-
         </div>
     );
 };
