@@ -1,5 +1,5 @@
 // src/pages/Products/CreateProductForm.tsx
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetVendorsQuery } from "../../../app/api/VendorSlices/VendorApi";
 import {
@@ -23,7 +23,11 @@ import type {
   GroupedProductLink,
   ConfigurableOption
 } from "../../../app/api/ProductSlices/ProductApi";
+import { useGetAttributeSetsQuery } from "../../../app/api/AttributeSetSlices/AttributeSetApi";
 import { useGetStoresByVendorQuery } from "../../../app/api/StoreSlices/StoreApi";
+import { useGetCategoryTreeQuery, type CategoryTree } from "../../../app/api/CategorySlices/CategoryApi";
+import SearchableSelect from "../../../component/SearchableSelect";
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,8 +46,22 @@ interface Store {
   status: string;
 }
 
+interface AttributeSet {
+  id: string;
+  uuid: string;
+  attribute_set_name: string;
+  magento_attr_set_id: number | null;
+}
+
 interface FormErrors {
   [key: string]: string | undefined;
+}
+
+interface CategoryOption {
+  value: string;
+  label: string;
+  depth: number;
+  children?: CategoryOption[];
 }
 
 // Configurable Product Steps
@@ -70,6 +88,125 @@ interface BulkConfig {
     uniqueValues?: Record<string, number>;
   };
 }
+
+// ─── MultiSelectTree Component ────────────────────────────────────────────────
+
+const MultiSelectTree = ({ 
+  options, 
+  selectedValues, 
+  onChange, 
+  placeholder 
+}: { 
+  options: CategoryOption[]; 
+  selectedValues: string[]; 
+  onChange: (values: string[]) => void; 
+  placeholder: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleOption = (value: string) => {
+    if (selectedValues.includes(value)) {
+      onChange(selectedValues.filter(v => v !== value));
+    } else {
+      onChange([...selectedValues, value]);
+    }
+  };
+
+  const removeSelected = (valueToRemove: string) => {
+    onChange(selectedValues.filter(v => v !== valueToRemove));
+  };
+
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getSelectedLabels = () => {
+    return options
+      .filter(opt => selectedValues.includes(opt.value))
+      .map(opt => opt.label);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <div 
+        className="min-h-[42px] px-3 py-2 border border-gray-300 rounded-xl bg-white cursor-pointer flex flex-wrap gap-1 items-center"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {selectedValues.length > 0 ? (
+          getSelectedLabels().map((label, idx) => (
+            <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-teal-100 text-teal-700 rounded-md text-sm">
+              {label}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const valueToRemove = selectedValues[idx];
+                  removeSelected(valueToRemove);
+                }}
+                className="hover:text-teal-900"
+              >
+                ×
+              </button>
+            </span>
+          ))
+        ) : (
+          <span className="text-gray-400 text-sm">{placeholder}</span>
+        )}
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-hidden">
+          <div className="p-2 border-b border-gray-100">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search categories..."
+              className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:border-teal-400"
+              onClick={(e) => e.stopPropagation()}
+              autoFocus
+            />
+          </div>
+          <div className="overflow-y-auto max-h-60">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map(option => (
+                <label
+                  key={option.value}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                  style={{ paddingLeft: `${12 + option.depth * 20}px` }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedValues.includes(option.value)}
+                    onChange={() => toggleOption(option.value)}
+                    className="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                  />
+                  <span className="text-sm text-gray-700">{option.label}</span>
+                </label>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                No categories found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ─── Helper Component Outside Main Component ─────────────────────────────────
 
@@ -134,6 +271,29 @@ const CreateProductForm = () => {
   const { data: vendorsData, isLoading: vendorsLoading } = useGetVendorsQuery({});
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
+  // Fetch attribute sets dynamically
+  const [selectedVendorUuidForAttrSets, setSelectedVendorUuidForAttrSets] = useState<string>("");
+  const {
+    data: attributeSetsResponse,
+    isLoading: attributeSetsLoading,
+  } = useGetAttributeSetsQuery(
+    { vendor_uuid: selectedVendorUuidForAttrSets, page: 1, per_page: 100 },
+    { skip: !selectedVendorUuidForAttrSets }
+  );
+
+  // Category state
+  const [selectedCategoryUuids, setSelectedCategoryUuids] = useState<string[]>([]);
+  const [categoryTreeData, setCategoryTreeData] = useState<CategoryTree[]>([]);
+
+  // Fetch category tree
+  const {
+    data: categoryTreeResponse,
+    isLoading: categoryTreeLoading,
+  } = useGetCategoryTreeQuery(
+    { vendor_uuid: selectedVendorUuidForAttrSets, depth: 10 },
+    { skip: !selectedVendorUuidForAttrSets }
+  );
+
   // Fetch attributes
   const [availableAttributes, setAvailableAttributes] = useState<any[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<any[]>([]);
@@ -175,8 +335,33 @@ const CreateProductForm = () => {
   );
 
   const availableStores = storesResponse?.data?.stores || [];
+  const attributeSets = attributeSetsResponse?.data || [];
 
   const [createVendorProduct, { isLoading: isSubmitting }] = useCreateVendorProductMutation();
+
+  // Build category options from tree
+  const buildCategoryOptions = (categories: CategoryTree[], depth: number = 0): CategoryOption[] => {
+    const options: CategoryOption[] = [];
+
+    for (const category of categories) {
+      // Skip the root category (usually named "Root Catalog" or has level 0)
+      if (category.name !== "Root Catalog" && category.name !== "Default Category" && category.level > 0) {
+        const prefix = "— ".repeat(depth);
+        options.push({
+          value: category.uuid,
+          label: `${prefix}${category.name}`,
+          depth: depth
+        });
+      }
+
+      // Process children recursively
+      if (category.children && category.children.length > 0) {
+        options.push(...buildCategoryOptions(category.children, depth + 1));
+      }
+    }
+
+    return options;
+  };
 
   // Complete Form Data with all Magento fields
   const [formData, setFormData] = useState<CreateProductPayload>({
@@ -262,11 +447,28 @@ const CreateProductForm = () => {
     if (formData.vendor_id && vendorsData?.data) {
       const vendor = vendorsData.data.find((v: Vendor) => v.uuid === formData.vendor_id);
       setSelectedVendor(vendor || null);
+      setSelectedVendorUuidForAttrSets(formData.vendor_id);
       setFormData(prev => ({ ...prev, vendor_store_id: "" }));
     } else {
       setSelectedVendor(null);
+      setSelectedVendorUuidForAttrSets("");
     }
   }, [formData.vendor_id, vendorsData]);
+
+  // Update category options when data loads
+  useEffect(() => {
+    if (categoryTreeResponse?.data && Array.isArray(categoryTreeResponse.data)) {
+      setCategoryTreeData(categoryTreeResponse.data);
+    } else if (categoryTreeResponse?.data && typeof categoryTreeResponse.data === 'object') {
+      // Handle if response has a nested structure
+      const treeData = (categoryTreeResponse.data as any).tree || 
+                       (categoryTreeResponse.data as any).categories || 
+                       [];
+      setCategoryTreeData(Array.isArray(treeData) ? treeData : []);
+    } else {
+      setCategoryTreeData([]);
+    }
+  }, [categoryTreeResponse]);
 
   // Auto-generate SKU from name
   useEffect(() => {
@@ -307,10 +509,17 @@ const CreateProductForm = () => {
     }
   }, [configurableAttributesData]);
 
+  // Handle category selection
+  const handleCategoryChange = (selectedUuids: string[]) => {
+    setSelectedCategoryUuids(selectedUuids);
+    // Convert UUIDs to Magento category IDs (you may need to map these)
+    setFormData(prev => ({ ...prev, category_ids: selectedUuids.map(id => parseInt(id) || 0) }));
+  };
+
   // Handle product type change with confirmation
   const handleProductTypeChange = (type: CreateProductPayload['type_id']) => {
     if (activeProductType === type) return;
-    
+
     if (activeProductType !== "simple") {
       setPendingProductType(type);
       setShowTypeChangeConfirm(true);
@@ -582,7 +791,7 @@ const CreateProductForm = () => {
   const handleSelectAll = (attributeId: number, allValues: any[]) => {
     const allSelected = !selectedAll[attributeId];
     setSelectedAll(prev => ({ ...prev, [attributeId]: allSelected }));
-    
+
     const attribute = selectedAttributes.find(attr => attr.attribute_id === attributeId);
     if (attribute) {
       allValues.forEach(value => {
@@ -875,7 +1084,7 @@ const CreateProductForm = () => {
   const renderBulkImagesPriceStep = () => {
     const selectedValues = formData.configurable_options || [];
     const selectedAttributeValues: Record<string, any[]> = {};
-    
+
     selectedAttributes.forEach(attr => {
       const selectedOptions = selectedValues.find(opt => opt.attribute_id === attr.attribute_id);
       if (selectedOptions) {
@@ -1213,9 +1422,8 @@ const CreateProductForm = () => {
           </button>
         </div>
       </div>
-    );
-  };
-
+  );
+};
   const renderSummaryStep = () => (
     <div className="space-y-6">
       <div className="bg-blue-50 p-4 rounded-lg mb-4">
@@ -1338,45 +1546,123 @@ const CreateProductForm = () => {
 
   // ============ RENDER FUNCTIONS FOR OTHER PRODUCT TYPES ============
 
-  const renderVendorStoreSection = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-xl">
-      <div>
-        <label className="block text-sm font-semibold mb-2 text-gray-700">Vendor <span className="text-red-500">*</span></label>
-        <select
-          name="vendor_id"
-          value={formData.vendor_id || ""}
-          onChange={handleChange}
-          onBlur={() => handleBlur("vendor_id")}
-          className={`w-full border ${touched.vendor_id && errors.vendor_id ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
-        >
-          <option value="">Select Vendor</option>
-          {vendorsData?.data?.map((vendor: Vendor) => (
-            <option key={vendor.uuid} value={vendor.uuid}>{vendor.company_name}</option>
-          ))}
-        </select>
-        {touched.vendor_id && errors.vendor_id && <p className="text-red-500 text-sm mt-1">{errors.vendor_id}</p>}
+  const renderVendorStoreSection = () => {
+    const vendorOptions = vendorsData?.data?.map((vendor: Vendor) => ({
+      value: vendor.uuid,
+      label: vendor.company_name
+    })) || [];
+
+    const storeOptions = availableStores.map((store: Store) => ({
+      value: store.uuid,
+      label: store.store_name
+    }));
+
+    const attributeSetOptions = attributeSets.map((set: AttributeSet) => ({
+      value: set.magento_attr_set_id?.toString() || set.id,
+      label: set.attribute_set_name
+    }));
+
+    const categoryOptions = buildCategoryOptions(categoryTreeData, 0);
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-xl">
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Vendor <span className="text-red-500">*</span></label>
+          {vendorsLoading ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                <span className="text-sm text-gray-500">Loading vendors...</span>
+              </div>
+            </div>
+          ) : (
+            <SearchableSelect
+              options={vendorOptions}
+              value={formData.vendor_id || ""}
+              onChange={(value) => {
+                setFormData(prev => ({ ...prev, vendor_id: value }));
+                handleBlur("vendor_id");
+              }}
+              placeholder="Select Vendor"
+            />
+          )}
+          {touched.vendor_id && errors.vendor_id && <p className="text-red-500 text-sm mt-1">{errors.vendor_id}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Store <span className="text-red-500">*</span></label>
+          {!formData.vendor_id ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <span className="text-sm text-gray-500">Select a vendor first</span>
+            </div>
+          ) : storesLoading ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                <span className="text-sm text-gray-500">Loading stores...</span>
+              </div>
+            </div>
+          ) : (
+            <SearchableSelect
+              options={storeOptions}
+              value={formData.vendor_store_id || ""}
+              onChange={(value) => {
+                setFormData(prev => ({ ...prev, vendor_store_id: value }));
+                handleBlur("vendor_store_id");
+              }}
+              placeholder="Select Store"
+            />
+          )}
+          {touched.vendor_store_id && errors.vendor_store_id && <p className="text-red-500 text-sm mt-1">{errors.vendor_store_id}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Attribute Set ID</label>
+          {!formData.vendor_id ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <span className="text-sm text-gray-500">Select a vendor first</span>
+            </div>
+          ) : attributeSetsLoading ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                <span className="text-sm text-gray-500">Loading attribute sets...</span>
+              </div>
+            </div>
+          ) : (
+            <SearchableSelect
+              options={attributeSetOptions}
+              value={formData.attribute_set_id?.toString() || ""}
+              onChange={(value) => {
+                setFormData(prev => ({ ...prev, attribute_set_id: parseInt(value) }));
+              }}
+              placeholder="Select Attribute Set"
+            />
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Categories</label>
+          {!formData.vendor_id ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <span className="text-sm text-gray-500">Select a vendor first</span>
+            </div>
+          ) : categoryTreeLoading ? (
+            <div className="w-full border border-gray-300 rounded-xl p-3 bg-gray-50">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                <span className="text-sm text-gray-500">Loading categories...</span>
+              </div>
+            </div>
+          ) : (
+            <MultiSelectTree
+              options={categoryOptions}
+              selectedValues={selectedCategoryUuids}
+              onChange={handleCategoryChange}
+              placeholder="Select Categories"
+            />
+          )}
+        </div>
       </div>
-      <div>
-        <label className="block text-sm font-semibold mb-2 text-gray-700">Store <span className="text-red-500">*</span></label>
-        <select
-          name="vendor_store_id"
-          value={formData.vendor_store_id || ""}
-          onChange={handleChange}
-          onBlur={() => handleBlur("vendor_store_id")}
-          disabled={!formData.vendor_id || storesLoading}
-          className={`w-full border ${touched.vendor_store_id && errors.vendor_store_id ? "border-red-500" : "border-gray-300"} rounded-xl p-3 disabled:bg-gray-100`}
-        >
-          <option value="">
-            {!formData.vendor_id ? "Select a vendor first" : storesLoading ? "Loading Stores..." : "Select Store"}
-          </option>
-          {availableStores.map((store: Store) => (
-            <option key={store.uuid} value={store.uuid}>{store.store_name}</option>
-          ))}
-        </select>
-        {touched.vendor_store_id && errors.vendor_store_id && <p className="text-red-500 text-sm mt-1">{errors.vendor_store_id}</p>}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderProductTypeSelector = () => (
     <div className="flex gap-2 flex-wrap border-b border-gray-200 pb-4">
@@ -1393,209 +1679,315 @@ const CreateProductForm = () => {
     </div>
   );
 
-  const renderGeneralTab = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-semibold mb-1">SKU <span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="sku"
-            value={formData.sku}
-            onChange={handleChange}
-            onBlur={() => handleBlur("sku")}
-            className={`w-full border ${touched.sku && errors.sku ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
-            placeholder="Unique product SKU (auto-generated from name)"
-          />
-          {touched.sku && errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Product Name <span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            onBlur={() => handleBlur("name")}
-            className={`w-full border ${touched.name && errors.name ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
-            placeholder="Product name"
-          />
-          {touched.name && errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Attribute Set ID</label>
-          <input type="number" name="attribute_set_id" value={formData.attribute_set_id} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Visibility</label>
-          <select name="visibility" value={formData.visibility} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3">
-            <option value={1}>Not Visible Individually</option>
-            <option value={2}>Catalog</option>
-            <option value={3}>Search</option>
-            <option value={4}>Catalog & Search</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Status</label>
-          <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3">
-            <option value={1}>Enabled</option>
-            <option value={0}>Disabled</option>
-          </select>
-        </div>
-        {formData.type_id !== 'virtual' && formData.type_id !== 'downloadable' && formData.type_id !== 'giftcard' && (
+  const renderGeneralTab = () => {
+    const visibilityOptions = [
+      { value: "1", label: "Not Visible Individually" },
+      { value: "2", label: "Catalog" },
+      { value: "3", label: "Search" },
+      { value: "4", label: "Catalog & Search" }
+    ];
+
+    const statusOptions = [
+      { value: "1", label: "Enabled" },
+      { value: "0", label: "Disabled" }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-semibold mb-1">Weight (kg)</label>
-            <input type="number" step="0.01" name="weight" value={formData.weight} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-          </div>
-        )}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Tax Class ID</label>
-          <input type="number" name="tax_class_id" value={formData.tax_class_id} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-semibold mb-1">Short Description</label>
-        <textarea name="short_description" rows={3} value={formData.short_description} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-      </div>
-      <div>
-        <label className="block text-sm font-semibold mb-1">Full Description</label>
-        <textarea name="description" rows={5} value={formData.description} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-      </div>
-    </div>
-  );
-
-  const renderPricingTab = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {formData.type_id !== 'grouped' && (
-          <div>
-            <label className="block text-sm font-semibold mb-1">Regular Price <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              step="0.01"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              onBlur={() => handleBlur("price")}
-              className={`w-full border ${touched.price && errors.price ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
-            />
-            {touched.price && errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
-          </div>
-        )}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Special Price</label>
-          <input type="number" step="0.01" name="special_price" value={formData.special_price || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Special Price From</label>
-          <input type="date" name="special_from_date" value={formData.special_from_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Special Price To</label>
-          <input type="date" name="special_to_date" value={formData.special_to_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Cost (Manufacturer Price)</label>
-          <input type="number" step="0.01" name="cost" value={formData.cost || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">MSRP (Manufacturer's Suggested Retail Price)</label>
-          <input type="number" step="0.01" name="msrp" value={formData.msrp || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-      </div>
-
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-gray-700">Tier Prices (Volume Discounts)</label>
-          <button
-            type="button"
-            onClick={() => addToArray("tier_prices", { customer_group: "ALL GROUPS", quantity: 1, price: 0, website_id: 0, price_type: "fixed" })}
-            className="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm"
-          >
-            + Add Tier Price
-          </button>
-        </div>
-        {formData.tier_prices?.map((tier, index) => (
-          <div key={index} className="relative grid grid-cols-5 gap-4 mb-3 p-3 bg-gray-50 rounded-lg">
-            <RemoveButton onClick={() => removeFromArray("tier_prices", index)} />
-            <select
-              value={tier.customer_group}
-              onChange={(e) => handleArrayChange("tier_prices", index, "customer_group", e.target.value)}
-              className="border rounded-lg p-2"
-            >
-              <option value="ALL GROUPS">ALL GROUPS</option>
-              <option value="General">General</option>
-              <option value="Wholesale">Wholesale</option>
-              <option value="Retailer">Retailer</option>
-            </select>
-            <input
-              type="number"
-              placeholder="Min Qty"
-              value={tier.quantity}
-              onChange={(e) => handleArrayChange("tier_prices", index, "quantity", parseInt(e.target.value))}
-              className="border rounded-lg p-2"
-            />
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Price"
-              value={tier.price}
-              onChange={(e) => handleArrayChange("tier_prices", index, "price", parseFloat(e.target.value))}
-              className="border rounded-lg p-2"
-            />
-            <input
-              type="number"
-              placeholder="Website ID"
-              value={tier.website_id}
-              onChange={(e) => handleArrayChange("tier_prices", index, "website_id", parseInt(e.target.value))}
-              className="border rounded-lg p-2"
-            />
-            <select
-              value={tier.price_type}
-              onChange={(e) => handleArrayChange("tier_prices", index, "price_type", e.target.value)}
-              className="border rounded-lg p-2"
-            >
-              <option value="fixed">Fixed</option>
-              <option value="discount">Discount</option>
-            </select>
-          </div>
-        ))}
-      </div>
-
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-gray-700">Product Links (Related/Up-sell/Cross-sell)</label>
-          <button
-            type="button"
-            onClick={() => addToArray("product_links", { link_type: "related", linked_sku: "", linked_type: "simple", position: 0 })}
-            className="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm"
-          >
-            + Add Link
-          </button>
-        </div>
-        {formData.product_links?.map((link, index) => (
-          <div key={index} className="relative grid grid-cols-4 gap-4 mb-3 p-3 bg-gray-50 rounded-lg">
-            <RemoveButton onClick={() => removeFromArray("product_links", index)} />
+            <label className="block text-sm font-semibold mb-1">SKU <span className="text-red-500">*</span></label>
             <input
               type="text"
-              placeholder="Linked Product SKU"
-              value={link.linked_sku}
-              onChange={(e) => handleArrayChange("product_links", index, "linked_sku", e.target.value)}
-              className="border rounded-lg p-2"
+              name="sku"
+              value={formData.sku}
+              onChange={handleChange}
+              onBlur={() => handleBlur("sku")}
+              className={`w-full border ${touched.sku && errors.sku ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
+              placeholder="Unique product SKU (auto-generated from name)"
             />
-            <select value={link.link_type} onChange={(e) => handleArrayChange("product_links", index, "link_type", e.target.value)} className="border rounded-lg p-2">
-              <option value="related">Related</option>
-              <option value="upsell">Up-sell</option>
-              <option value="crosssell">Cross-sell</option>
-            </select>
-            <input type="number" placeholder="Position" value={link.position} onChange={(e) => handleArrayChange("product_links", index, "position", parseInt(e.target.value))} className="border rounded-lg p-2" />
+            {touched.sku && errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku}</p>}
           </div>
-        ))}
+          <div>
+            <label className="block text-sm font-semibold mb-1">Product Name <span className="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              onBlur={() => handleBlur("name")}
+              className={`w-full border ${touched.name && errors.name ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
+              placeholder="Product name"
+            />
+            {touched.name && errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Visibility</label>
+            <SearchableSelect
+              options={visibilityOptions}
+              value={formData.visibility?.toString() || "4"}
+              onChange={(value) => setFormData(prev => ({ ...prev, visibility: parseInt(value) }))}
+              placeholder="Select Visibility"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Status</label>
+            <SearchableSelect
+              options={statusOptions}
+              value={formData.status?.toString() || "1"}
+              onChange={(value) => setFormData(prev => ({ ...prev, status: parseInt(value) }))}
+              placeholder="Select Status"
+            />
+          </div>
+          {formData.type_id !== 'virtual' && formData.type_id !== 'downloadable' && formData.type_id !== 'giftcard' && (
+            <div>
+              <label className="block text-sm font-semibold mb-1">Weight (kg)</label>
+              <input type="number" step="0.01" name="weight" value={formData.weight} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-semibold mb-1">Tax Class ID</label>
+            <input type="number" name="tax_class_id" value={formData.tax_class_id} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-1">Short Description</label>
+          <textarea name="short_description" rows={3} value={formData.short_description} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-1">Full Description</label>
+          <textarea name="description" rows={5} value={formData.description} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const renderPricingTab = () => {
+    const countryOptions = [
+      { value: "", label: "Select Country" },
+      { value: "US", label: "United States" },
+      { value: "CN", label: "China" },
+      { value: "IN", label: "India" },
+      { value: "JP", label: "Japan" },
+      { value: "DE", label: "Germany" },
+      { value: "UK", label: "United Kingdom" }
+    ];
+
+    const pageLayoutOptions = [
+      { value: "", label: "No Layout Updates" },
+      { value: "1column", label: "1 Column" },
+      { value: "2columns-left", label: "2 Columns with Left Bar" },
+      { value: "2columns-right", label: "2 Columns with Right Bar" },
+      { value: "3columns", label: "3 Columns" }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {formData.type_id !== 'grouped' && (
+            <div>
+              <label className="block text-sm font-semibold mb-1">Regular Price <span className="text-red-500">*</span></label>
+              <input
+                type="number"
+                step="0.01"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                onBlur={() => handleBlur("price")}
+                className={`w-full border ${touched.price && errors.price ? 'border-red-500' : 'border-gray-300'} rounded-xl p-3`}
+              />
+              {touched.price && errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-semibold mb-1">Special Price</label>
+            <input type="number" step="0.01" name="special_price" value={formData.special_price || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Special Price From</label>
+            <input type="date" name="special_from_date" value={formData.special_from_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Special Price To</label>
+            <input type="date" name="special_to_date" value={formData.special_to_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Cost (Manufacturer Price)</label>
+            <input type="number" step="0.01" name="cost" value={formData.cost || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">MSRP (Manufacturer's Suggested Retail Price)</label>
+            <input type="number" step="0.01" name="msrp" value={formData.msrp || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-semibold text-gray-700">Tier Prices (Volume Discounts)</label>
+            <button
+              type="button"
+              onClick={() => addToArray("tier_prices", { customer_group: "ALL GROUPS", quantity: 1, price: 0, website_id: 0, price_type: "fixed" })}
+              className="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm"
+            >
+              + Add Tier Price
+            </button>
+          </div>
+          {formData.tier_prices?.map((tier, index) => (
+            <div key={index} className="relative grid grid-cols-5 gap-4 mb-3 p-3 bg-gray-50 rounded-lg">
+              <RemoveButton onClick={() => removeFromArray("tier_prices", index)} />
+              <SearchableSelect
+                options={[
+                  { value: "ALL GROUPS", label: "ALL GROUPS" },
+                  { value: "General", label: "General" },
+                  { value: "Wholesale", label: "Wholesale" },
+                  { value: "Retailer", label: "Retailer" }
+                ]}
+                value={tier.customer_group}
+                onChange={(value) => handleArrayChange("tier_prices", index, "customer_group", value)}
+                placeholder="Customer Group"
+              />
+              <input
+                type="number"
+                placeholder="Min Qty"
+                value={tier.quantity}
+                onChange={(e) => handleArrayChange("tier_prices", index, "quantity", parseInt(e.target.value))}
+                className="border rounded-lg p-2"
+              />
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Price"
+                value={tier.price}
+                onChange={(e) => handleArrayChange("tier_prices", index, "price", parseFloat(e.target.value))}
+                className="border rounded-lg p-2"
+              />
+              <input
+                type="number"
+                placeholder="Website ID"
+                value={tier.website_id}
+                onChange={(e) => handleArrayChange("tier_prices", index, "website_id", parseInt(e.target.value))}
+                className="border rounded-lg p-2"
+              />
+              <SearchableSelect
+                options={[
+                  { value: "fixed", label: "Fixed" },
+                  { value: "discount", label: "Discount" }
+                ]}
+                value={tier.price_type}
+                onChange={(value) => handleArrayChange("tier_prices", index, "price_type", value)}
+                placeholder="Price Type"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-semibold text-gray-700">Product Links (Related/Up-sell/Cross-sell)</label>
+            <button
+              type="button"
+              onClick={() => addToArray("product_links", { link_type: "related", linked_sku: "", linked_type: "simple", position: 0 })}
+              className="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm"
+            >
+              + Add Link
+            </button>
+          </div>
+          {formData.product_links?.map((link, index) => (
+            <div key={index} className="relative grid grid-cols-4 gap-4 mb-3 p-3 bg-gray-50 rounded-lg">
+              <RemoveButton onClick={() => removeFromArray("product_links", index)} />
+              <input
+                type="text"
+                placeholder="Linked Product SKU"
+                value={link.linked_sku}
+                onChange={(e) => handleArrayChange("product_links", index, "linked_sku", e.target.value)}
+                className="border rounded-lg p-2"
+              />
+              <SearchableSelect
+                options={[
+                  { value: "related", label: "Related" },
+                  { value: "upsell", label: "Up-sell" },
+                  { value: "crosssell", label: "Cross-sell" }
+                ]}
+                value={link.link_type}
+                onChange={(value) => handleArrayChange("product_links", index, "link_type", value)}
+                placeholder="Link Type"
+              />
+              <input type="number" placeholder="Position" value={link.position} onChange={(e) => handleArrayChange("product_links", index, "position", parseInt(e.target.value))} className="border rounded-lg p-2" />
+            </div>
+          ))}
+        </div>
+
+        {/* Advanced Tab Controls */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Custom Design</label>
+            <input type="text" name="custom_design" value={formData.custom_design} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Page Layout</label>
+            <SearchableSelect
+              options={pageLayoutOptions}
+              value={formData.page_layout || ""}
+              onChange={(value) => setFormData(prev => ({ ...prev, page_layout: value }))}
+              placeholder="Select Page Layout"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold mb-1">Custom Layout Update (XML)</label>
+            <textarea
+              name="custom_layout_update"
+              rows={4}
+              value={formData.custom_layout_update}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-xl p-3 font-mono text-sm"
+              placeholder="<referenceContainer name='content'><block class='Magento\Framework\View\Element\Template' template='MyModule::custom.phtml'/></referenceContainer>"
+            />
+          </div>
+          <div>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" name="gift_message_available" checked={formData.gift_message_available} onChange={handleChange} className="w-4 h-4" />
+              Allow Gift Message
+            </label>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">News From Date</label>
+            <input type="date" name="news_from_date" value={formData.news_from_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">News To Date</label>
+            <input type="date" name="news_to_date" value={formData.news_to_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Country of Manufacture</label>
+            <SearchableSelect
+              options={countryOptions}
+              value={formData.country_of_manufacture || ""}
+              onChange={(value) => setFormData(prev => ({ ...prev, country_of_manufacture: value }))}
+              placeholder="Select Country"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-1">Website IDs</label>
+          <input
+            type="text"
+            placeholder="Enter website IDs separated by commas"
+            value={formData.website_ids?.join(", ")}
+            onChange={(e) => setFormData(prev => ({ ...prev, website_ids: e.target.value.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id)) }))}
+            className="w-full border border-gray-300 rounded-xl p-3"
+          />
+        </div>
+      </div>
+    );
+  };
 
   const renderInventoryTab = () => {
+    const backorderOptions = [
+      { value: "0", label: "No Backorders" },
+      { value: "1", label: "Allow Qty Below 0" },
+      { value: "2", label: "Allow Qty Below 0 & Notify" }
+    ];
+
     if (formData.type_id === 'configurable' || formData.type_id === 'grouped') {
       return (
         <div className="p-6 bg-gray-50 rounded-xl text-center text-gray-500">
@@ -1627,11 +2019,12 @@ const CreateProductForm = () => {
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1">Backorders</label>
-            <select name="backorders" value={formData.backorders} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3">
-              <option value={0}>No Backorders</option>
-              <option value={1}>Allow Qty Below 0</option>
-              <option value={2}>Allow Qty Below 0 & Notify</option>
-            </select>
+            <SearchableSelect
+              options={backorderOptions}
+              value={formData.backorders?.toString() || "0"}
+              onChange={(value) => setFormData(prev => ({ ...prev, backorders: parseInt(value) }))}
+              placeholder="Select Backorder Option"
+            />
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1">Notify Stock Qty</label>
@@ -1699,223 +2092,159 @@ const CreateProductForm = () => {
     </div>
   );
 
-  const renderCustomOptionsTab = () => (
-    <div className="space-y-6">
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-gray-700">Custom Options</label>
-          <button
-            type="button"
-            onClick={() => addToArray("custom_options", {
-              title: "New Option",
-              type: "field",
-              is_required: false,
-              sort_order: 0,
-              price: 0,
-              price_type: "fixed",
-              sku: "",
-              values: []
-            })}
-            className="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm"
-          >
-            + Add Option
-          </button>
-        </div>
-        {formData.custom_options?.map((option, index) => (
-          <div key={index} className="relative p-4 bg-gray-50 rounded-lg mb-3">
-            <RemoveButton onClick={() => removeFromArray("custom_options", index)} />
-            <div className="grid grid-cols-2 gap-4 mb-3">
-              <input type="text" placeholder="Option Title" value={option.title} onChange={(e) => handleArrayChange("custom_options", index, "title", e.target.value)} className="border rounded-lg p-2" />
-              <select value={option.type} onChange={(e) => handleArrayChange("custom_options", index, "type", e.target.value)} className="border rounded-lg p-2">
-                <option value="field">Text Field</option>
-                <option value="area">Text Area</option>
-                <option value="drop_down">Drop-down</option>
-                <option value="radio">Radio Buttons</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="date">Date</option>
-                <option value="date_time">Date & Time</option>
-                <option value="time">Time</option>
-                <option value="file">File</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-3 gap-4 mb-3">
-              <input type="number" step="0.01" placeholder="Price" value={option.price} onChange={(e) => handleArrayChange("custom_options", index, "price", parseFloat(e.target.value))} className="border rounded-lg p-2" />
-              <select value={option.price_type} onChange={(e) => handleArrayChange("custom_options", index, "price_type", e.target.value)} className="border rounded-lg p-2">
-                <option value="fixed">Fixed</option>
-                <option value="percent">Percent</option>
-              </select>
-              <input type="text" placeholder="SKU" value={option.sku} onChange={(e) => handleArrayChange("custom_options", index, "sku", e.target.value)} className="border rounded-lg p-2" />
-            </div>
-            <label className="flex items-center gap-2">
-              <input type="checkbox" checked={option.is_required} onChange={(e) => handleArrayChange("custom_options", index, "is_required", e.target.checked)} className="w-4 h-4" />
-              Required
-            </label>
+  const renderCustomOptionsTab = () => {
+    const customOptionTypeOptions = [
+      { value: "field", label: "Text Field" },
+      { value: "area", label: "Text Area" },
+      { value: "drop_down", label: "Drop-down" },
+      { value: "radio", label: "Radio Buttons" },
+      { value: "checkbox", label: "Checkbox" },
+      { value: "date", label: "Date" },
+      { value: "date_time", label: "Date & Time" },
+      { value: "time", label: "Time" },
+      { value: "file", label: "File" }
+    ];
 
-            {['drop_down', 'radio', 'checkbox', 'multiple'].includes(option.type) && (
-              <div className="mt-3 pl-4 border-l-2">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm font-medium">Option Values</label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const currentValues = [...(option.values || [])];
-                      currentValues.push({ title: "", price: 0, price_type: "fixed", sku: "", sort_order: currentValues.length });
-                      handleArrayChange("custom_options", index, "values", currentValues);
-                    }}
-                    className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
-                  >
-                    + Add Value
-                  </button>
-                </div>
-                {option.values?.map((value, vIdx) => (
-                  <div key={vIdx} className="grid grid-cols-4 gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="Value Label"
-                      value={value.title}
-                      onChange={(e) => {
-                        const updated = [...(option.values || [])];
-                        updated[vIdx] = { ...updated[vIdx], title: e.target.value };
-                        handleArrayChange("custom_options", index, "values", updated);
-                      }}
-                      className="border rounded p-1 text-sm"
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="Price"
-                      value={value.price}
-                      onChange={(e) => {
-                        const updated = [...(option.values || [])];
-                        updated[vIdx] = { ...updated[vIdx], price: parseFloat(e.target.value) };
-                        handleArrayChange("custom_options", index, "values", updated);
-                      }}
-                      className="border rounded p-1 text-sm"
-                    />
-                    <select
-                      value={value.price_type}
-                      onChange={(e) => {
-                        const updated = [...(option.values || [])];
-                        updated[vIdx] = { ...updated[vIdx], price_type: e.target.value };
-                        handleArrayChange("custom_options", index, "values", updated);
-                      }}
-                      className="border rounded p-1 text-sm"
-                    >
-                      <option value="fixed">Fixed</option>
-                      <option value="percent">Percent</option>
-                    </select>
-                    <input
-                      type="text"
-                      placeholder="SKU"
-                      value={value.sku}
-                      onChange={(e) => {
-                        const updated = [...(option.values || [])];
-                        updated[vIdx] = { ...updated[vIdx], sku: e.target.value };
-                        handleArrayChange("custom_options", index, "values", updated);
-                      }}
-                      className="border rounded p-1 text-sm"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+    const priceTypeOptions = [
+      { value: "fixed", label: "Fixed" },
+      { value: "percent", label: "Percent" }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-semibold text-gray-700">Custom Options</label>
+            <button
+              type="button"
+              onClick={() => addToArray("custom_options", {
+                title: "New Option",
+                type: "field",
+                is_required: false,
+                sort_order: 0,
+                price: 0,
+                price_type: "fixed",
+                sku: "",
+                values: []
+              })}
+              className="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm"
+            >
+              + Add Option
+            </button>
           </div>
-        ))}
-      </div>
+          {formData.custom_options?.map((option, index) => (
+            <div key={index} className="relative p-4 bg-gray-50 rounded-lg mb-3">
+              <RemoveButton onClick={() => removeFromArray("custom_options", index)} />
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <input type="text" placeholder="Option Title" value={option.title} onChange={(e) => handleArrayChange("custom_options", index, "title", e.target.value)} className="border rounded-lg p-2" />
+                <SearchableSelect
+                  options={customOptionTypeOptions}
+                  value={option.type}
+                  onChange={(value) => handleArrayChange("custom_options", index, "type", value)}
+                  placeholder="Select Type"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4 mb-3">
+                <input type="number" step="0.01" placeholder="Price" value={option.price} onChange={(e) => handleArrayChange("custom_options", index, "price", parseFloat(e.target.value))} className="border rounded-lg p-2" />
+                <SearchableSelect
+                  options={priceTypeOptions}
+                  value={option.price_type}
+                  onChange={(value) => handleArrayChange("custom_options", index, "price_type", value)}
+                  placeholder="Price Type"
+                />
+                <input type="text" placeholder="SKU" value={option.sku} onChange={(e) => handleArrayChange("custom_options", index, "sku", e.target.value)} className="border rounded-lg p-2" />
+              </div>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" checked={option.is_required} onChange={(e) => handleArrayChange("custom_options", index, "is_required", e.target.checked)} className="w-4 h-4" />
+                Required
+              </label>
 
-      <div className="border-t pt-4">
-        <h4 className="font-semibold mb-3">Dynamic Custom Attributes</h4>
-        <div className="space-y-2">
-          {Object.entries(formData.dynamic_attributes || {}).map(([key, value]) => (
-            <div key={key} className="flex gap-2">
-              <input type="text" placeholder="Attribute Code" value={key} className="border rounded-lg p-2 flex-1" disabled />
-              <input type="text" placeholder="Value" value={value} onChange={(e) => setFormData(prev => ({ ...prev, dynamic_attributes: { ...prev.dynamic_attributes, [key]: e.target.value } }))} className="border rounded-lg p-2 flex-1" />
-              <button type="button" onClick={() => { const { [key]: _, ...rest } = formData.dynamic_attributes || {}; setFormData(prev => ({ ...prev, dynamic_attributes: rest })); }} className="bg-red-500 text-white px-3 rounded-lg">×</button>
+              {['drop_down', 'radio', 'checkbox', 'multiple'].includes(option.type) && (
+                <div className="mt-3 pl-4 border-l-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-sm font-medium">Option Values</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentValues = [...(option.values || [])];
+                        currentValues.push({ title: "", price: 0, price_type: "fixed", sku: "", sort_order: currentValues.length });
+                        handleArrayChange("custom_options", index, "values", currentValues);
+                      }}
+                      className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
+                    >
+                      + Add Value
+                    </button>
+                  </div>
+                  {option.values?.map((value, vIdx) => (
+                    <div key={vIdx} className="grid grid-cols-4 gap-2 mb-2">
+                      <input
+                        type="text"
+                        placeholder="Value Label"
+                        value={value.title}
+                        onChange={(e) => {
+                          const updated = [...(option.values || [])];
+                          updated[vIdx] = { ...updated[vIdx], title: e.target.value };
+                          handleArrayChange("custom_options", index, "values", updated);
+                        }}
+                        className="border rounded p-1 text-sm"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Price"
+                        value={value.price}
+                        onChange={(e) => {
+                          const updated = [...(option.values || [])];
+                          updated[vIdx] = { ...updated[vIdx], price: parseFloat(e.target.value) };
+                          handleArrayChange("custom_options", index, "values", updated);
+                        }}
+                        className="border rounded p-1 text-sm"
+                      />
+                      <SearchableSelect
+                        options={priceTypeOptions}
+                        value={value.price_type}
+                        onChange={(newValue) => {
+                          const updated = [...(option.values || [])];
+                          updated[vIdx] = { ...updated[vIdx], price_type: newValue };
+                          handleArrayChange("custom_options", index, "values", updated);
+                        }}
+                        placeholder="Price Type"
+                      />
+                      <input
+                        type="text"
+                        placeholder="SKU"
+                        value={value.sku}
+                        onChange={(e) => {
+                          const updated = [...(option.values || [])];
+                          updated[vIdx] = { ...updated[vIdx], sku: e.target.value };
+                          handleArrayChange("custom_options", index, "values", updated);
+                        }}
+                        className="border rounded p-1 text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
-          <button type="button" onClick={() => { const code = prompt("Enter attribute code:"); if (code) setFormData(prev => ({ ...prev, dynamic_attributes: { ...prev.dynamic_attributes, [code]: "" } })); }} className="text-teal-500 text-sm">+ Add Dynamic Attribute</button>
         </div>
-      </div>
-    </div>
-  );
 
-  const renderAdvancedTab = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-semibold mb-1">Custom Design</label>
-          <input type="text" name="custom_design" value={formData.custom_design} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Page Layout</label>
-          <select name="page_layout" value={formData.page_layout} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3">
-            <option value="">No Layout Updates</option>
-            <option value="1column">1 Column</option>
-            <option value="2columns-left">2 Columns with Left Bar</option>
-            <option value="2columns-right">2 Columns with Right Bar</option>
-            <option value="3columns">3 Columns</option>
-          </select>
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-semibold mb-1">Custom Layout Update (XML)</label>
-          <textarea
-            name="custom_layout_update"
-            rows={4}
-            value={formData.custom_layout_update}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-xl p-3 font-mono text-sm"
-            placeholder="<referenceContainer name='content'><block class='Magento\Framework\View\Element\Template' template='MyModule::custom.phtml'/></referenceContainer>"
-          />
-        </div>
-        <div>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" name="gift_message_available" checked={formData.gift_message_available} onChange={handleChange} className="w-4 h-4" />
-            Allow Gift Message
-          </label>
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">News From Date</label>
-          <input type="date" name="news_from_date" value={formData.news_from_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">News To Date</label>
-          <input type="date" name="news_to_date" value={formData.news_to_date || ""} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3" />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Country of Manufacture</label>
-          <select name="country_of_manufacture" value={formData.country_of_manufacture} onChange={handleChange} className="w-full border border-gray-300 rounded-xl p-3">
-            <option value="">Select Country</option>
-            <option value="US">United States</option>
-            <option value="CN">China</option>
-            <option value="IN">India</option>
-            <option value="JP">Japan</option>
-            <option value="DE">Germany</option>
-            <option value="UK">United Kingdom</option>
-          </select>
+        <div className="border-t pt-4">
+          <h4 className="font-semibold mb-3">Dynamic Custom Attributes</h4>
+          <div className="space-y-2">
+            {Object.entries(formData.dynamic_attributes || {}).map(([key, value]) => (
+              <div key={key} className="flex gap-2">
+                <input type="text" placeholder="Attribute Code" value={key} className="border rounded-lg p-2 flex-1" disabled />
+                <input type="text" placeholder="Value" value={value} onChange={(e) => setFormData(prev => ({ ...prev, dynamic_attributes: { ...prev.dynamic_attributes, [key]: e.target.value } }))} className="border rounded-lg p-2 flex-1" />
+                <button type="button" onClick={() => { const { [key]: _, ...rest } = formData.dynamic_attributes || {}; setFormData(prev => ({ ...prev, dynamic_attributes: rest })); }} className="bg-red-500 text-white px-3 rounded-lg">×</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => { const code = prompt("Enter attribute code:"); if (code) setFormData(prev => ({ ...prev, dynamic_attributes: { ...prev.dynamic_attributes, [code]: "" } })); }} className="text-teal-500 text-sm">+ Add Dynamic Attribute</button>
+          </div>
         </div>
       </div>
-      <div>
-        <label className="block text-sm font-semibold mb-1">Categories</label>
-        <input
-          type="text"
-          placeholder="Enter category IDs separated by commas"
-          value={formData.category_ids?.join(", ")}
-          onChange={(e) => setFormData(prev => ({ ...prev, category_ids: e.target.value.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id)) }))}
-          className="w-full border border-gray-300 rounded-xl p-3"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-semibold mb-1">Website IDs</label>
-        <input
-          type="text"
-          placeholder="Enter website IDs separated by commas"
-          value={formData.website_ids?.join(", ")}
-          onChange={(e) => setFormData(prev => ({ ...prev, website_ids: e.target.value.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id)) }))}
-          className="w-full border border-gray-300 rounded-xl p-3"
-        />
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderGroupedProductFields = () => (
     <div className="space-y-6 mt-6 p-4 bg-green-50 rounded-xl">
@@ -1961,446 +2290,463 @@ const CreateProductForm = () => {
     </div>
   );
 
-  const renderBundleProductFields = () => (
-    <div className="space-y-6 mt-6 p-4 bg-yellow-50 rounded-xl">
-      <h3 className="font-semibold text-lg text-yellow-800">Bundle Product Configuration</h3>
+  const renderBundleProductFields = () => {
+    const bundleTypeOptions = [
+      { value: "select", label: "Drop-down" },
+      { value: "radio", label: "Radio Buttons" },
+      { value: "checkbox", label: "Checkbox" },
+      { value: "multi", label: "Multiple Select" }
+    ];
 
-      <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg border">
-        <div>
-          <label className="block text-sm font-semibold mb-1">Price Type</label>
-          <select
-            name="bundle_price_type"
-            value={formData.bundle_price_type}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="dynamic">Dynamic</option>
-            <option value="fixed">Fixed</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">SKU Type</label>
-          <select
-            name="bundle_sku_type"
-            value={formData.bundle_sku_type}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="dynamic">Dynamic</option>
-            <option value="fixed">Fixed</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Shipping Type</label>
-          <select
-            name="bundle_shipping_type"
-            value={formData.bundle_shipping_type}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="together">Ship Together</option>
-            <option value="separately">Ship Separately</option>
-          </select>
-        </div>
-      </div>
+    return (
+      <div className="space-y-6 mt-6 p-4 bg-yellow-50 rounded-xl">
+        <h3 className="font-semibold text-lg text-yellow-800">Bundle Product Configuration</h3>
 
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-gray-700">Bundle Options</label>
-          <button
-            type="button"
-            onClick={() => addToArray("bundle_options", {
-              title: "",
-              required: true,
-              type: "select",
-              position: 0,
-              sku: "",
-              product_links: []
-            })}
-            className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
-          >
-            + Add Option
-          </button>
+        <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg border">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Price Type</label>
+            <select
+              name="bundle_price_type"
+              value={formData.bundle_price_type}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-2"
+            >
+              <option value="dynamic">Dynamic</option>
+              <option value="fixed">Fixed</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">SKU Type</label>
+            <select
+              name="bundle_sku_type"
+              value={formData.bundle_sku_type}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-2"
+            >
+              <option value="dynamic">Dynamic</option>
+              <option value="fixed">Fixed</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Shipping Type</label>
+            <select
+              name="bundle_shipping_type"
+              value={formData.bundle_shipping_type}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-2"
+            >
+              <option value="together">Ship Together</option>
+              <option value="separately">Ship Separately</option>
+            </select>
+          </div>
         </div>
-        {formData.bundle_options?.map((option, index) => (
-          <div key={index} className="relative p-4 bg-white rounded-lg mb-3 border">
-            <RemoveButton onClick={() => removeFromArray("bundle_options", index)} />
-            <div className="grid grid-cols-2 gap-4 mb-3">
-              <input
-                type="text"
-                placeholder="Option Title"
-                value={option.title}
-                onChange={(e) => handleArrayChange("bundle_options", index, "title", e.target.value)}
-                className="border rounded-lg p-2"
-              />
-              <select
-                value={option.type}
-                onChange={(e) => handleArrayChange("bundle_options", index, "type", e.target.value)}
-                className="border rounded-lg p-2"
-              >
-                <option value="select">Drop-down</option>
-                <option value="radio">Radio Buttons</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="multi">Multiple Select</option>
-              </select>
-              <label className="flex items-center gap-2">
+
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-semibold text-gray-700">Bundle Options</label>
+            <button
+              type="button"
+              onClick={() => addToArray("bundle_options", {
+                title: "",
+                required: true,
+                type: "select",
+                position: 0,
+                sku: "",
+                product_links: []
+              })}
+              className="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm"
+            >
+              + Add Option
+            </button>
+          </div>
+          {formData.bundle_options?.map((option, index) => (
+            <div key={index} className="relative p-4 bg-white rounded-lg mb-3 border">
+              <RemoveButton onClick={() => removeFromArray("bundle_options", index)} />
+              <div className="grid grid-cols-2 gap-4 mb-3">
                 <input
-                  type="checkbox"
-                  checked={option.required}
-                  onChange={(e) => handleArrayChange("bundle_options", index, "required", e.target.checked)}
-                  className="w-4 h-4"
+                  type="text"
+                  placeholder="Option Title"
+                  value={option.title}
+                  onChange={(e) => handleArrayChange("bundle_options", index, "title", e.target.value)}
+                  className="border rounded-lg p-2"
                 />
-                Required
-              </label>
-              <input
-                type="text"
-                placeholder="Option SKU"
-                value={option.sku}
-                onChange={(e) => handleArrayChange("bundle_options", index, "sku", e.target.value)}
-                className="border rounded-lg p-2"
-              />
-            </div>
-
-            <div className="mt-3 pl-4 border-l-2">
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-medium">Products in this Option</label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const currentLinks = [...(option.product_links || [])];
-                    currentLinks.push({ sku: "", qty: 1, price: 0, price_type: "fixed", is_default: false });
-                    handleArrayChange("bundle_options", index, "product_links", currentLinks);
-                  }}
-                  className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
-                >
-                  + Add Product
-                </button>
+                <SearchableSelect
+                  options={bundleTypeOptions}
+                  value={option.type}
+                  onChange={(value) => handleArrayChange("bundle_options", index, "type", value)}
+                  placeholder="Select Type"
+                />
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={option.required}
+                    onChange={(e) => handleArrayChange("bundle_options", index, "required", e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  Required
+                </label>
+                <input
+                  type="text"
+                  placeholder="Option SKU"
+                  value={option.sku}
+                  onChange={(e) => handleArrayChange("bundle_options", index, "sku", e.target.value)}
+                  className="border rounded-lg p-2"
+                />
               </div>
-              {option.product_links?.map((product, pIdx) => (
-                <div key={pIdx} className="grid grid-cols-4 gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Product SKU"
-                    value={product.sku}
-                    onChange={(e) => {
-                      const updated = [...option.product_links];
-                      updated[pIdx] = { ...updated[pIdx], sku: e.target.value };
-                      handleArrayChange("bundle_options", index, "product_links", updated);
+
+              <div className="mt-3 pl-4 border-l-2">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium">Products in this Option</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentLinks = [...(option.product_links || [])];
+                      currentLinks.push({ sku: "", qty: 1, price: 0, price_type: "fixed", is_default: false });
+                      handleArrayChange("bundle_options", index, "product_links", currentLinks);
                     }}
-                    className="border rounded p-1 text-sm"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Default Qty"
-                    value={product.qty}
-                    onChange={(e) => {
-                      const updated = [...option.product_links];
-                      updated[pIdx] = { ...updated[pIdx], qty: parseInt(e.target.value) };
-                      handleArrayChange("bundle_options", index, "product_links", updated);
-                    }}
-                    className="border rounded p-1 text-sm"
-                  />
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="Price"
-                    value={product.price}
-                    onChange={(e) => {
-                      const updated = [...option.product_links];
-                      updated[pIdx] = { ...updated[pIdx], price: parseFloat(e.target.value) };
-                      handleArrayChange("bundle_options", index, "product_links", updated);
-                    }}
-                    className="border rounded p-1 text-sm"
-                  />
-                  <label className="flex items-center gap-1 text-sm">
+                    className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
+                  >
+                    + Add Product
+                  </button>
+                </div>
+                {option.product_links?.map((product, pIdx) => (
+                  <div key={pIdx} className="grid grid-cols-4 gap-2 mb-2">
                     <input
-                      type="checkbox"
-                      checked={product.is_default}
+                      type="text"
+                      placeholder="Product SKU"
+                      value={product.sku}
                       onChange={(e) => {
                         const updated = [...option.product_links];
-                        updated[pIdx] = { ...updated[pIdx], is_default: e.target.checked };
+                        updated[pIdx] = { ...updated[pIdx], sku: e.target.value };
                         handleArrayChange("bundle_options", index, "product_links", updated);
                       }}
+                      className="border rounded p-1 text-sm"
                     />
-                    Default
-                  </label>
-                </div>
-              ))}
+                    <input
+                      type="number"
+                      placeholder="Default Qty"
+                      value={product.qty}
+                      onChange={(e) => {
+                        const updated = [...option.product_links];
+                        updated[pIdx] = { ...updated[pIdx], qty: parseInt(e.target.value) };
+                        handleArrayChange("bundle_options", index, "product_links", updated);
+                      }}
+                      className="border rounded p-1 text-sm"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Price"
+                      value={product.price}
+                      onChange={(e) => {
+                        const updated = [...option.product_links];
+                        updated[pIdx] = { ...updated[pIdx], price: parseFloat(e.target.value) };
+                        handleArrayChange("bundle_options", index, "product_links", updated);
+                      }}
+                      className="border rounded p-1 text-sm"
+                    />
+                    <label className="flex items-center gap-1 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={product.is_default}
+                        onChange={(e) => {
+                          const updated = [...option.product_links];
+                          updated[pIdx] = { ...updated[pIdx], is_default: e.target.checked };
+                          handleArrayChange("bundle_options", index, "product_links", updated);
+                        }}
+                      />
+                      Default
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  const renderDownloadableProductFields = () => (
-    <div className="space-y-6 mt-6 p-4 bg-blue-50 rounded-xl">
-      <h3 className="font-semibold text-lg text-blue-800">Downloadable Product Configuration</h3>
+  const renderDownloadableProductFields = () => {
+    const shareableOptions = [
+      { value: "0", label: "No" },
+      { value: "1", label: "Yes" },
+      { value: "2", label: "Use Config" }
+    ];
 
-      <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg border">
-        <div>
-          <label className="block text-sm font-semibold mb-1">Links Title</label>
-          <input
-            type="text"
-            name="links_title"
-            value={formData.links_title}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Samples Title</label>
-          <input
-            type="text"
-            name="samples_title"
-            value={formData.samples_title}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          />
-        </div>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="links_purchased_separately"
-            checked={formData.links_purchased_separately}
-            onChange={handleChange}
-            className="w-4 h-4"
-          />
-          Links can be purchased separately
-        </label>
-      </div>
+    const linkTypeOptions = [
+      { value: "file", label: "File Upload" },
+      { value: "url", label: "URL" }
+    ];
 
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-gray-700">Downloadable Links</label>
-          <button
-            type="button"
-            onClick={() => addToArray("downloadable_links", {
-              title: "",
-              sort_order: 0,
-              is_shareable: 1,
-              price: 0,
-              number_of_downloads: 0,
-              link_type: "file",
-              sample_type: "file"
-            })}
-            className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
-          >
-            + Add Link
-          </button>
-        </div>
-        {formData.downloadable_links?.map((link, index) => (
-          <div key={index} className="relative p-4 bg-white rounded-lg mb-3 border">
-            <RemoveButton onClick={() => removeFromArray("downloadable_links", index)} />
-            <div className="grid grid-cols-2 gap-4 mb-3">
-              <input
-                type="text"
-                placeholder="Link Title"
-                value={link.title}
-                onChange={(e) => handleArrayChange("downloadable_links", index, "title", e.target.value)}
-                className="border rounded-lg p-2"
-              />
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Price"
-                value={link.price}
-                onChange={(e) => handleArrayChange("downloadable_links", index, "price", parseFloat(e.target.value))}
-                className="border rounded-lg p-2"
-              />
-              <select
-                value={link.link_type}
-                onChange={(e) => handleArrayChange("downloadable_links", index, "link_type", e.target.value)}
-                className="border rounded-lg p-2"
-              >
-                <option value="file">File Upload</option>
-                <option value="url">URL</option>
-              </select>
-              <input
-                type="text"
-                placeholder={link.link_type === "file" ? "File Path" : "URL"}
-                value={link.link_type === "file" ? link.link_file : link.link_url}
-                onChange={(e) => handleArrayChange("downloadable_links", index,
-                  link.link_type === "file" ? "link_file" : "link_url", e.target.value)}
-                className="border rounded-lg p-2"
-              />
-              <input
-                type="number"
-                placeholder="Max Downloads (0 = unlimited)"
-                value={link.number_of_downloads}
-                onChange={(e) => handleArrayChange("downloadable_links", index, "number_of_downloads", parseInt(e.target.value))}
-                className="border rounded-lg p-2"
-              />
-              <select
-                value={link.is_shareable}
-                onChange={(e) => handleArrayChange("downloadable_links", index, "is_shareable", parseInt(e.target.value))}
-                className="border rounded-lg p-2"
-              >
-                <option value={0}>No</option>
-                <option value={1}>Yes</option>
-                <option value={2}>Use Config</option>
-              </select>
-            </div>
-          </div>
-        ))}
-      </div>
+    return (
+      <div className="space-y-6 mt-6 p-4 bg-blue-50 rounded-xl">
+        <h3 className="font-semibold text-lg text-blue-800">Downloadable Product Configuration</h3>
 
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-gray-700">Samples</label>
-          <button
-            type="button"
-            onClick={() => addToArray("downloadable_samples", {
-              title: "",
-              sort_order: 0,
-              sample_type: "file"
-            })}
-            className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
-          >
-            + Add Sample
-          </button>
-        </div>
-        {formData.downloadable_samples?.map((sample, index) => (
-          <div key={index} className="relative grid grid-cols-3 gap-4 mb-3 p-3 bg-white rounded-lg border">
-            <RemoveButton onClick={() => removeFromArray("downloadable_samples", index)} />
-            <input
-              type="text"
-              placeholder="Sample Title"
-              value={sample.title}
-              onChange={(e) => handleArrayChange("downloadable_samples", index, "title", e.target.value)}
-              className="border rounded-lg p-2"
-            />
-            <select
-              value={sample.sample_type}
-              onChange={(e) => handleArrayChange("downloadable_samples", index, "sample_type", e.target.value)}
-              className="border rounded-lg p-2"
-            >
-              <option value="file">File Upload</option>
-              <option value="url">URL</option>
-            </select>
-            <input
-              type="text"
-              placeholder={sample.sample_type === "file" ? "File Path" : "URL"}
-              value={sample.sample_type === "file" ? sample.sample_file : sample.sample_url}
-              onChange={(e) => handleArrayChange("downloadable_samples", index,
-                sample.sample_type === "file" ? "sample_file" : "sample_url", e.target.value)}
-              className="border rounded-lg p-2"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderGiftCardFields = () => (
-    <div className="space-y-6 mt-6 p-4 bg-pink-50 rounded-xl">
-      <h3 className="font-semibold text-lg text-pink-800">Gift Card Configuration</h3>
-
-      <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg border">
-        <div>
-          <label className="block text-sm font-semibold mb-1">Gift Card Type</label>
-          <select
-            name="giftcard_type"
-            value={formData.giftcard_type}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="virtual">Virtual</option>
-            <option value="physical">Physical</option>
-            <option value="combined">Combined</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Amount Type</label>
-          <select
-            name="giftcard_amount_type"
-            value={formData.giftcard_amount_type}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="fixed">Fixed Amounts</option>
-            <option value="dynamic">Open Amount</option>
-          </select>
-        </div>
-
-        {formData.giftcard_amount_type === 'dynamic' && (
-          <>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Min Open Amount</label>
-              <input
-                type="number"
-                step="0.01"
-                name="giftcard_open_amount_min"
-                value={formData.giftcard_open_amount_min}
-                onChange={handleChange}
-                className="w-full border rounded-lg p-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Max Open Amount</label>
-              <input
-                type="number"
-                step="0.01"
-                name="giftcard_open_amount_max"
-                value={formData.giftcard_open_amount_max}
-                onChange={handleChange}
-                className="w-full border rounded-lg p-2"
-              />
-            </div>
-          </>
-        )}
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="allow_message"
-            checked={formData.allow_message}
-            onChange={handleChange}
-            className="w-4 h-4"
-          />
-          Allow Gift Message
-        </label>
-
-        {formData.allow_message && (
+        <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg border">
           <div>
-            <label className="block text-sm font-semibold mb-1">Message Max Length</label>
+            <label className="block text-sm font-semibold mb-1">Links Title</label>
             <input
-              type="number"
-              name="gift_message_max_length"
-              value={formData.gift_message_max_length}
+              type="text"
+              name="links_title"
+              value={formData.links_title}
               onChange={handleChange}
               className="w-full border rounded-lg p-2"
             />
           </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Samples Title</label>
+            <input
+              type="text"
+              name="samples_title"
+              value={formData.samples_title}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-2"
+            />
+          </div>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="links_purchased_separately"
+              checked={formData.links_purchased_separately}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            Links can be purchased separately
+          </label>
+        </div>
+
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-semibold text-gray-700">Downloadable Links</label>
+            <button
+              type="button"
+              onClick={() => addToArray("downloadable_links", {
+                title: "",
+                sort_order: 0,
+                is_shareable: 1,
+                price: 0,
+                number_of_downloads: 0,
+                link_type: "file",
+                sample_type: "file"
+              })}
+              className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
+            >
+              + Add Link
+            </button>
+          </div>
+          {formData.downloadable_links?.map((link, index) => (
+            <div key={index} className="relative p-4 bg-white rounded-lg mb-3 border">
+              <RemoveButton onClick={() => removeFromArray("downloadable_links", index)} />
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <input
+                  type="text"
+                  placeholder="Link Title"
+                  value={link.title}
+                  onChange={(e) => handleArrayChange("downloadable_links", index, "title", e.target.value)}
+                  className="border rounded-lg p-2"
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Price"
+                  value={link.price}
+                  onChange={(e) => handleArrayChange("downloadable_links", index, "price", parseFloat(e.target.value))}
+                  className="border rounded-lg p-2"
+                />
+                <SearchableSelect
+                  options={linkTypeOptions}
+                  value={link.link_type}
+                  onChange={(value) => handleArrayChange("downloadable_links", index, "link_type", value)}
+                  placeholder="Link Type"
+                />
+                <input
+                  type="text"
+                  placeholder={link.link_type === "file" ? "File Path" : "URL"}
+                  value={link.link_type === "file" ? link.link_file : link.link_url}
+                  onChange={(e) => handleArrayChange("downloadable_links", index,
+                    link.link_type === "file" ? "link_file" : "link_url", e.target.value)}
+                  className="border rounded-lg p-2"
+                />
+                <input
+                  type="number"
+                  placeholder="Max Downloads (0 = unlimited)"
+                  value={link.number_of_downloads}
+                  onChange={(e) => handleArrayChange("downloadable_links", index, "number_of_downloads", parseInt(e.target.value))}
+                  className="border rounded-lg p-2"
+                />
+                <SearchableSelect
+                  options={shareableOptions}
+                  value={link.is_shareable?.toString() || "1"}
+                  onChange={(value) => handleArrayChange("downloadable_links", index, "is_shareable", parseInt(value))}
+                  placeholder="Shareable"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-semibold text-gray-700">Samples</label>
+            <button
+              type="button"
+              onClick={() => addToArray("downloadable_samples", {
+                title: "",
+                sort_order: 0,
+                sample_type: "file"
+              })}
+              className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
+            >
+              + Add Sample
+            </button>
+          </div>
+          {formData.downloadable_samples?.map((sample, index) => (
+            <div key={index} className="relative grid grid-cols-3 gap-4 mb-3 p-3 bg-white rounded-lg border">
+              <RemoveButton onClick={() => removeFromArray("downloadable_samples", index)} />
+              <input
+                type="text"
+                placeholder="Sample Title"
+                value={sample.title}
+                onChange={(e) => handleArrayChange("downloadable_samples", index, "title", e.target.value)}
+                className="border rounded-lg p-2"
+              />
+              <SearchableSelect
+                options={linkTypeOptions}
+                value={sample.sample_type}
+                onChange={(value) => handleArrayChange("downloadable_samples", index, "sample_type", value)}
+                placeholder="Sample Type"
+              />
+              <input
+                type="text"
+                placeholder={sample.sample_type === "file" ? "File Path" : "URL"}
+                value={sample.sample_type === "file" ? sample.sample_file : sample.sample_url}
+                onChange={(e) => handleArrayChange("downloadable_samples", index,
+                  sample.sample_type === "file" ? "sample_file" : "sample_url", e.target.value)}
+                className="border rounded-lg p-2"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderGiftCardFields = () => {
+    const giftcardTypeOptions = [
+      { value: "virtual", label: "Virtual" },
+      { value: "physical", label: "Physical" },
+      { value: "combined", label: "Combined" }
+    ];
+
+    const amountTypeOptions = [
+      { value: "fixed", label: "Fixed Amounts" },
+      { value: "dynamic", label: "Open Amount" }
+    ];
+
+    return (
+      <div className="space-y-6 mt-6 p-4 bg-pink-50 rounded-xl">
+        <h3 className="font-semibold text-lg text-pink-800">Gift Card Configuration</h3>
+
+        <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg border">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Gift Card Type</label>
+            <SearchableSelect
+              options={giftcardTypeOptions}
+              value={formData.giftcard_type}
+              onChange={(value) => setFormData(prev => ({ ...prev, giftcard_type: value }))}
+              placeholder="Select Type"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Amount Type</label>
+            <SearchableSelect
+              options={amountTypeOptions}
+              value={formData.giftcard_amount_type}
+              onChange={(value) => setFormData(prev => ({ ...prev, giftcard_amount_type: value }))}
+              placeholder="Select Amount Type"
+            />
+          </div>
+
+          {formData.giftcard_amount_type === 'dynamic' && (
+            <>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Min Open Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="giftcard_open_amount_min"
+                  value={formData.giftcard_open_amount_min}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Max Open Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="giftcard_open_amount_max"
+                  value={formData.giftcard_open_amount_max}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg p-2"
+                />
+              </div>
+            </>
+          )}
+
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="allow_message"
+              checked={formData.allow_message}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            Allow Gift Message
+          </label>
+
+          {formData.allow_message && (
+            <div>
+              <label className="block text-sm font-semibold mb-1">Message Max Length</label>
+              <input
+                type="number"
+                name="gift_message_max_length"
+                value={formData.gift_message_max_length}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-2"
+              />
+            </div>
+          )}
+        </div>
+
+        {formData.giftcard_amount_type === 'fixed' && (
+          <div>
+            <label className="block text-sm font-semibold mb-2">Predefined Amounts</label>
+            <div className="flex gap-2 flex-wrap">
+              {["10", "25", "50", "100", "200", "500"].map(amount => (
+                <label key={amount} className="flex items-center gap-2 p-2 border rounded cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.giftcard_amounts?.some(a => a.value === parseInt(amount))}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        addToArray("giftcard_amounts", { website_id: 0, value: parseInt(amount) });
+                      } else {
+                        const filtered = formData.giftcard_amounts?.filter(a => a.value !== parseInt(amount));
+                        setFormData(prev => ({ ...prev, giftcard_amounts: filtered }));
+                      }
+                    }}
+                  />
+                  ${amount}
+                </label>
+              ))}
+            </div>
+          </div>
         )}
       </div>
-
-      {formData.giftcard_amount_type === 'fixed' && (
-        <div>
-          <label className="block text-sm font-semibold mb-2">Predefined Amounts</label>
-          <div className="flex gap-2 flex-wrap">
-            {["10", "25", "50", "100", "200", "500"].map(amount => (
-              <label key={amount} className="flex items-center gap-2 p-2 border rounded cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.giftcard_amounts?.some(a => a.value === parseInt(amount))}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      addToArray("giftcard_amounts", { website_id: 0, value: parseInt(amount) });
-                    } else {
-                      const filtered = formData.giftcard_amounts?.filter(a => a.value !== parseInt(amount));
-                      setFormData(prev => ({ ...prev, giftcard_amounts: filtered }));
-                    }
-                  }}
-                />
-                ${amount}
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
   const LoadingOverlay = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -2453,7 +2799,7 @@ const CreateProductForm = () => {
           {activeMainTab === "images" && renderImagesTab()}
           {activeMainTab === "seo" && renderSeoTab()}
           {activeMainTab === "options" && renderCustomOptionsTab()}
-          {activeMainTab === "advanced" && renderAdvancedTab()}
+          {activeMainTab === "advanced" && renderPricingTab()}
 
           {activeProductType === "configurable" && renderConfigurableProductFields()}
           {activeProductType === "grouped" && renderGroupedProductFields()}

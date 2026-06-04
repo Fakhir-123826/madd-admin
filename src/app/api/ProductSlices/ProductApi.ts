@@ -597,11 +597,13 @@ export const productApi = createApi({
             search?: string;
             type_id?: string;
             sync_status?: string;
-            status?: boolean;
+            status?: boolean | string;
             min_price?: number;
             max_price?: number;
             sort_by?: string;
             sort_order?: "asc" | "desc";
+             limited?: boolean;
+            
         }>({
             query: (args) => {
                 const { vendor_uuid, ...params } = args;
@@ -619,7 +621,6 @@ export const productApi = createApi({
                 });
 
                 const url = `by-vendor/${vendor_uuid}/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-                console.log('📦 Fetching vendor products:', url);
 
                 return { url, method: "GET" };
             },

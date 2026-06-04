@@ -1,19 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Minus, Package, Plus, Search, Trash2, User } from "lucide-react";
+import { ArrowLeft, Mail, Minus, Package, Plus, Search, Trash2, User, Loader2 } from "lucide-react";
 import { useGetVendorsQuery } from "../../app/api/VendorSlices/VendorApi";
 import { useGetStoresByVendorQuery } from "../../app/api/StoreSlices/StoreApi";
 import { useGetVendorProductsQuery, type VendorProduct } from "../../app/api/ProductSlices/ProductApi";
 import { useCreateManualOrderMutation } from "../../app/api/OrderSlices/OrderApi";
 import { useGetCustomersQuery } from "../../app/api/CustomerSlices/CustomerApi";
+import { useGetPaymentMethodsQuery, useGetShippingMethodsQuery } from "../../app/api/CartSlices/CartApi";
 import SearchableSelect from "../SearchableSelect";
 
 const fallbackEmail = "naimyaqoob10@gmail.com";
-
-// const customers = [
-//   { id: 1, name: "Customer ID 1", email: "customer1@example.com" },
-//   { id: 2, name: "Customer ID 2", email: "" },
-// ];
 
 const customerGroups = ["General", "Retailer", "Wholesale"] as const;
 
@@ -22,20 +18,6 @@ const countries = [
   { code: "PK", label: "Pakistan" },
   { code: "AE", label: "United Arab Emirates" },
   { code: "GB", label: "United Kingdom" },
-];
-
-const states = ["California", "New York", "Punjab", "Sindh", "Dubai", "England"];
-
-const shippingMethods = [
-  { label: "Flat Rate", carrier_code: "flatrate", method_code: "flatrate", amount: 10 },
-  { label: "Free Shipping", carrier_code: "freeshipping", method_code: "freeshipping", amount: 0 },
-  { label: "Best Way", carrier_code: "tablerate", method_code: "bestway", amount: 15 },
-];
-
-const paymentMethods = [
-  { label: "Check / Money Order", value: "checkmo" },
-  { label: "Bank Transfer", value: "banktransfer" },
-  { label: "Cash On Delivery", value: "cashondelivery" },
 ];
 
 type AddressForm = {
@@ -61,6 +43,24 @@ type SelectedProduct = {
   sku: string;
   price: number;
   qty: number;
+};
+
+type PaymentMethod = {
+  code: string;
+  title: string;
+  is_default: boolean;
+  sort_order: number;
+};
+
+type ShippingMethod = {
+  carrier_code: string;
+  method_code: string;
+  carrier_title: string;
+  method_title: string;
+  amount: number;
+  base_amount: number;
+  price_incl_tax: number;
+  error_message?: string | null;
 };
 
 const emptyAddress: AddressForm = {
@@ -96,12 +96,15 @@ function AddOrder() {
   const [billingAddress, setBillingAddress] = useState<AddressForm>(emptyAddress);
   const [shippingAddress, setShippingAddress] = useState<AddressForm>(emptyAddress);
   const [sameAsBilling, setSameAsBilling] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState("checkmo");
-  const [shippingMethodKey, setShippingMethodKey] = useState("flatrate_flatrate");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("checkmo");
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState("");
   const [historyComment, setHistoryComment] = useState("");
   const [appendComment, setAppendComment] = useState(true);
   const [emailConfirmation, setEmailConfirmation] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  
+  // Debounce for shipping address to avoid too many API calls
+  const [debouncedShippingAddress, setDebouncedShippingAddress] = useState<AddressForm>(shippingAddress);
 
   const { data: vendorsData } = useGetVendorsQuery();
   const vendors = vendorsData?.data || [];
@@ -111,17 +114,12 @@ function AddOrder() {
     skip: !selectedVendorUuid,
   });
   const stores = storesData?.data?.stores || [];
-  const selectedStore = stores.find((store) => store.uuid === selectedStoreUuid);
+  const selectedStore = stores.find((store: any) => store.uuid === selectedStoreUuid);
 
-  const { data: customersData, isLoading: customersLoading } =
-    useGetCustomersQuery(
-      {
-        vendor_uuid: selectedVendorUuid,
-      },
-      {
-        skip: !selectedVendorUuid,
-      }
-    );
+  const { data: customersData, isLoading: customersLoading } = useGetCustomersQuery(
+    { vendor_uuid: selectedVendorUuid },
+    { skip: !selectedVendorUuid }
+  );
   const customers = customersData?.data || [];
 
   const { data: productsData, isFetching: productsLoading } = useGetVendorProductsQuery(
@@ -129,25 +127,103 @@ function AddOrder() {
       vendor_uuid: selectedVendorUuid,
       store_uuid: selectedStoreUuid || undefined,
       search: productSearch.length >= 2 ? productSearch : undefined,
-      status: true,
+      status: 'active',
       per_page: 20,
+      limited: true,
     },
-    { skip: !selectedVendorUuid }
+    { skip: !selectedVendorUuid || !selectedStoreUuid }
   );
   const products = productsData?.data?.data || [];
 
+  // ✅ Dynamic Payment Methods
+  const { 
+    data: paymentMethods = [], 
+    isLoading: paymentLoading,
+    refetch: refetchPayment 
+  } = useGetPaymentMethodsQuery(
+    {
+      vendor_uuid: selectedVendorUuid,
+      store_uuid: selectedStoreUuid,
+      customer_id: Number(selectedCustomerId),
+    },
+    { skip: !selectedVendorUuid || !selectedStoreUuid || !selectedCustomerId }
+  );
+
+  // ✅ Dynamic Shipping Methods
+  const { 
+    data: shippingMethods = [], 
+    isLoading: shippingLoading,
+    refetch: refetchShipping 
+  } = useGetShippingMethodsQuery(
+    {
+      vendor_uuid: selectedVendorUuid,
+      store_uuid: selectedStoreUuid,
+      customer_id: Number(selectedCustomerId),
+      shipping_address: {
+        country_id: debouncedShippingAddress.country_id,
+        region: debouncedShippingAddress.region,
+        city: debouncedShippingAddress.city,
+        postcode: debouncedShippingAddress.postcode,
+        street: debouncedShippingAddress.street,
+        firstname: debouncedShippingAddress.firstname,
+        lastname: debouncedShippingAddress.lastname,
+        telephone: debouncedShippingAddress.telephone,
+      },
+    },
+    { 
+      skip: !selectedVendorUuid || !selectedStoreUuid || !selectedCustomerId || 
+             !debouncedShippingAddress.country_id || !debouncedShippingAddress.postcode 
+    }
+  );
+
   const [createManualOrder, { isLoading: isCreating }] = useCreateManualOrderMutation();
 
-  const selectedShippingMethod = shippingMethods.find(
-    (method) => `${method.carrier_code}_${method.method_code}` === shippingMethodKey
-  ) || shippingMethods[0];
+  // Set default payment method when methods load
+  useEffect(() => {
+    if (paymentMethods.length > 0 && !selectedPaymentMethod) {
+      const defaultMethod = paymentMethods.find(m => m.is_default) || paymentMethods[0];
+      setSelectedPaymentMethod(defaultMethod.code);
+    }
+  }, [paymentMethods, selectedPaymentMethod]);
+
+  // Set default shipping method when methods load
+  useEffect(() => {
+    if (shippingMethods.length > 0 && !selectedShippingMethod) {
+      setSelectedShippingMethod(`${shippingMethods[0].carrier_code}_${shippingMethods[0].method_code}`);
+    }
+  }, [shippingMethods, selectedShippingMethod]);
+
+  // Debounce shipping address to avoid too many API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (shippingAddress.country_id && shippingAddress.postcode) {
+        setDebouncedShippingAddress(shippingAddress);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [shippingAddress]);
+
+  // Refetch shipping methods when shipping address changes
+  // useEffect(() => {
+  //   if (debouncedShippingAddress.country_id && debouncedShippingAddress.postcode) {
+  //     refetchShipping();
+  //   }
+  // }, [debouncedShippingAddress, refetchShipping]);
+
+  const getSelectedShippingMethod = () => {
+    return shippingMethods.find(
+      (method) => `${method.carrier_code}_${method.method_code}` === selectedShippingMethod
+    );
+  };
+
+  const selectedShippingMethodObj = getSelectedShippingMethod();
 
   const subtotal = useMemo(
     () => selectedProducts.reduce((sum, product) => sum + product.price * product.qty, 0),
     [selectedProducts]
   );
   const discount = couponCode.trim() ? subtotal * 0.1 : 0;
-  const grandTotal = Math.max(subtotal - discount + selectedShippingMethod.amount, 0);
+  const grandTotal = Math.max(subtotal - discount + (selectedShippingMethodObj?.amount || 0), 0);
 
   useEffect(() => {
     if (sameAsBilling) {
@@ -156,13 +232,9 @@ function AddOrder() {
   }, [billingAddress, sameAsBilling]);
 
   useEffect(() => {
-    const customer = customers.find(
-      (item: any) => item.id === selectedCustomerId
-    );
+    const customer = customers.find((item: any) => item.id === selectedCustomerId);
 
-    setCustomerEmail(
-      customer?.email || fallbackEmail
-    );
+    setCustomerEmail(customer?.email || fallbackEmail);
 
     if (customer) {
       setBillingAddress((prev) => ({
@@ -193,7 +265,9 @@ function AddOrder() {
     setSelectedProducts((current) => {
       const existing = current.find((item) => item.uuid === product.uuid);
       if (existing) {
-        return current.map((item) => item.uuid === product.uuid ? { ...item, qty: item.qty + 1 } : item);
+        return current.map((item) =>
+          item.uuid === product.uuid ? { ...item, qty: item.qty + 1 } : item
+        );
       }
 
       return [
@@ -248,13 +322,21 @@ function AddOrder() {
     shippingAddress.lastname &&
     shippingAddress.street &&
     shippingAddress.city &&
-    shippingAddress.postcode;
+    shippingAddress.postcode &&
+    selectedPaymentMethod &&
+    selectedShippingMethod;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!canSubmit) {
-      showToast("error", "Please complete vendor, store, customer, products, and required address fields.");
+      showToast("error", "Please complete all required fields.");
+      return;
+    }
+
+    const shippingMethodObj = getSelectedShippingMethod();
+    if (!shippingMethodObj) {
+      showToast("error", "Please select a shipping method.");
       return;
     }
 
@@ -276,9 +358,13 @@ function AddOrder() {
         coupon_code: couponCode || undefined,
         billing_address: billingAddress,
         shipping_address: shippingAddress,
-        payment_method: paymentMethod,
-        shipping_method: selectedShippingMethod,
-        shipping_amount: selectedShippingMethod.amount,
+        payment_method: selectedPaymentMethod,
+        shipping_method: {
+          carrier_code: shippingMethodObj.carrier_code,
+          method_code: shippingMethodObj.method_code,
+          label: shippingMethodObj.carrier_title,
+        },
+        shipping_amount: shippingMethodObj.amount,
         history: {
           comment: historyComment,
           append_comment: appendComment,
@@ -287,13 +373,13 @@ function AddOrder() {
         totals: {
           subtotal,
           discount,
-          shipping: selectedShippingMethod.amount,
+          shipping: shippingMethodObj.amount,
           grand_total: grandTotal,
         },
       }).unwrap();
 
-      showToast("success", "Order created in Magento and synchronized locally.");
-      setTimeout(() => navigate("/orderlist"), 700);
+      showToast("success", "Order created successfully!");
+      setTimeout(() => navigate("/orderlist"), 2000);
     } catch (error: any) {
       showToast("error", error?.data?.message || error?.error || "Failed to create order.");
     }
@@ -302,8 +388,11 @@ function AddOrder() {
   return (
     <div className="min-h-screen bg-white p-6">
       {toast && (
-        <div className={`fixed right-5 top-5 z-50 rounded-xl px-5 py-3 text-sm shadow-lg ${toast.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
-          }`}>
+        <div className={`fixed right-5 top-5 z-50 rounded-xl px-5 py-3 text-sm shadow-lg ${
+          toast.type === "success" 
+            ? "bg-green-50 text-green-700 border border-green-200" 
+            : "bg-red-50 text-red-700 border border-red-200"
+        }`}>
           {toast.message}
         </div>
       )}
@@ -322,6 +411,7 @@ function AddOrder() {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-6">
         <div className="space-y-6">
+          {/* Vendor, Store & Customer Section */}
           <section className="rounded-xl border border-gray-200 p-5">
             <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">Vendor, Store & Customer</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -336,6 +426,8 @@ function AddOrder() {
                   setSelectedStoreUuid("");
                   setSelectedProducts([]);
                   setSelectedCustomerId("");
+                  setSelectedPaymentMethod("");
+                  setSelectedShippingMethod("");
                 }}
                 placeholder="Select Vendor *"
               />
@@ -349,12 +441,10 @@ function AddOrder() {
                 onChange={(value: any) => {
                   setSelectedStoreUuid(value);
                   setSelectedProducts([]);
+                  setSelectedPaymentMethod("");
+                  setSelectedShippingMethod("");
                 }}
-                placeholder={
-                  storesLoading
-                    ? "Loading Stores..."
-                    : "Select Store *"
-                }
+                placeholder={storesLoading ? "Loading Stores..." : "Select Store *"}
               />
 
               <SearchableSelect
@@ -365,12 +455,10 @@ function AddOrder() {
                 value={selectedCustomerId}
                 onChange={(value: any) => {
                   setSelectedCustomerId(value);
+                  setSelectedPaymentMethod("");
+                  setSelectedShippingMethod("");
                 }}
-                placeholder={
-                  customersLoading
-                    ? "Loading Customers..."
-                    : "Select Customer *"
-                }
+                placeholder={customersLoading ? "Loading Customers..." : "Select Customer *"}
               />
 
               <SearchableSelect
@@ -379,14 +467,9 @@ function AddOrder() {
                   label: group,
                 }))}
                 value={customerGroup}
-                onChange={(value: any) =>
-                  setCustomerGroup(value as (typeof customerGroups)[number])
-                }
+                onChange={(value: any) => setCustomerGroup(value)}
                 placeholder="Select Customer Group"
               />
-
-
-
             </div>
             <div className="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
               <Mail size={16} className="text-teal-500" />
@@ -394,6 +477,7 @@ function AddOrder() {
             </div>
           </section>
 
+          {/* Products Section */}
           <section className="rounded-xl border border-gray-200 p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase text-gray-600">Products</h2>
@@ -412,22 +496,37 @@ function AddOrder() {
 
             <div className="mb-5 grid grid-cols-1 md:grid-cols-2 gap-3">
               {productsLoading ? (
-                <div className="text-sm text-gray-400">Loading products...</div>
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Loading products...
+                </div>
+              ) : !selectedVendorUuid ? (
+                <div className="text-sm text-gray-400">Please select a vendor first</div>
+              ) : !selectedStoreUuid ? (
+                <div className="text-sm text-gray-400">Please select a store first</div>
               ) : products.length === 0 ? (
-                <div className="text-sm text-gray-400">Select a vendor/store or search products.</div>
+                <div className="text-sm text-gray-400">
+                  No products found for this vendor/store.
+                  {productSearch && " Try different search terms."}
+                </div>
               ) : (
-                products.map((product) => (
+                products.map((product: any) => (
                   <button
                     type="button"
                     key={product.uuid}
                     onClick={() => addProduct(product)}
-                    className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left hover:border-teal-300 hover:bg-teal-50"
+                    className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left hover:border-teal-300 hover:bg-teal-50 transition-all"
                   >
                     <span>
                       <span className="block text-sm font-semibold text-gray-700">{product.name}</span>
                       <span className="text-xs text-gray-400">{product.magento_sku || product.sku}</span>
+                      {product.quantity !== undefined && (
+                        <span className="text-xs text-gray-400">Stock: {product.quantity}</span>
+                      )}
                     </span>
-                    <span className="text-sm font-bold text-teal-600">{money(Number(product.price || 0))}</span>
+                    <span className="text-sm font-bold text-teal-600">
+                      {money(Number(product.price || 0))}
+                    </span>
                   </button>
                 ))
               )}
@@ -470,8 +569,13 @@ function AddOrder() {
             </div>
           </section>
 
+          {/* Addresses Section */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AddressSection title="Billing Address" address={billingAddress} onChange={(field, value) => updateAddress("billing", field, value)} />
+            <AddressSection 
+              title="Billing Address" 
+              address={billingAddress} 
+              onChange={(field, value) => updateAddress("billing", field, value)} 
+            />
             <div>
               <label className="mb-3 flex items-center gap-2 text-sm text-gray-600">
                 <input
@@ -493,24 +597,70 @@ function AddOrder() {
             </div>
           </section>
 
+          {/* Payment & Shipping Methods Section - DYNAMIC */}
           <section className="rounded-xl border border-gray-200 p-5">
-            <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">Payment & Shipping</h2>
+            <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">Payment & Shipping Methods</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value)} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm">
-                {paymentMethods.map((method) => (
-                  <option key={method.value} value={method.value}>{method.label}</option>
-                ))}
-              </select>
-              <select value={shippingMethodKey} onChange={(event) => setShippingMethodKey(event.target.value)} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm">
-                {shippingMethods.map((method) => (
-                  <option key={`${method.carrier_code}_${method.method_code}`} value={`${method.carrier_code}_${method.method_code}`}>
-                    {method.label} - {money(method.amount)}
-                  </option>
-                ))}
-              </select>
+              {/* Payment Methods Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method *</label>
+                {paymentLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading payment methods...
+                  </div>
+                ) : paymentMethods.length > 0 ? (
+                  <select
+                    value={selectedPaymentMethod}
+                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                  >
+                    {paymentMethods.map((method: PaymentMethod) => (
+                      <option key={method.code} value={method.code}>
+                        {method.title}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-sm text-red-500">No payment methods available. Please check Magento configuration.</div>
+                )}
+              </div>
+
+              {/* Shipping Methods Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Shipping Method *</label>
+                {shippingLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading shipping methods...
+                  </div>
+                ) : shippingMethods.length > 0 ? (
+                  <select
+                    value={selectedShippingMethod}
+                    onChange={(e) => setSelectedShippingMethod(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                  >
+                    {shippingMethods.map((method: ShippingMethod) => (
+                      <option 
+                        key={`${method.carrier_code}_${method.method_code}`} 
+                        value={`${method.carrier_code}_${method.method_code}`}
+                      >
+                        {method.carrier_title} - {method.method_title} ({money(method.amount)})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-sm text-yellow-500">
+                    {shippingAddress.country_id && shippingAddress.postcode 
+                      ? "No shipping methods available for this address. Please check Magento configuration."
+                      : "Please enter shipping address (Country & Postcode) to see available shipping methods."}
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
+          {/* Order History Section */}
           <section className="rounded-xl border border-gray-200 p-5">
             <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">Order History</h2>
             <textarea
@@ -533,6 +683,7 @@ function AddOrder() {
           </section>
         </div>
 
+        {/* Order Summary Sidebar */}
         <aside className="h-fit rounded-xl border border-gray-200 p-5 xl:sticky xl:top-6">
           <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">Order Summary</h2>
           <input
@@ -542,15 +693,29 @@ function AddOrder() {
             className="mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm"
           />
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-            <div className="flex justify-between"><span>Coupon Discount</span><strong>-{money(discount)}</strong></div>
-            <div className="flex justify-between"><span>Shipping & Handling</span><strong>{money(selectedShippingMethod.amount)}</strong></div>
-            <div className="border-t pt-3 flex justify-between text-lg"><span>Grand Total</span><strong className="text-teal-600">{money(grandTotal)}</strong></div>
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <strong>{money(subtotal)}</strong>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between">
+                <span>Coupon Discount</span>
+                <strong className="text-red-500">-{money(discount)}</strong>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span>Shipping & Handling</span>
+              <strong>{money(selectedShippingMethodObj?.amount || 0)}</strong>
+            </div>
+            <div className="border-t pt-3 flex justify-between text-lg">
+              <span>Grand Total</span>
+              <strong className="text-teal-600">{money(grandTotal)}</strong>
+            </div>
           </div>
           <button
             type="submit"
             disabled={!canSubmit || isCreating}
-            className="mt-6 w-full rounded-xl bg-gradient-to-r from-teal-500 to-green-500 px-5 py-3 font-semibold text-white disabled:opacity-50"
+            className="mt-6 w-full rounded-xl bg-gradient-to-r from-teal-500 to-green-500 px-5 py-3 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreating ? "Creating Order..." : "Submit Order"}
           </button>
@@ -560,6 +725,7 @@ function AddOrder() {
   );
 }
 
+// Address Section Component
 const AddressSection = ({
   title,
   address,
@@ -577,24 +743,22 @@ const AddressSection = ({
     <section className="rounded-xl border border-gray-200 p-5">
       <h2 className="mb-4 text-sm font-bold uppercase text-gray-600">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <input disabled={disabled} value={address.prefix} onChange={(event) => onChange("prefix", event.target.value)} className={inputClass} placeholder="Name Prefix" />
-        <input disabled={disabled} value={address.firstname} onChange={(event) => onChange("firstname", event.target.value)} className={inputClass} placeholder="First Name *" />
-        <input disabled={disabled} value={address.middlename} onChange={(event) => onChange("middlename", event.target.value)} className={inputClass} placeholder="Middle Name / Initial" />
-        <input disabled={disabled} value={address.lastname} onChange={(event) => onChange("lastname", event.target.value)} className={inputClass} placeholder="Last Name *" />
-        <input disabled={disabled} value={address.suffix} onChange={(event) => onChange("suffix", event.target.value)} className={inputClass} placeholder="Name Suffix" />
-        <input disabled={disabled} value={address.company} onChange={(event) => onChange("company", event.target.value)} className={inputClass} placeholder="Company" />
-        <textarea disabled={disabled} value={address.street} onChange={(event) => onChange("street", event.target.value)} className={`${inputClass} md:col-span-2`} rows={3} placeholder="Street Address *" />
-        <select disabled={disabled} value={address.country_id} onChange={(event) => onChange("country_id", event.target.value)} className={inputClass}>
+        <input disabled={disabled} value={address.prefix} onChange={(e) => onChange("prefix", e.target.value)} className={inputClass} placeholder="Name Prefix" />
+        <input disabled={disabled} value={address.firstname} onChange={(e) => onChange("firstname", e.target.value)} className={inputClass} placeholder="First Name *" />
+        <input disabled={disabled} value={address.middlename} onChange={(e) => onChange("middlename", e.target.value)} className={inputClass} placeholder="Middle Name / Initial" />
+        <input disabled={disabled} value={address.lastname} onChange={(e) => onChange("lastname", e.target.value)} className={inputClass} placeholder="Last Name *" />
+        <input disabled={disabled} value={address.suffix} onChange={(e) => onChange("suffix", e.target.value)} className={inputClass} placeholder="Name Suffix" />
+        <input disabled={disabled} value={address.company} onChange={(e) => onChange("company", e.target.value)} className={inputClass} placeholder="Company" />
+        <textarea disabled={disabled} value={address.street} onChange={(e) => onChange("street", e.target.value)} className={`${inputClass} md:col-span-2`} rows={3} placeholder="Street Address *" />
+        <select disabled={disabled} value={address.country_id} onChange={(e) => onChange("country_id", e.target.value)} className={inputClass}>
           {countries.map((country) => <option key={country.code} value={country.code}>{country.label}</option>)}
         </select>
-        <select disabled={disabled} value={address.region} onChange={(event) => onChange("region", event.target.value)} className={inputClass}>
-          {states.map((state) => <option key={state}>{state}</option>)}
-        </select>
-        <input disabled={disabled} value={address.city} onChange={(event) => onChange("city", event.target.value)} className={inputClass} placeholder="City *" />
-        <input disabled={disabled} value={address.postcode} onChange={(event) => onChange("postcode", event.target.value)} className={inputClass} placeholder="Zip / Postal Code *" />
-        <input disabled={disabled} value={address.telephone} onChange={(event) => onChange("telephone", event.target.value)} className={inputClass} placeholder="Phone Number" />
-        <input disabled={disabled} value={address.fax} onChange={(event) => onChange("fax", event.target.value)} className={inputClass} placeholder="Fax" />
-        <input disabled={disabled} value={address.vat_id} onChange={(event) => onChange("vat_id", event.target.value)} className={inputClass} placeholder="VAT Number" />
+        <input disabled={disabled} value={address.region} onChange={(e) => onChange("region", e.target.value)} className={inputClass} placeholder="State/Region *" />
+        <input disabled={disabled} value={address.city} onChange={(e) => onChange("city", e.target.value)} className={inputClass} placeholder="City *" />
+        <input disabled={disabled} value={address.postcode} onChange={(e) => onChange("postcode", e.target.value)} className={inputClass} placeholder="Zip / Postal Code *" />
+        <input disabled={disabled} value={address.telephone} onChange={(e) => onChange("telephone", e.target.value)} className={inputClass} placeholder="Phone Number" />
+        <input disabled={disabled} value={address.fax} onChange={(e) => onChange("fax", e.target.value)} className={inputClass} placeholder="Fax" />
+        <input disabled={disabled} value={address.vat_id} onChange={(e) => onChange("vat_id", e.target.value)} className={inputClass} placeholder="VAT Number" />
       </div>
     </section>
   );
