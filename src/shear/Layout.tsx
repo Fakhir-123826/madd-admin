@@ -641,9 +641,9 @@ const Layout = () => {
       label: "Orders",
       icon: FaShoppingCart,
       children: [
-        { label: "All Orders", path: "/orderlist" },
-        { label: "Add Order", path: "/addorder" },
-        { label: "Order Statistics", path: "/OrderStatistics" }
+        { label: "All Orders", path: ROUTES.ORDER_LIST },
+        { label: "Add Order", path: ROUTES.ADD_ORDER },
+        { label: "Order Statistics", path: ROUTES.ORDER_STATISTICS }
       ]
     },
 
